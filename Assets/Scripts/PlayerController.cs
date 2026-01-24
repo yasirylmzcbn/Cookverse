@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour
     public float gravity = -9.81f * 2;
     public float jumpHeight = 3f;
 
+    [Header("Movement Reference")]
+    [Tooltip("If set, movement will be relative to this transform (usually the active camera). If left empty, uses the active SwitchCamera camera, else Camera.main.")]
+    [SerializeField] private Transform movementReference;
+
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
@@ -37,6 +41,26 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         switchCamera = FindFirstObjectByType<SwitchCamera>();
+    }
+
+    private Transform GetMovementReference()
+    {
+        if (movementReference != null)
+            return movementReference;
+
+        if (switchCamera != null)
+        {
+            if (switchCamera.stoveCamera != null && switchCamera.stoveCamera.activeInHierarchy)
+                return switchCamera.stoveCamera.transform;
+
+            if (switchCamera.thirdPersonCamera != null && switchCamera.thirdPersonCamera.activeInHierarchy)
+                return switchCamera.thirdPersonCamera.transform;
+
+            if (switchCamera.firstPersonCamera != null && switchCamera.firstPersonCamera.activeInHierarchy)
+                return switchCamera.firstPersonCamera.transform;
+        }
+
+        return Camera.main != null ? Camera.main.transform : null;
     }
 
     private void Awake()
@@ -97,7 +121,17 @@ public class PlayerController : MonoBehaviour
         Vector2 moveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         float x = moveInput.x;
         float z = moveInput.y;
-        Vector3 move = transform.right * x + transform.forward * z;
+
+        Transform reference = GetMovementReference();
+        Vector3 referenceForward = reference != null ? reference.forward : transform.forward;
+        Vector3 referenceRight = reference != null ? reference.right : transform.right;
+        referenceForward.y = 0f;
+        referenceRight.y = 0f;
+        referenceForward = referenceForward.sqrMagnitude > 0.0001f ? referenceForward.normalized : transform.forward;
+        referenceRight = referenceRight.sqrMagnitude > 0.0001f ? referenceRight.normalized : transform.right;
+
+        Vector3 move = (referenceRight * x) + (referenceForward * z);
+        move = Vector3.ClampMagnitude(move, 1f);
         Vector3 moveVelocity = move * speed;
         controller.Move(moveVelocity * Time.deltaTime);
 

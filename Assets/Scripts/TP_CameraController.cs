@@ -12,7 +12,23 @@ public class CameraMove : MonoBehaviour
 
     [Header("Camera")]
     public float distance = 10.0f;
-    public float sensivity = 4.0f;
+    public float sensivity = 55.0f;
+
+    [Header("Collision")]
+    [Tooltip("Layers the camera should collide with (e.g., Default, Environment).")]
+    [SerializeField] private LayerMask collisionLayers = ~0;
+
+    [Tooltip("Radius used for collision checks. Larger values keep the camera further from walls.")]
+    [SerializeField] private float collisionRadius = 0.25f;
+
+    [Tooltip("Extra space to keep between the camera and the hit surface.")]
+    [SerializeField] private float collisionOffset = 0.1f;
+
+    [Tooltip("Minimum distance the camera is allowed to get to the pivot.")]
+    [SerializeField] private float minDistance = 0.5f;
+
+    [Tooltip("How quickly the camera returns to the desired distance after an obstruction clears.")]
+    [SerializeField] private float collisionSmooth = 12f;
 
     [Tooltip("Mouse delta is in pixels; this scales it to feel closer to the old Input.GetAxis.")]
     [SerializeField] private float mouseDeltaMultiplier = 0.1f;
@@ -22,10 +38,12 @@ public class CameraMove : MonoBehaviour
 
     private float currentX = 0.0f;
     private float currentY = 0.0f;
+    private float currentDistance;
 
     private void Awake()
     {
         EnsureActionsConfigured();
+        currentDistance = Mathf.Max(minDistance, distance);
     }
 
     private void OnEnable()
@@ -67,14 +85,45 @@ public class CameraMove : MonoBehaviour
             scaled *= mouseDeltaMultiplier;
 
         currentX += scaled.x;
-        currentY += scaled.y;
+        currentY -= scaled.y;
 
         currentY = Mathf.Clamp(currentY, YMin, YMax);
 
-        Vector3 direction = new Vector3(0f, 0f, -distance);
         Quaternion rotation = Quaternion.Euler(currentY, currentX, 0f);
 
-        transform.position = lookAt.position + rotation * direction;
-        transform.LookAt(lookAt.position);
+        Vector3 pivot = lookAt.position;
+        float targetDistance = Mathf.Max(minDistance, distance);
+
+        Vector3 desiredOffset = rotation * new Vector3(0f, 0f, -targetDistance);
+        Vector3 desiredPosition = pivot + desiredOffset;
+
+        Vector3 castVector = desiredPosition - pivot;
+        float castDistance = castVector.magnitude;
+        Vector3 castDirection = castDistance > 0.0001f ? (castVector / castDistance) : Vector3.back;
+
+        float correctedDistance = targetDistance;
+        if (castDistance > 0.0001f)
+        {
+            if (Physics.SphereCast(
+                    pivot,
+                    collisionRadius,
+                    castDirection,
+                    out RaycastHit hit,
+                    castDistance,
+                    collisionLayers,
+                    QueryTriggerInteraction.Ignore))
+            {
+                correctedDistance = Mathf.Clamp(hit.distance - collisionOffset, minDistance, targetDistance);
+            }
+        }
+
+        // Smooth the distance to reduce camera popping when occlusion appears/disappears.
+        float smoothT = 1f - Mathf.Exp(-Mathf.Max(0.01f, collisionSmooth) * Time.deltaTime);
+        currentDistance = Mathf.Lerp(currentDistance, correctedDistance, smoothT);
+
+        Vector3 finalOffset = rotation * new Vector3(0f, 0f, -currentDistance);
+        transform.position = pivot + finalOffset;
+        transform.LookAt(pivot);
+        Player.rotation = Quaternion.Euler(0f, currentX, 0f);
     }
 }

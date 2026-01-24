@@ -2556,9 +2556,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   controller: {fileID: 1413408607}
-  speed: 15
+  speed: 13
   gravity: -9.81
   jumpHeight: 3
+  movementReference: {fileID: 0}
   groundCheck: {fileID: 35563359}
   groundDistance: 0.4
   groundMask:
@@ -2846,7 +2847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a55c2502658c4343885e3c7f67f75b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
-  sensX: 50
+  sensX: 45
   sensY: 37
   lookAction:
     m_Name: Look
@@ -3352,7 +3353,14 @@ MonoBehaviour:
   lookAt: {fileID: 1413408606}
   Player: {fileID: 877373388}
   distance: 5
-  sensivity: 4
+  sensivity: 55
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionRadius: 0.25
+  collisionOffset: 0.1
+  minDistance: 0.5
+  collisionSmooth: 12
   mouseDeltaMultiplier: 0.1
   lookAction:
     m_Name: Look
