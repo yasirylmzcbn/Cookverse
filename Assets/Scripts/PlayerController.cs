@@ -1,6 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
+
+interface IInteractable
+{
+    public bool Interact();
+}
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,8 +20,72 @@ public class PlayerController : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    [Header("Input (New Input System)")]
+    [SerializeField] private InputAction moveAction;
+    [SerializeField] private InputAction jumpAction;
+
     Vector3 velocity;
     bool isGrounded;
+
+    public Transform InteractorSource;
+    public float InteractDistance = 3f;
+
+    bool currentlyInteracting = false;
+
+    SwitchCamera switchCamera;
+
+    void Start()
+    {
+        switchCamera = FindFirstObjectByType<SwitchCamera>();
+    }
+
+    private void Awake()
+    {
+        EnsureActionsConfigured();
+    }
+
+    private void OnEnable()
+    {
+        moveAction?.Enable();
+        jumpAction?.Enable();
+    }
+
+    private void OnDisable()
+    {
+        moveAction?.Disable();
+        jumpAction?.Disable();
+    }
+
+    private void EnsureActionsConfigured()
+    {
+        if (moveAction == null || moveAction.bindings.Count == 0)
+        {
+            moveAction = new InputAction("Move", InputActionType.Value);
+
+            // Keyboard WASD / arrows
+            var composite = moveAction.AddCompositeBinding("2DVector");
+            composite.With("Up", "<Keyboard>/w");
+            composite.With("Down", "<Keyboard>/s");
+            composite.With("Left", "<Keyboard>/a");
+            composite.With("Right", "<Keyboard>/d");
+
+            composite = moveAction.AddCompositeBinding("2DVector");
+            composite.With("Up", "<Keyboard>/upArrow");
+            composite.With("Down", "<Keyboard>/downArrow");
+            composite.With("Left", "<Keyboard>/leftArrow");
+            composite.With("Right", "<Keyboard>/rightArrow");
+
+            moveAction.AddBinding("<Gamepad>/leftStick");
+        }
+
+        if (jumpAction == null || jumpAction.bindings.Count == 0)
+        {
+            jumpAction = new InputAction("Jump", InputActionType.Button);
+            jumpAction.AddBinding("<Keyboard>/space");
+            jumpAction.AddBinding("<Gamepad>/buttonSouth");
+        }
+    }
+
     void Update()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
@@ -22,18 +93,38 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = -2f;
         }
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+
+        Vector2 moveInput = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+        float x = moveInput.x;
+        float z = moveInput.y;
         Vector3 move = transform.right * x + transform.forward * z;
         Vector3 moveVelocity = move * speed;
         controller.Move(moveVelocity * Time.deltaTime);
 
-        if (Input.GetButton("Jump") && isGrounded)
+        if (jumpAction != null && jumpAction.WasPressedThisFrame() && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * 2f * -gravity);
         }
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            if (currentlyInteracting)
+            {
+                currentlyInteracting = false;
+                switchCamera.ExitKitchenCamera();
+                return;
+            }
+            Ray r = new Ray(InteractorSource.position, InteractorSource.forward);
+            if (Physics.Raycast(r, out RaycastHit hit, InteractDistance))
+            {
+                if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
+                {
+                    currentlyInteracting = interactable.Interact();
+                }
+            }
+        }
     }
 }
