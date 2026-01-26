@@ -112,6 +112,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (currentlyInteracting)
+        {
+            if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
+            {
+                currentlyInteracting = false;
+                switchCamera.ExitKitchenCamera();
+            }
+            return;
+        }
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         if (isGrounded && velocity.y < 0)
         {
@@ -145,19 +155,25 @@ public class PlayerController : MonoBehaviour
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            if (currentlyInteracting)
-            {
-                currentlyInteracting = false;
-                switchCamera.ExitKitchenCamera();
-                return;
-            }
             Ray r = new Ray(InteractorSource.position, InteractorSource.forward);
             if (Physics.Raycast(r, out RaycastHit hit, InteractDistance))
             {
-                if (hit.collider.gameObject.TryGetComponent(out IInteractable interactable))
-                {
+                Debug.Log("Hit " + hit.collider.gameObject.name);
+                IInteractable interactable = null;
+
+                // 1) Exact collider object
+                hit.collider.gameObject.TryGetComponent(out interactable);
+
+                // 2) Parent chain (common when collider is on a child)
+                if (interactable == null)
+                    interactable = hit.collider.GetComponentInParent<IInteractable>();
+
+                // 3) Rigidbody root (common for compound colliders)
+                if (interactable == null && hit.rigidbody != null)
+                    interactable = hit.rigidbody.GetComponentInParent<IInteractable>();
+
+                if (interactable != null)
                     currentlyInteracting = interactable.Interact();
-                }
             }
         }
     }

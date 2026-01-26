@@ -12,7 +12,7 @@ public class CameraMove : MonoBehaviour
 
     [Header("Camera")]
     public float distance = 10.0f;
-    public float sensivity = 55.0f;
+    public float sensivity = 65.0f;
 
     [Header("Collision")]
     [Tooltip("Layers the camera should collide with (e.g., Default, Environment).")]
@@ -31,7 +31,7 @@ public class CameraMove : MonoBehaviour
     [SerializeField] private float collisionSmooth = 12f;
 
     [Tooltip("Mouse delta is in pixels; this scales it to feel closer to the old Input.GetAxis.")]
-    [SerializeField] private float mouseDeltaMultiplier = 0.1f;
+    [SerializeField] private float mouseDeltaMultiplier = 0.2f;
 
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction lookAction;
