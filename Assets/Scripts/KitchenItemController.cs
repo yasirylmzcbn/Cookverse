@@ -1,10 +1,13 @@
+using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class DraggableObject : MonoBehaviour, IMoveableItem
 {
     public Camera stoveCam;
-    [SerializeField] private Rigidbody rb; // Optional: auto-filled from this GameObject if left empty
+    [SerializeField] private Rigidbody rb;
+    public List<Ingredients> ingredientsContained;
     private bool isDragging = false;
     private float zDistance;
     private Vector3 offset;
@@ -12,7 +15,6 @@ public class DraggableObject : MonoBehaviour, IMoveableItem
 
     private void Awake()
     {
-        // Makes rb optional in the Inspector.
         if (rb == null)
         {
             TryGetComponent(out rb);
