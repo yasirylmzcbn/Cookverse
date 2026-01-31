@@ -35,13 +35,13 @@ public class DraggableObject : MonoBehaviour, IMoveableItem
             Vector3 newPosition = GetMouseWorldPosition() + offset;
             newPosition.y = lockedY;
             transform.position = newPosition;
+
         }
 
         // Check for mouse release
         if (Mouse.current.leftButton.wasReleasedThisFrame && isDragging)
         {
             isDragging = false;
-            OnDrop();
         }
     }
 
@@ -59,7 +59,6 @@ public class DraggableObject : MonoBehaviour, IMoveableItem
                 zDistance = stoveCam.WorldToScreenPoint(transform.position).z;
                 offset = transform.position - GetMouseWorldPosition();
                 isDragging = true;
-                OnPickup();
             }
         }
     }
@@ -73,13 +72,11 @@ public class DraggableObject : MonoBehaviour, IMoveableItem
 
     public void OnPickup()
     {
-        // Optional: Add visual feedback
-        // if (rb != null) rb.isKinematic = true;
+        // Implementation for OnPickup if needed
     }
 
     public void OnDrop()
     {
-        // Optional: Re-enable physics
-        // if (rb != null) rb.isKinematic = false;
+        // Implementation for OnDrop if needed
     }
 }

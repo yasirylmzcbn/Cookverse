@@ -155,7 +155,6 @@ public class KitchenItemSlot : MonoBehaviour
 
         return clone;
     }
-
     private void OnDisable()
     {
         HidePreview();

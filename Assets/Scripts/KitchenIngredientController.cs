@@ -30,7 +30,15 @@ public class KitchenIngredientController : MonoBehaviour
     [Tooltip("How far we search for nearby slots while dragging (performance).")]
     public float slotSearchRadius = 2.0f;
 
+    [Tooltip("If true, hide the slot's ghost preview while dragging when within snap range.")]
+    public bool hideSlotPreviewWhileDraggingInSnapRange = true;
+
+    [Header("Drag Visuals")]
+    [Tooltip("If true, while dragging and within snap range of a slot, hide this ingredient's own renderers (slot ghost preview remains visible).")]
+    public bool hideDraggedVisualsInSnapRange = true;
+
     private readonly Collider[] _snapOverlapBuffer = new Collider[32];
+    private readonly RaycastHit[] _clickHitBuffer = new RaycastHit[32];
 
     private bool isDragging;
     private Vector3 dragOffset;
@@ -38,6 +46,10 @@ public class KitchenIngredientController : MonoBehaviour
 
     private KitchenItemSlot currentSlot;
     private KitchenItemSlot hoverSlot;
+
+    private Renderer[] _visualRenderers;
+    private bool[] _visualRenderersInitiallyEnabled;
+    private bool _dragVisualsHidden;
 
     // Remembers where the ingredient was last sitting freely (counter/table/etc.)
     private struct FreeState
@@ -56,7 +68,18 @@ public class KitchenIngredientController : MonoBehaviour
     private void Awake()
     {
         if (rb == null) TryGetComponent(out rb);
+        CacheVisualRenderers();
         SaveFreeState();
+    }
+
+    private void CacheVisualRenderers()
+    {
+        Transform root = visualsRoot != null ? visualsRoot : transform;
+        _visualRenderers = root.GetComponentsInChildren<Renderer>(true);
+        _visualRenderersInitiallyEnabled = new bool[_visualRenderers.Length];
+
+        for (int i = 0; i < _visualRenderers.Length; i++)
+            _visualRenderersInitiallyEnabled[i] = _visualRenderers[i] != null && _visualRenderers[i].enabled;
     }
 
     private void Update()
@@ -77,8 +100,10 @@ public class KitchenIngredientController : MonoBehaviour
     {
         if (stoveCamera == null) return;
 
-        // If currently placed in a slot, only allow pickup if slot is NOT on.
-        // On removal, restore to last free state (do NOT start dragging immediately).
+        if (!IsTopmostIngredientUnderPointer())
+            return;
+
+
         if (currentSlot != null)
         {
             if (!currentSlot.CanRemoveIngredient())
@@ -86,15 +111,62 @@ public class KitchenIngredientController : MonoBehaviour
 
             currentSlot.RemoveIngredient(this);
             currentSlot = null;
+
+            BeginDragInternal();
             return;
         }
 
+        BeginDragInternal();
+    }
+
+    private bool IsTopmostIngredientUnderPointer()
+    {
+        if (stoveCamera == null || Mouse.current == null) return false;
+
         Ray ray = stoveCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-        if (Physics.Raycast(ray, out RaycastHit hit, 500f, interactLayers, QueryTriggerInteraction.Ignore))
+
+        KitchenIngredientController bestIngredient = null;
+        float bestDistance = float.PositiveInfinity;
+
+        int hitCount = Physics.RaycastNonAlloc(ray, _clickHitBuffer, 500f, interactLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < hitCount; i++)
         {
-            if (hit.collider != null && hit.collider.gameObject == gameObject)
-                BeginDragInternal();
+            Collider col = _clickHitBuffer[i].collider;
+            if (col == null) continue;
+
+            KitchenIngredientController ingredient = col.GetComponentInParent<KitchenIngredientController>();
+            if (ingredient == null) continue;
+
+            float d = _clickHitBuffer[i].distance;
+            if (d < bestDistance)
+            {
+                bestDistance = d;
+                bestIngredient = ingredient;
+            }
         }
+
+        // Fallback to a small sphere cast to be more forgiving for tiny colliders.
+        if (bestIngredient == null)
+        {
+            hitCount = Physics.SphereCastNonAlloc(ray, snapSphereCastRadius, _clickHitBuffer, 500f, interactLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < hitCount; i++)
+            {
+                Collider col = _clickHitBuffer[i].collider;
+                if (col == null) continue;
+
+                KitchenIngredientController ingredient = col.GetComponentInParent<KitchenIngredientController>();
+                if (ingredient == null) continue;
+
+                float d = _clickHitBuffer[i].distance;
+                if (d < bestDistance)
+                {
+                    bestDistance = d;
+                    bestIngredient = ingredient;
+                }
+            }
+        }
+
+        return bestIngredient == this;
     }
 
     private void BeginDragInternal()
@@ -117,6 +189,9 @@ public class KitchenIngredientController : MonoBehaviour
 
         transform.SetParent(null, true);
         SetHoverSlot(null);
+
+        // Ensure visuals start visible; we may hide them during drag when in snap range.
+        SetDraggedVisualsHidden(false);
     }
 
     private void DragMove()
@@ -140,11 +215,76 @@ public class KitchenIngredientController : MonoBehaviour
             candidate = FindNearestAcceptingSlotInRange(transform.position);
 
         SetHoverSlot(candidate);
+        UpdateHoverSlotPreviewVisibility();
+        UpdateDraggedVisualsVisibility();
+    }
+
+    private void UpdateHoverSlotPreviewVisibility()
+    {
+        if (hoverSlot == null) return;
+
+        bool inRange = hoverSlot.IsWithinSnapRange(transform.position);
+        bool canAccept = hoverSlot.CanAcceptIngredient(this);
+
+        bool shouldShowPreview = inRange && canAccept;
+
+        if (shouldShowPreview)
+            hoverSlot.ShowPreviewFor(this);
+        else
+            hoverSlot.HidePreview();
+    }
+
+    private void UpdateDraggedVisualsVisibility()
+    {
+        if (!isDragging)
+        {
+            SetDraggedVisualsHidden(false);
+            return;
+        }
+
+        if (!hideDraggedVisualsInSnapRange)
+        {
+            SetDraggedVisualsHidden(false);
+            return;
+        }
+
+        bool shouldHide = hoverSlot != null
+                          && hoverSlot.IsWithinSnapRange(transform.position)
+                          && hoverSlot.CanAcceptIngredient(this);
+
+        SetDraggedVisualsHidden(shouldHide);
+    }
+
+    private void SetDraggedVisualsHidden(bool hidden)
+    {
+        if (_dragVisualsHidden == hidden) return;
+        _dragVisualsHidden = hidden;
+
+        if (_visualRenderers == null || _visualRenderersInitiallyEnabled == null)
+            CacheVisualRenderers();
+
+        for (int i = 0; i < _visualRenderers.Length; i++)
+        {
+            Renderer r = _visualRenderers[i];
+            if (r == null) continue;
+
+            if (hidden)
+            {
+                r.enabled = false;
+            }
+            else
+            {
+                // Restore original enabled state
+                bool initial = i < _visualRenderersInitiallyEnabled.Length && _visualRenderersInitiallyEnabled[i];
+                r.enabled = initial;
+            }
+        }
     }
 
     private void EndDragAndTryPlace()
     {
         isDragging = false;
+        SetDraggedVisualsHidden(false);
 
         // Try place into hovered slot if in its snap range
         if (hoverSlot != null && hoverSlot.IsWithinSnapRange(transform.position) && hoverSlot.TryPlaceIngredient(this))
@@ -166,14 +306,11 @@ public class KitchenIngredientController : MonoBehaviour
     private void SetHoverSlot(KitchenItemSlot slot)
     {
         if (hoverSlot == slot) return;
-
         if (hoverSlot != null)
             hoverSlot.HidePreview();
 
-        hoverSlot = slot;
 
-        if (hoverSlot != null && hoverSlot.IsWithinSnapRange(transform.position) && hoverSlot.CanAcceptIngredient(this))
-            hoverSlot.ShowPreviewFor(this);
+        hoverSlot = slot;
     }
 
     private KitchenItemSlot SphereCastSlotUnderMouse()
