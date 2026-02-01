@@ -9,7 +9,7 @@ public class KitchenIngredientController : MonoBehaviour
 
     [Header("Dragging")]
     [Tooltip("Fixed kitchen camera (assign in Inspector).")]
-    public Camera stoveCamera;
+    public Camera kitchenCamera;
 
     [Tooltip("What layers can be interacted with (ingredients + kitchen items).")]
     public LayerMask interactLayers = ~0;
@@ -58,6 +58,7 @@ public class KitchenIngredientController : MonoBehaviour
         public Transform parent;
         public Vector3 position;
         public Quaternion rotation;
+        public Vector3 localScale;
         public bool rbKinematic;
         public bool rbUseGravity;
         public RigidbodyConstraints rbConstraints;
@@ -98,7 +99,7 @@ public class KitchenIngredientController : MonoBehaviour
 
     private void TryBeginDrag()
     {
-        if (stoveCamera == null) return;
+        if (kitchenCamera == null) return;
 
         if (!IsTopmostIngredientUnderPointer())
             return;
@@ -121,9 +122,9 @@ public class KitchenIngredientController : MonoBehaviour
 
     private bool IsTopmostIngredientUnderPointer()
     {
-        if (stoveCamera == null || Mouse.current == null) return false;
+        if (kitchenCamera == null || Mouse.current == null) return false;
 
-        Ray ray = stoveCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray ray = kitchenCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
 
         KitchenIngredientController bestIngredient = null;
         float bestDistance = float.PositiveInfinity;
@@ -176,18 +177,18 @@ public class KitchenIngredientController : MonoBehaviour
         lockedY = useFixedDragY ? fixedDragY : transform.position.y;
 
         if (TryGetPointerWorldPoint(out Vector3 pointerWorld))
-            dragOffset = transform.position - pointerWorld;
+        {
+            // dragOffset = transform.position - pointerWorld;
+        }
         else
             dragOffset = Vector3.zero;
 
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
         }
 
-        transform.SetParent(null, true);
+        // transform.SetParent(null, true);
         SetHoverSlot(null);
 
         // Ensure visuals start visible; we may hide them during drag when in snap range.
@@ -226,9 +227,7 @@ public class KitchenIngredientController : MonoBehaviour
         bool inRange = hoverSlot.IsWithinSnapRange(transform.position);
         bool canAccept = hoverSlot.CanAcceptIngredient(this);
 
-        bool shouldShowPreview = inRange && canAccept;
-
-        if (shouldShowPreview)
+        if (inRange && canAccept)
             hoverSlot.ShowPreviewFor(this);
         else
             hoverSlot.HidePreview();
@@ -309,15 +308,14 @@ public class KitchenIngredientController : MonoBehaviour
         if (hoverSlot != null)
             hoverSlot.HidePreview();
 
-
         hoverSlot = slot;
     }
 
     private KitchenItemSlot SphereCastSlotUnderMouse()
     {
-        if (stoveCamera == null) return null;
+        if (kitchenCamera == null) return null;
 
-        Ray ray = stoveCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray ray = kitchenCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.SphereCast(ray, snapSphereCastRadius, out RaycastHit hit, 500f, interactLayers, QueryTriggerInteraction.Ignore))
             return hit.collider != null ? hit.collider.GetComponentInParent<KitchenItemSlot>() : null;
 
@@ -354,9 +352,9 @@ public class KitchenIngredientController : MonoBehaviour
     private bool TryGetPointerWorldPoint(out Vector3 world)
     {
         world = default;
-        if (stoveCamera == null || Mouse.current == null) return false;
+        if (kitchenCamera == null || Mouse.current == null) return false;
 
-        Ray ray = stoveCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray ray = kitchenCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
 
         if (Physics.Raycast(ray, out RaycastHit hit, surfaceRayDistance, dragSurfaceLayers, QueryTriggerInteraction.Ignore))
         {
@@ -380,6 +378,7 @@ public class KitchenIngredientController : MonoBehaviour
         freeState.parent = transform.parent;
         freeState.position = transform.position;
         freeState.rotation = transform.rotation;
+        freeState.localScale = transform.localScale;
 
         if (rb != null)
         {
@@ -396,11 +395,10 @@ public class KitchenIngredientController : MonoBehaviour
         transform.SetParent(freeState.parent, true);
         transform.position = freeState.position;
         transform.rotation = freeState.rotation;
+        transform.localScale = freeState.localScale;
 
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             rb.isKinematic = freeState.rbKinematic;
             rb.useGravity = freeState.rbUseGravity;
             rb.constraints = freeState.rbConstraints;
@@ -413,15 +411,14 @@ public class KitchenIngredientController : MonoBehaviour
 
         if (anchor != null)
         {
-            transform.SetParent(anchor, false);
+            // Keep world scale when parenting under scaled kitchen items.
+            transform.SetParent(anchor, true);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
 
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
         }
     }

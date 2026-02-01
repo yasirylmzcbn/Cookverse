@@ -90,7 +90,7 @@ public class KitchenItemSlot : MonoBehaviour
         if (_previewInstance == null) return;
 
         Transform anchor = GetAnchor();
-        _previewInstance.transform.SetParent(anchor, false);
+        _previewInstance.transform.SetParent(anchor, true);
         _previewInstance.transform.localPosition = Vector3.zero;
         _previewInstance.transform.localRotation = Quaternion.identity;
         _previewInstance.SetActive(true);

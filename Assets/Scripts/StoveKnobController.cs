@@ -1,12 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class KnobController : MonoBehaviour
 {
-    [Header("Camera Reference")]
-    [SerializeField] public Camera stoveCam;
-
     public enum BurnerSide { Left, Right }
+
+    [Header("Camera Reference")]
+    [SerializeField] public Camera kitchenCamera;
+
+    [Header("Cookware Reference")]
+    [SerializeField] public GameObject cookwareType;
+
 
     [Header("Rotation Settings")]
     [SerializeField] private float rotationSpeed = 1f;
@@ -37,7 +42,7 @@ public class KnobController : MonoBehaviour
         // Check for mouse click on this object
         if (mouse.leftButton.wasPressedThisFrame)
         {
-            Ray ray = stoveCam.ScreenPointToRay(mouse.position.ReadValue());
+            Ray ray = kitchenCamera.ScreenPointToRay(mouse.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 if (hit.collider.gameObject == gameObject)
@@ -75,6 +80,7 @@ public class KnobController : MonoBehaviour
             if (stove != null)
             {
                 stove.ApplyVisuals(side, GetHeatLevel());
+
             }
 
             // Check if stove should be on or off

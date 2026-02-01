@@ -50,8 +50,8 @@ public class PlayerController : MonoBehaviour
 
         if (switchCamera != null)
         {
-            if (switchCamera.stoveCamera != null && switchCamera.stoveCamera.activeInHierarchy)
-                return switchCamera.stoveCamera.transform;
+            if (switchCamera.kitchenCamera != null && switchCamera.kitchenCamera.activeInHierarchy)
+                return switchCamera.kitchenCamera.transform;
 
             if (switchCamera.thirdPersonCamera != null && switchCamera.thirdPersonCamera.activeInHierarchy)
                 return switchCamera.thirdPersonCamera.transform;

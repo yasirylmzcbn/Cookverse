@@ -6,7 +6,7 @@ public class SwitchCamera : MonoBehaviour
 {
     public GameObject firstPersonCamera;
     public GameObject thirdPersonCamera;
-    public GameObject stoveCamera;
+    public GameObject kitchenCamera;
     public GameObject playerBody;
     // TODO add more kitchen cameras once models are created
     public enum KitchenCameras { Stove, Oven, Sink, Fryer, Microwave, }
@@ -16,17 +16,17 @@ public class SwitchCamera : MonoBehaviour
     bool firstPerson = true;
 
     public bool IsInKitchenCamera => kitchenCam;
-    public bool IsInStoveCamera => kitchenCam && currentKitchenCamera == KitchenCameras.Stove;
+    public bool IsInkitchenCamera => kitchenCam && currentKitchenCamera == KitchenCameras.Stove;
 
     void Start()
     {
         firstPersonCamera.SetActive(true);
         thirdPersonCamera.SetActive(false);
-        stoveCamera.SetActive(false);
+        kitchenCamera.SetActive(false);
         currentKitchenCamera = KitchenCameras.Stove;
         cameras = new Dictionary<KitchenCameras, GameObject>()
         {
-            { KitchenCameras.Stove, stoveCamera },
+            { KitchenCameras.Stove, kitchenCamera },
             // TODO Add other kitchen cameras here when implemented
         };
     }
@@ -74,7 +74,7 @@ public class SwitchCamera : MonoBehaviour
     {
         playerBody.SetActive(true);
         kitchenCam = false;
-        stoveCamera.SetActive(false);
+        kitchenCamera.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (firstPerson)
