@@ -3,9 +3,10 @@ using UnityEngine.InputSystem;
 
 public class KitchenIngredientController : MonoBehaviour
 {
-    [Header("Ingredient Visuals")]
-    [Tooltip("Optional: assign the model root to clone for preview (ghost). If null, uses this transform.")]
-    public Transform visualsRoot;
+    [Header("Forms")]
+    [SerializeField] private GameObject rawForm;
+    [SerializeField] private GameObject choppedForm;
+    [SerializeField] private GameObject cookedForm;
 
     [Header("Dragging")]
     [Tooltip("Fixed kitchen camera (assign in Inspector).")]
@@ -30,9 +31,6 @@ public class KitchenIngredientController : MonoBehaviour
     [Tooltip("How far we search for nearby slots while dragging (performance).")]
     public float slotSearchRadius = 2.0f;
 
-    [Tooltip("If true, hide the slot's ghost preview while dragging when within snap range.")]
-    public bool hideSlotPreviewWhileDraggingInSnapRange = true;
-
     [Header("Drag Visuals")]
     [Tooltip("If true, while dragging and within snap range of a slot, hide this ingredient's own renderers (slot ghost preview remains visible).")]
     public bool hideDraggedVisualsInSnapRange = true;
@@ -47,9 +45,7 @@ public class KitchenIngredientController : MonoBehaviour
     private KitchenItemSlot currentSlot;
     private KitchenItemSlot hoverSlot;
 
-    private Renderer[] _visualRenderers;
-    private bool[] _visualRenderersInitiallyEnabled;
-    private bool _dragVisualsHidden;
+    public float cookLevel = 0f; // 0 = raw, 1 = cooked
 
     // Remembers where the ingredient was last sitting freely (counter/table/etc.)
     private struct FreeState
@@ -69,18 +65,7 @@ public class KitchenIngredientController : MonoBehaviour
     private void Awake()
     {
         if (rb == null) TryGetComponent(out rb);
-        CacheVisualRenderers();
         SaveFreeState();
-    }
-
-    private void CacheVisualRenderers()
-    {
-        Transform root = visualsRoot != null ? visualsRoot : transform;
-        _visualRenderers = root.GetComponentsInChildren<Renderer>(true);
-        _visualRenderersInitiallyEnabled = new bool[_visualRenderers.Length];
-
-        for (int i = 0; i < _visualRenderers.Length; i++)
-            _visualRenderersInitiallyEnabled[i] = _visualRenderers[i] != null && _visualRenderers[i].enabled;
     }
 
     private void Update()
@@ -191,8 +176,6 @@ public class KitchenIngredientController : MonoBehaviour
         // transform.SetParent(null, true);
         SetHoverSlot(null);
 
-        // Ensure visuals start visible; we may hide them during drag when in snap range.
-        SetDraggedVisualsHidden(false);
     }
 
     private void DragMove()
@@ -237,53 +220,22 @@ public class KitchenIngredientController : MonoBehaviour
     {
         if (!isDragging)
         {
-            SetDraggedVisualsHidden(false);
             return;
         }
 
         if (!hideDraggedVisualsInSnapRange)
         {
-            SetDraggedVisualsHidden(false);
             return;
         }
 
         bool shouldHide = hoverSlot != null
                           && hoverSlot.IsWithinSnapRange(transform.position)
                           && hoverSlot.CanAcceptIngredient(this);
-
-        SetDraggedVisualsHidden(shouldHide);
-    }
-
-    private void SetDraggedVisualsHidden(bool hidden)
-    {
-        if (_dragVisualsHidden == hidden) return;
-        _dragVisualsHidden = hidden;
-
-        if (_visualRenderers == null || _visualRenderersInitiallyEnabled == null)
-            CacheVisualRenderers();
-
-        for (int i = 0; i < _visualRenderers.Length; i++)
-        {
-            Renderer r = _visualRenderers[i];
-            if (r == null) continue;
-
-            if (hidden)
-            {
-                r.enabled = false;
-            }
-            else
-            {
-                // Restore original enabled state
-                bool initial = i < _visualRenderersInitiallyEnabled.Length && _visualRenderersInitiallyEnabled[i];
-                r.enabled = initial;
-            }
-        }
     }
 
     private void EndDragAndTryPlace()
     {
         isDragging = false;
-        SetDraggedVisualsHidden(false);
 
         // Try place into hovered slot if in its snap range
         if (hoverSlot != null && hoverSlot.IsWithinSnapRange(transform.position) && hoverSlot.TryPlaceIngredient(this))
@@ -407,11 +359,13 @@ public class KitchenIngredientController : MonoBehaviour
 
     public void SnapInto(Transform anchor)
     {
+        if (IsCooked()) return;
+
         SaveFreeState();
 
         if (anchor != null)
         {
-            // Keep world scale when parenting under scaled kitchen items.
+            SetToChoppedForm();
             transform.SetParent(anchor, true);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
@@ -426,5 +380,30 @@ public class KitchenIngredientController : MonoBehaviour
     public void OnRemovedFromSlot()
     {
         RestoreFreeState();
+        if (!IsCooked()) SetToRawForm();
     }
+
+    public void SetToRawForm()
+    {
+        rawForm.SetActive(true);
+        choppedForm.SetActive(false);
+        cookedForm.SetActive(false);
+    }
+
+    public void SetToChoppedForm()
+    {
+        rawForm.SetActive(false);
+        choppedForm.SetActive(true);
+        cookedForm.SetActive(false);
+    }
+
+    public void SetToCookedForm()
+    {
+        rawForm.SetActive(false);
+        choppedForm.SetActive(false);
+        cookedForm.SetActive(true);
+    }
+
+    public bool IsCooked() => cookLevel >= 1f;
+
 }

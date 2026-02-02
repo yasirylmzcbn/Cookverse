@@ -174,6 +174,7 @@ public class PlayerController : MonoBehaviour
 
                 if (interactable != null)
                     currentlyInteracting = interactable.Interact();
+                Debug.Log("Interactable: " + interactable);
             }
         }
     }

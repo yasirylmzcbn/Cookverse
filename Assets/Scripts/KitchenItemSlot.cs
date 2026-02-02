@@ -6,7 +6,13 @@ public class KitchenItemSlot : MonoBehaviour
 {
     [Header("State")]
     [Tooltip("If true, ingredient cannot be removed.")]
-    public bool isOn = false;
+    [SerializeField] private bool isOn = false;
+
+    public bool IsOn
+    {
+        get => isOn;
+        set => isOn = value;
+    }
 
     [Header("Placement")]
     [Tooltip("Where the ingredient snaps to (create an empty child and assign it).")]
@@ -22,20 +28,39 @@ public class KitchenItemSlot : MonoBehaviour
     [Range(0.05f, 1f)]
     public float previewAlpha = 0.35f;
 
+    [Header("Cooking")]
+    [Tooltip("How fast cookLevel increases per second while this slot is On and has an ingredient.")]
+    [SerializeField] private float cookRatePerSecond = 0.2f;
+
     private KitchenIngredientController currentIngredient;
 
     private GameObject _previewInstance;
     private KitchenIngredientController _previewSource;
 
+    private void Update()
+    {
+        if (!isOn) return;
+        if (currentIngredient == null) return;
+        if (currentIngredient.IsCooked()) return;
+
+        currentIngredient.cookLevel = Mathf.Clamp01(currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime);
+
+        if (currentIngredient.cookLevel >= 1)
+        {
+            currentIngredient.SetToCookedForm();
+        }
+    }
+
     public bool HasIngredient() => currentIngredient != null;
 
-    public bool CanRemoveIngredient() => !isOn;
+    public bool CanRemoveIngredient() => !IsOn || currentIngredient.IsCooked();
 
     public Transform GetAnchor() => ingredientAnchor != null ? ingredientAnchor : transform;
 
     public bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
+        if (ingredient.IsCooked()) return false;
         if (HasIngredient()) return false;
         return true;
     }
@@ -64,6 +89,7 @@ public class KitchenItemSlot : MonoBehaviour
 
     public bool RemoveIngredient(KitchenIngredientController ingredient)
     {
+        Debug.Log($"RemoveIngredient called on slot {gameObject.name}, isOn={isOn}");
         if (ingredient == null) return false;
         if (currentIngredient != ingredient) return false;
         if (!CanRemoveIngredient()) return false;
@@ -84,16 +110,7 @@ public class KitchenItemSlot : MonoBehaviour
         {
             HidePreview();
             _previewSource = ingredient;
-            _previewInstance = BuildPreviewInstance(ingredient);
         }
-
-        if (_previewInstance == null) return;
-
-        Transform anchor = GetAnchor();
-        _previewInstance.transform.SetParent(anchor, true);
-        _previewInstance.transform.localPosition = Vector3.zero;
-        _previewInstance.transform.localRotation = Quaternion.identity;
-        _previewInstance.SetActive(true);
     }
 
     public void HidePreview()
@@ -106,55 +123,6 @@ public class KitchenItemSlot : MonoBehaviour
         _previewSource = null;
     }
 
-    private GameObject BuildPreviewInstance(KitchenIngredientController ingredient)
-    {
-        // Clone the ingredient visuals (same model) as a "ghost"
-        Transform visualsRoot = ingredient.visualsRoot != null ? ingredient.visualsRoot : ingredient.transform;
-
-        GameObject clone = Instantiate(visualsRoot.gameObject);
-        clone.name = $"{visualsRoot.gameObject.name}_Preview";
-        clone.layer = LayerMask.NameToLayer("Ignore Raycast");
-
-        // Strip physics + scripts/colliders so it's purely visual
-        foreach (var c in clone.GetComponentsInChildren<Collider>(true)) Destroy(c);
-        foreach (var r in clone.GetComponentsInChildren<Rigidbody>(true)) Destroy(r);
-        foreach (var mb in clone.GetComponentsInChildren<MonoBehaviour>(true)) Destroy(mb);
-        foreach (var a in clone.GetComponentsInChildren<AudioSource>(true)) Destroy(a);
-
-        // Make it look like a preview (no shadows + alpha via property block when possible)
-        var renderers = clone.GetComponentsInChildren<Renderer>(true);
-        var mpb = new MaterialPropertyBlock();
-
-        foreach (var rend in renderers)
-        {
-            rend.shadowCastingMode = ShadowCastingMode.Off;
-            rend.receiveShadows = false;
-
-            // Try set alpha without instantiating materials
-            mpb.Clear();
-
-            var mat = rend.sharedMaterial;
-            if (mat != null)
-            {
-                if (mat.HasProperty("_BaseColor"))
-                {
-                    Color c0 = mat.GetColor("_BaseColor");
-                    c0.a = previewAlpha;
-                    mpb.SetColor("_BaseColor", c0);
-                    rend.SetPropertyBlock(mpb);
-                }
-                else if (mat.HasProperty("_Color"))
-                {
-                    Color c0 = mat.GetColor("_Color");
-                    c0.a = previewAlpha;
-                    mpb.SetColor("_Color", c0);
-                    rend.SetPropertyBlock(mpb);
-                }
-            }
-        }
-
-        return clone;
-    }
     private void OnDisable()
     {
         HidePreview();

@@ -10,7 +10,8 @@ public class KnobController : MonoBehaviour
     [SerializeField] public Camera kitchenCamera;
 
     [Header("Cookware Reference")]
-    [SerializeField] public GameObject cookwareType;
+    [SerializeField] public GameObject cookware;
+    private KitchenItemSlot cookwareSlot;
 
 
     [Header("Rotation Settings")]
@@ -20,7 +21,6 @@ public class KnobController : MonoBehaviour
 
     [Header("State")]
     [SerializeField] public BurnerSide side;
-    [SerializeField] private bool isOn = false;
     [SerializeField] private float onThreshold = 30f; // Angle at which stove turns on
 
     private bool isDragging = false;
@@ -33,6 +33,12 @@ public class KnobController : MonoBehaviour
     {
         mouse = Mouse.current;
         stove = GetComponentInParent<StoveScript>();
+        cookwareSlot = cookware.GetComponent<KitchenItemSlot>();
+        Debug.Assert(cookwareSlot != null, $"Cookware assigned to knob {gameObject.name} does not have a KitchenItemSlot component.");
+        if (cookwareSlot != null)
+        {
+            cookwareSlot.IsOn = false;
+        }
     }
 
     void Update()
@@ -47,20 +53,17 @@ public class KnobController : MonoBehaviour
             {
                 if (hit.collider.gameObject == gameObject)
                 {
-                    Debug.Log("Started dragging knob");
                     isDragging = true;
                     lastMousePos = mouse.position.ReadValue();
                 }
             }
         }
 
-        // Check for mouse release
         if (mouse.leftButton.wasReleasedThisFrame)
         {
             isDragging = false;
         }
 
-        // Handle dragging
         if (isDragging)
         {
             Vector2 currentMousePos = mouse.position.ReadValue();
@@ -69,45 +72,30 @@ public class KnobController : MonoBehaviour
             // Calculate rotation based on horizontal mouse movement
             float rotationAmount = mouseDelta.x * rotationSpeed;
             currentAngle += rotationAmount;
-
-            // Clamp the angle to min/max range
             currentAngle = Mathf.Clamp(currentAngle, minAngle, maxAngle);
-
-            // Apply rotation (rotating around local Z-axis, adjust if needed)
             transform.localRotation = Quaternion.Euler(0, currentAngle, 0);
 
-            // Update burner visuals continuously so heat level can reach 1.0
             if (stove != null)
             {
                 stove.ApplyVisuals(side, GetHeatLevel());
 
             }
 
-            // Check if stove should be on or off
-            bool wasOn = isOn;
-            isOn = currentAngle >= onThreshold;
+            bool wasOn = cookwareSlot.IsOn;
+            cookwareSlot.IsOn = currentAngle >= onThreshold;
 
-            // Optional: Trigger events when state changes
-            if (wasOn != isOn)
+            if (wasOn != cookwareSlot.IsOn)
             {
-                OnStateChanged(isOn);
+                OnStateChanged(cookwareSlot.IsOn);
             }
 
             lastMousePos = currentMousePos;
         }
     }
 
-    // Override this or use Unity Events to communicate with your stove
     protected virtual void OnStateChanged(bool newState)
     {
         Debug.Log($"Knob {gameObject.name} is now: {(newState ? "ON" : "OFF")}");
-        // Keep this for ON/OFF logic (sound, VFX enable/disable, etc.).
-    }
-
-    // Public method to get current state
-    public bool IsOn()
-    {
-        return isOn;
     }
 
     // Public method to get current angle (useful for heat levels)

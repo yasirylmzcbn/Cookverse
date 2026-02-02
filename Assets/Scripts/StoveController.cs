@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StoveScript : MonoBehaviour, IInteractable
+public class StoveScript : MonoBehaviour
 {
 
     [Header("Burner Renderers (Optional)")]
@@ -18,16 +18,6 @@ public class StoveScript : MonoBehaviour, IInteractable
         ApplyVisuals(KnobController.BurnerSide.Left);
         ApplyVisuals(KnobController.BurnerSide.Right);
     }
-    bool IInteractable.Interact()
-    {
-        if (switchCamera != null)
-        {
-            switchCamera.SwitchToKitchenCamera(SwitchCamera.KitchenCameras.Stove);
-            return true;
-        }
-        return false;
-    }
-
 
     public void ApplyVisuals(KnobController.BurnerSide side, float heatLevel = 0f)
     {
@@ -39,7 +29,6 @@ public class StoveScript : MonoBehaviour, IInteractable
         {
             ApplyBurnerColor(rightBurnerRenderer, heatLevel);
         }
-
     }
 
     private void ApplyBurnerColor(Renderer rend, float level01)
@@ -47,8 +36,6 @@ public class StoveScript : MonoBehaviour, IInteractable
         if (rend == null) return;
 
         Color targetColor = Color.Lerp(burnerOffColor, burnerOnColor, Mathf.Clamp01(level01));
-        Debug.Log($"Applied color {targetColor} to burner renderer {rend.gameObject.name} with level {level01}");
         rend.material.SetColor(colorProperty, targetColor);
-
     }
 }
