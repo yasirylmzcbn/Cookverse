@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class KitchenItemSlot : MonoBehaviour
+public class CookwareSlot : MonoBehaviour
 {
     [Header("State")]
     [Tooltip("If true, ingredient cannot be removed.")]
@@ -34,6 +34,8 @@ public class KitchenItemSlot : MonoBehaviour
 
     private KitchenIngredientController currentIngredient;
 
+    public KitchenIngredientController CurrentIngredient => currentIngredient;
+
     private GameObject _previewInstance;
     private KitchenIngredientController _previewSource;
 
@@ -60,7 +62,6 @@ public class KitchenItemSlot : MonoBehaviour
     public bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
-        if (ingredient.IsCooked()) return false;
         if (HasIngredient()) return false;
         return true;
     }

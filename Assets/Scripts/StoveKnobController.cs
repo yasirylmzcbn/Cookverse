@@ -11,7 +11,7 @@ public class KnobController : MonoBehaviour
 
     [Header("Cookware Reference")]
     [SerializeField] public GameObject cookware;
-    private KitchenItemSlot cookwareSlot;
+    private CookwareSlot cookwareSlot;
 
 
     [Header("Rotation Settings")]
@@ -33,8 +33,8 @@ public class KnobController : MonoBehaviour
     {
         mouse = Mouse.current;
         stove = GetComponentInParent<StoveScript>();
-        cookwareSlot = cookware.GetComponent<KitchenItemSlot>();
-        Debug.Assert(cookwareSlot != null, $"Cookware assigned to knob {gameObject.name} does not have a KitchenItemSlot component.");
+        cookwareSlot = cookware.GetComponent<CookwareSlot>();
+        Debug.Assert(cookwareSlot != null, $"Cookware assigned to knob {gameObject.name} does not have a CookwareSlot component.");
         if (cookwareSlot != null)
         {
             cookwareSlot.IsOn = false;

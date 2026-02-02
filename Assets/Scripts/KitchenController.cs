@@ -22,9 +22,5 @@ public class KitchenController : MonoBehaviour, IInteractable
         }
         return false;
     }
-    // Update is called once per frame
-    void Update()
-    {
 
-    }
 }

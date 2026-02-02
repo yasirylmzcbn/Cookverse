@@ -3,6 +3,15 @@ using UnityEngine.InputSystem;
 
 public class KitchenIngredientController : MonoBehaviour
 {
+    [Header("Ingredient")]
+    [SerializeField] private Ingredient ingredientType;
+
+    public Ingredient IngredientType => ingredientType;
+    public bool IsProteinIngredient => ingredientType == Ingredient.DraculaWing
+                                     || ingredientType == Ingredient.MerewolfSteak
+                                     || ingredientType == Ingredient.ManticoreTail;
+    public bool IsVegetableIngredient => !IsProteinIngredient;
+
     [Header("Forms")]
     [SerializeField] private GameObject rawForm;
     [SerializeField] private GameObject choppedForm;
@@ -42,8 +51,8 @@ public class KitchenIngredientController : MonoBehaviour
     private Vector3 dragOffset;
     private float lockedY;
 
-    private KitchenItemSlot currentSlot;
-    private KitchenItemSlot hoverSlot;
+    private CookwareSlot currentSlot;
+    private CookwareSlot hoverSlot;
 
     public float cookLevel = 0f; // 0 = raw, 1 = cooked
 
@@ -193,7 +202,7 @@ public class KitchenIngredientController : MonoBehaviour
     private void UpdateHoverPreview()
     {
         // Prefer slot under cursor (for intent), else nearest in range
-        KitchenItemSlot candidate = SphereCastSlotUnderMouse();
+        CookwareSlot candidate = SphereCastSlotUnderMouse();
 
         if (candidate == null)
             candidate = FindNearestAcceptingSlotInRange(transform.position);
@@ -254,7 +263,7 @@ public class KitchenIngredientController : MonoBehaviour
         SaveFreeState();
     }
 
-    private void SetHoverSlot(KitchenItemSlot slot)
+    private void SetHoverSlot(CookwareSlot slot)
     {
         if (hoverSlot == slot) return;
         if (hoverSlot != null)
@@ -263,22 +272,22 @@ public class KitchenIngredientController : MonoBehaviour
         hoverSlot = slot;
     }
 
-    private KitchenItemSlot SphereCastSlotUnderMouse()
+    private CookwareSlot SphereCastSlotUnderMouse()
     {
         if (kitchenCamera == null) return null;
 
         Ray ray = kitchenCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.SphereCast(ray, snapSphereCastRadius, out RaycastHit hit, 500f, interactLayers, QueryTriggerInteraction.Ignore))
-            return hit.collider != null ? hit.collider.GetComponentInParent<KitchenItemSlot>() : null;
+            return hit.collider != null ? hit.collider.GetComponentInParent<CookwareSlot>() : null;
 
         return null;
     }
 
-    private KitchenItemSlot FindNearestAcceptingSlotInRange(Vector3 fromWorldPos)
+    private CookwareSlot FindNearestAcceptingSlotInRange(Vector3 fromWorldPos)
     {
         int count = Physics.OverlapSphereNonAlloc(fromWorldPos, slotSearchRadius, _snapOverlapBuffer, interactLayers, QueryTriggerInteraction.Ignore);
 
-        KitchenItemSlot best = null;
+        CookwareSlot best = null;
         float bestDist = float.PositiveInfinity;
 
         for (int i = 0; i < count; i++)
@@ -286,7 +295,7 @@ public class KitchenIngredientController : MonoBehaviour
             Collider col = _snapOverlapBuffer[i];
             if (col == null) continue;
 
-            KitchenItemSlot slot = col.GetComponentInParent<KitchenItemSlot>();
+            CookwareSlot slot = col.GetComponentInParent<CookwareSlot>();
             if (slot == null) continue;
             if (!slot.CanAcceptIngredient(this)) continue;
 
@@ -359,13 +368,12 @@ public class KitchenIngredientController : MonoBehaviour
 
     public void SnapInto(Transform anchor)
     {
-        if (IsCooked()) return;
-
         SaveFreeState();
-
+        Debug.Log("Snapping ingredient " + ingredientType + " into anchor " + (anchor != null ? anchor.name : "null"));
         if (anchor != null)
         {
-            SetToChoppedForm();
+            if (!IsCooked())
+                SetToChoppedForm();
             transform.SetParent(anchor, true);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
