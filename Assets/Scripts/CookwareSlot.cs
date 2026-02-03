@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CookwareSlot : MonoBehaviour
+public class CookwareSlot : MonoBehaviour, ISingleAnchorIngredientSlot
 {
     [Header("State")]
     [Tooltip("If true, ingredient cannot be removed.")]
@@ -53,11 +54,13 @@ public class CookwareSlot : MonoBehaviour
         }
     }
 
+
     public bool HasIngredient() => currentIngredient != null;
 
     public bool CanRemoveIngredient() => !IsOn || currentIngredient.IsCooked();
-
-    public Transform GetAnchor() => ingredientAnchor != null ? ingredientAnchor : transform;
+    public float SnapRange => snapRange;
+    public Transform IngredientAnchor => ingredientAnchor;
+    public Transform GetAnchor() => IngredientAnchor != null ? IngredientAnchor : transform;
 
     public bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
