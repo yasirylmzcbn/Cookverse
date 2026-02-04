@@ -17,6 +17,7 @@ public class enemyMovementAI : MonoBehaviour
     {
         // Get and store the NavMeshAgent component attached to this object.
         navMeshAgent = GetComponent<NavMeshAgent>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     // Update is called once per frame.
@@ -26,7 +27,7 @@ public class enemyMovementAI : MonoBehaviour
         if (player != null)
         {
             // Set the enemy's destination to the player's current position.
-            navMeshAgent.SetDestination(player.position);
+            navMeshAgent.SetDestination(player.transform.position);
         }
     }
 }
