@@ -34,7 +34,6 @@ public class KnobController : MonoBehaviour
         mouse = Mouse.current;
         stove = GetComponentInParent<StoveScript>();
         cookwareSlot = cookware.GetComponent<CookwareSlot>();
-        Debug.Assert(cookwareSlot != null, $"Cookware assigned to knob {gameObject.name} does not have a CookwareSlot component.");
         if (cookwareSlot != null)
         {
             cookwareSlot.IsOn = false;

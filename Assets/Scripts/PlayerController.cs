@@ -158,7 +158,6 @@ public class PlayerController : MonoBehaviour
             Ray r = new Ray(InteractorSource.position, InteractorSource.forward);
             if (Physics.Raycast(r, out RaycastHit hit, InteractDistance))
             {
-                Debug.Log("Hit " + hit.collider.gameObject.name);
                 IInteractable interactable = null;
 
                 // 1) Exact collider object
@@ -174,7 +173,6 @@ public class PlayerController : MonoBehaviour
 
                 if (interactable != null)
                     currentlyInteracting = interactable.Interact();
-                Debug.Log("Interactable: " + interactable);
             }
         }
     }

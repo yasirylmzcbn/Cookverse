@@ -1,3 +1,4 @@
+using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -51,8 +52,8 @@ public class KitchenIngredientController : MonoBehaviour
     private Vector3 dragOffset;
     private float lockedY;
 
-    private CookwareSlot currentSlot;
-    private CookwareSlot hoverSlot;
+    private IngredientSlotBehaviour currentSlot;
+    private IngredientSlotBehaviour hoverSlot;
 
     public float cookLevel = 0f; // 0 = raw, 1 = cooked
 
@@ -202,7 +203,7 @@ public class KitchenIngredientController : MonoBehaviour
     private void UpdateHoverPreview()
     {
         // Prefer slot under cursor (for intent), else nearest in range
-        CookwareSlot candidate = SphereCastSlotUnderMouse();
+        IngredientSlotBehaviour candidate = SphereCastSlotUnderMouse();
 
         if (candidate == null)
             candidate = FindNearestAcceptingSlotInRange(transform.position);
@@ -219,10 +220,13 @@ public class KitchenIngredientController : MonoBehaviour
         bool inRange = hoverSlot.IsWithinSnapRange(transform.position);
         bool canAccept = hoverSlot.CanAcceptIngredient(this);
 
+        if (hoverSlot is not CookwareSlot cookwareSlot)
+            return;
+
         if (inRange && canAccept)
-            hoverSlot.ShowPreviewFor(this);
+            cookwareSlot.ShowPreviewFor(this);
         else
-            hoverSlot.HidePreview();
+            cookwareSlot.HidePreview();
     }
 
     private void UpdateDraggedVisualsVisibility()
@@ -263,31 +267,31 @@ public class KitchenIngredientController : MonoBehaviour
         SaveFreeState();
     }
 
-    private void SetHoverSlot(CookwareSlot slot)
+    private void SetHoverSlot(IngredientSlotBehaviour slot)
     {
         if (hoverSlot == slot) return;
-        if (hoverSlot != null)
-            hoverSlot.HidePreview();
+        if (hoverSlot is CookwareSlot previousCookwareSlot)
+            previousCookwareSlot.HidePreview();
 
         hoverSlot = slot;
     }
 
-    private CookwareSlot SphereCastSlotUnderMouse()
+    private IngredientSlotBehaviour SphereCastSlotUnderMouse()
     {
         if (kitchenCamera == null) return null;
 
         Ray ray = kitchenCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (Physics.SphereCast(ray, snapSphereCastRadius, out RaycastHit hit, 500f, interactLayers, QueryTriggerInteraction.Ignore))
-            return hit.collider != null ? hit.collider.GetComponentInParent<CookwareSlot>() : null;
+            return hit.collider != null ? hit.collider.GetComponentInParent<IngredientSlotBehaviour>() : null;
 
         return null;
     }
 
-    private CookwareSlot FindNearestAcceptingSlotInRange(Vector3 fromWorldPos)
+    private IngredientSlotBehaviour FindNearestAcceptingSlotInRange(Vector3 fromWorldPos)
     {
         int count = Physics.OverlapSphereNonAlloc(fromWorldPos, slotSearchRadius, _snapOverlapBuffer, interactLayers, QueryTriggerInteraction.Ignore);
 
-        CookwareSlot best = null;
+        IngredientSlotBehaviour best = null;
         float bestDist = float.PositiveInfinity;
 
         for (int i = 0; i < count; i++)
@@ -295,12 +299,12 @@ public class KitchenIngredientController : MonoBehaviour
             Collider col = _snapOverlapBuffer[i];
             if (col == null) continue;
 
-            CookwareSlot slot = col.GetComponentInParent<CookwareSlot>();
+            IngredientSlotBehaviour slot = col.GetComponentInParent<IngredientSlotBehaviour>();
             if (slot == null) continue;
             if (!slot.CanAcceptIngredient(this)) continue;
 
-            float d = slot.DistanceToAnchor(fromWorldPos);
-            if (d <= slot.snapRange && d < bestDist)
+            float d = slot.DistanceToAnchor(fromWorldPos, this);
+            if (d <= slot.SnapRange && d < bestDist)
             {
                 bestDist = d;
                 best = slot;
@@ -369,7 +373,6 @@ public class KitchenIngredientController : MonoBehaviour
     public void SnapInto(Transform anchor)
     {
         SaveFreeState();
-        Debug.Log("Snapping ingredient " + ingredientType + " into anchor " + (anchor != null ? anchor.name : "null"));
         if (anchor != null)
         {
             if (!IsCooked())
