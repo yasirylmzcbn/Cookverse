@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -5,16 +6,33 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Transform[] spawners;
     [SerializeField] private GameObject enemy;
 
-    private void Update()
+    private void Start()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        StartCoroutine(SpawnEnemiesRoutine());
+    }
+
+    private IEnumerator SpawnEnemiesRoutine()
+    {
+        float duration = 60f;
+        float interval = 5f;
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
         {
-            SpawnEnemy();
+            // Spawn 10 enemies
+            for (int i = 0; i < 10; i++)
+            {
+                SpawnEnemy();
+            }
+
+            // Wait 5 seconds before next wave
+            yield return new WaitForSeconds(interval);
+            elapsedTime += interval;
         }
     }
+
     private void SpawnEnemy()
     {
-        int randomInt = Random.RandomRange(1, spawners.Length);
+        int randomInt = Random.RandomRange(0, spawners.Length);
         Transform randomSpawner = spawners[randomInt];
         Instantiate(enemy, randomSpawner.position, randomSpawner.rotation);
     }
