@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction moveAction;
     [SerializeField] private InputAction jumpAction;
+    [SerializeField] private InputAction shootAction;
 
     Vector3 velocity;
     bool isGrounded;
@@ -72,12 +73,14 @@ public class PlayerController : MonoBehaviour
     {
         moveAction?.Enable();
         jumpAction?.Enable();
+        shootAction?.Enable();
     }
 
     private void OnDisable()
     {
         moveAction?.Disable();
         jumpAction?.Disable();
+        shootAction?.Disable();
     }
 
     private void EnsureActionsConfigured()
@@ -107,6 +110,12 @@ public class PlayerController : MonoBehaviour
             jumpAction = new InputAction("Jump", InputActionType.Button);
             jumpAction.AddBinding("<Keyboard>/space");
             jumpAction.AddBinding("<Gamepad>/buttonSouth");
+        }
+
+        if (shootAction == null || shootAction.bindings.Count == 0)
+        {
+            shootAction = new InputAction("Shoot", InputActionType.Button);
+            shootAction.AddBinding("<Mouse>/leftButton");
         }
     }
 
@@ -175,6 +184,17 @@ public class PlayerController : MonoBehaviour
                 if (interactable != null)
                     currentlyInteracting = interactable.Interact();
                 Debug.Log("Interactable: " + interactable);
+            }
+        }
+
+        // Add a shoot cooldown later
+        if (shootAction != null && shootAction.IsPressed())
+        {
+            Debug.Log("player shoot");
+            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
+            if (potatoShooter != null)
+            {
+                potatoShooter.Shoot();
             }
         }
     }
