@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     public float gravity = -9.81f * 2;
     public float jumpHeight = 3f;
 
+    public int maxHealth = 100;
+    public int currentHealth;
+
     [Header("Movement Reference")]
     [Tooltip("If set, movement will be relative to this transform (usually the active camera). If left empty, uses the active SwitchCamera camera, else Camera.main.")]
     [SerializeField] private Transform movementReference;
@@ -43,6 +46,13 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         switchCamera = FindFirstObjectByType<SwitchCamera>();
+        currentHealth = maxHealth;
+    }
+
+    public void TakeDamage (int amount)
+    {
+        currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+        Debug.Log(currentHealth + "/" + maxHealth);
     }
 
     private Transform GetMovementReference()
