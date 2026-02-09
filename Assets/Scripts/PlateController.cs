@@ -1,5 +1,6 @@
 using Cookverse.Assets.Scripts;
 using UnityEngine;
+using TMPro;
 using System.Collections.Generic;
 
 public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlot
@@ -18,6 +19,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     private KitchenIngredientController proteinIngredient;
     private KitchenIngredientController vegetableIngredient;
+
+    [Header("Recipe Completion TMP")]
+    [SerializeField] public TextMeshProUGUI completionText;
+
 
     public Transform ProteinAnchor => proteinAnchor;
     public Transform VegetableAnchor => vegetableAnchor;
@@ -127,6 +132,11 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         if (recipe == null || proteinIngredient == null || vegetableIngredient == null) return false;
         bool hasRequiredProtein = requiredIngredients.Exists(ing => proteinIngredient != null && ing == proteinIngredient.IngredientType);
         bool hasRequiredVegetable = requiredIngredients.Exists(ing => vegetableIngredient != null && ing == vegetableIngredient.IngredientType);
+        if (hasRequiredProtein && hasRequiredVegetable)
+        {
+            Debug.Log("Recipe complete: " + recipe);
+            completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
+        }
         return hasRequiredProtein && hasRequiredVegetable;
     }
 
