@@ -1,8 +1,13 @@
 using Cookverse.Assets.Scripts;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlot
 {
+    [Header("Recipe")]
+    [SerializeField] public Recipe recipe;
+    private List<Ingredient> requiredIngredients;
+
     [Header("Placement")]
     [Tooltip("Where the protein ingredient snaps to (create an empty child and assign it).")]
     public Transform proteinAnchor;
@@ -21,6 +26,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     public Transform GetProteinAnchor() => proteinAnchor != null ? proteinAnchor : transform;
     public Transform GetVegetableAnchor() => vegetableAnchor != null ? vegetableAnchor : transform;
 
+    public void Start()
+    {
+        requiredIngredients = recipe != null ? Recipes.RecipeIngredients[recipe] : new List<Ingredient>();
+    }
     public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
@@ -71,12 +80,14 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         {
             proteinIngredient = ingredient;
             ingredient.SnapInto(GetProteinAnchor());
+            IsRecipeComplete();
             return true;
         }
         else if (isVegetable && !HasVegetableIngredient())
         {
             vegetableIngredient = ingredient;
             ingredient.SnapInto(GetVegetableAnchor());
+            IsRecipeComplete();
             return true;
         }
 
@@ -110,4 +121,13 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
         return false;
     }
+
+    public bool IsRecipeComplete()
+    {
+        if (recipe == null || proteinIngredient == null || vegetableIngredient == null) return false;
+        bool hasRequiredProtein = requiredIngredients.Exists(ing => proteinIngredient != null && ing == proteinIngredient.IngredientType);
+        bool hasRequiredVegetable = requiredIngredients.Exists(ing => vegetableIngredient != null && ing == vegetableIngredient.IngredientType);
+        return hasRequiredProtein && hasRequiredVegetable;
+    }
+
 }
