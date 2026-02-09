@@ -23,14 +23,12 @@ public class Bullet : MonoBehaviour
         Debug.Log(collision.gameObject.name);
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
-            Debug.Log("Ground destroy");
             Destroy(gameObject);
             return;
         }
         Enemy enemy = collision.collider.GetComponentInParent<Enemy>(); //currently hitting the enemy body
         if (enemy != null)
         {
-            Debug.Log("Enemy destroy");
             enemy.Damage(1);
             Destroy(gameObject);
             return;

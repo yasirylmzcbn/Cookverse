@@ -13,7 +13,7 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnEnemiesRoutine()
     {
-        float duration = 60f;
+        float duration = 10f;
         float interval = 5f;
         float elapsedTime = 0f;
         while (elapsedTime < duration)
@@ -32,7 +32,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        int randomInt = Random.RandomRange(0, spawners.Length);
+        int randomInt = Random.Range(0, spawners.Length);
         Transform randomSpawner = spawners[randomInt];
         Instantiate(enemy, randomSpawner.position, randomSpawner.rotation);
     }
