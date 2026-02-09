@@ -27,6 +27,23 @@ public class PlayerController : MonoBehaviour
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction moveAction;
     [SerializeField] private InputAction jumpAction;
+    [SerializeField] private InputAction shootAction;
+    [SerializeField] private InputAction reloadAction;
+
+    [Header("Spells")]
+    [Tooltip("Prefab with SpellProjectile + Rigidbody + Collider.")]
+    [SerializeField] private GameObject spellProjectilePrefab;
+
+    [Tooltip("Optional spawn point for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
+    [SerializeField] private Transform spellSpawnPoint;
+
+    [Tooltip("How far in front of the spawn point the spell appears (avoids colliding with player).")]
+    [SerializeField] private float spellSpawnForwardOffset = 0.8f;
+
+    [Tooltip("Seconds between casts.")]
+    [SerializeField] private float spellCooldownSeconds = 20f;
+
+    private float _nextSpellTime;
 
     Vector3 velocity;
     bool isGrounded;
@@ -72,12 +89,16 @@ public class PlayerController : MonoBehaviour
     {
         moveAction?.Enable();
         jumpAction?.Enable();
+        shootAction?.Enable();
+        reloadAction?.Enable();
     }
 
     private void OnDisable()
     {
         moveAction?.Disable();
         jumpAction?.Disable();
+        shootAction?.Disable();
+        reloadAction?.Disable();
     }
 
     private void EnsureActionsConfigured()
@@ -107,6 +128,17 @@ public class PlayerController : MonoBehaviour
             jumpAction = new InputAction("Jump", InputActionType.Button);
             jumpAction.AddBinding("<Keyboard>/space");
             jumpAction.AddBinding("<Gamepad>/buttonSouth");
+        }
+
+        if (shootAction == null || shootAction.bindings.Count == 0)
+        {
+            shootAction = new InputAction("Shoot", InputActionType.Button);
+            shootAction.AddBinding("<Mouse>/leftButton");
+        }
+        if (reloadAction == null || reloadAction.bindings.Count == 0)
+        {
+            reloadAction = new InputAction("Shoot", InputActionType.Button);
+            reloadAction.AddBinding("<Keyboard>/r");
         }
     }
 
@@ -175,5 +207,49 @@ public class PlayerController : MonoBehaviour
                     currentlyInteracting = interactable.Interact();
             }
         }
+
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            TryCastSpell1();
+        }
+
+        // Add a shoot cooldown later
+        if (shootAction != null && shootAction.IsPressed())
+        {
+            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
+            if (potatoShooter != null)
+            {
+                potatoShooter.Shoot();
+            }
+        }
+
+        if (reloadAction != null && reloadAction.IsPressed())
+        {
+            Debug.Log("reload pressed");
+            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
+            if (potatoShooter != null)
+            {
+                potatoShooter.TryReload();
+            }
+        }
+    }
+
+    private void TryCastSpell1()
+    {
+        if (spellProjectilePrefab == null) return;
+        if (Time.time < _nextSpellTime) return;
+
+        Transform spawnRef = spellSpawnPoint != null ? spellSpawnPoint : (InteractorSource != null ? InteractorSource : transform);
+        Vector3 forward = spawnRef.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.0001f)
+            forward = transform.forward;
+        forward.Normalize();
+
+        Vector3 spawnPos = spawnRef.position + forward * spellSpawnForwardOffset;
+        Quaternion spawnRot = Quaternion.LookRotation(forward, Vector3.up);
+
+        Instantiate(spellProjectilePrefab, spawnPos, spawnRot);
+        _nextSpellTime = Time.time + spellCooldownSeconds;
     }
 }
