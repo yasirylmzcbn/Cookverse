@@ -44,9 +44,16 @@ public class Enemy : MonoBehaviour
         
     }
     
-    void OnTriggerEnter()
+    void OnTriggerEnter(Collider other)
     {
-        player?.TakeDamage(contactDamage);
+        if (other == null)
+            return;
+
+        var hitPlayer = other.GetComponentInParent<PlayerController>();
+        if (hitPlayer == null)
+            return;
+
+        hitPlayer.TakeDamage(contactDamage);
     }
 
     void FlashDamage()
