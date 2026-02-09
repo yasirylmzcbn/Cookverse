@@ -1,11 +1,26 @@
 using UnityEngine;
+using System.Collections;
+using System.Resources;
 
 public class Potato_Shooter : MonoBehaviour
 {
 
     public GameObject Bullet;
     public Transform Shoot_Pos;
-
+    public int initialAmmo;
+    public float shootCooldownDuration;
+    public float reloadDuration = 2f;
+    private int ammo;
+    private Coroutine reloadCoroutine;
+    private Coroutine shootCooldownCoroutine;
+    enum WeaponState
+    {
+        Ready,
+        Cooldown, //async op to wait for the cooldown and then set it to ready or empty
+        Reloading,
+        Empty
+    }
+    private WeaponState state;
     [Header("Aiming")]
     [Tooltip("Optional override. If empty, uses the currently active camera from SwitchCamera, else Camera.main.")]
     [SerializeField] private Transform aimReference;
@@ -23,6 +38,8 @@ public class Potato_Shooter : MonoBehaviour
     private void Awake()
     {
         _switchCamera = FindFirstObjectByType<SwitchCamera>();
+        ammo = initialAmmo;
+
     }
 
     // Update is called once per frame
@@ -32,6 +49,16 @@ public class Potato_Shooter : MonoBehaviour
 
     public void Shoot()
     {
+        if (state == WeaponState.Cooldown || state == WeaponState.Reloading)
+        {
+            return;
+        }
+        if (ammo <= 0)
+        {
+            state = WeaponState.Empty;
+            //make a click sound or change color in grayboxing
+            return;
+        }
         if (Bullet == null || Shoot_Pos == null) return;
 
         Transform aim = GetAimTransform();
@@ -42,6 +69,61 @@ public class Potato_Shooter : MonoBehaviour
 
         Quaternion rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
         Instantiate(Bullet, Shoot_Pos.position, rotation);
+        ammo -= 1;
+        SetCooldown();
+    }
+
+    public void TryReload()
+    {
+        if (state == WeaponState.Reloading)
+        {
+            return;
+        }
+
+        if (reloadCoroutine != null)
+        {
+            return;
+        }
+
+        reloadCoroutine = StartCoroutine(ReloadRoutine());
+        state = WeaponState.Reloading;
+    }
+
+    IEnumerator ReloadRoutine()
+    {
+        //animation
+        yield return new WaitForSeconds(reloadDuration);
+        ammo = initialAmmo;
+        state = WeaponState.Ready;
+        reloadCoroutine = null;
+    }
+
+    public void SetCooldown()
+    {
+        if (state == WeaponState.Cooldown || shootCooldownCoroutine != null || state == WeaponState.Reloading)
+        {
+            return;
+        }
+
+        shootCooldownCoroutine = StartCoroutine(WaitCooldownRoutine());
+        state = WeaponState.Cooldown;
+    }
+
+    IEnumerator WaitCooldownRoutine()
+    {
+        yield return new WaitForSeconds(shootCooldownDuration);
+        if (state == WeaponState.Cooldown) //so that shooting during reload can't happen
+        {
+            if (ammo <= 0)
+            {
+                state = WeaponState.Empty;
+            }
+            else
+            {
+                state = WeaponState.Ready;
+            }
+        }
+        shootCooldownCoroutine = null;
     }
 
     private Transform GetAimTransform()

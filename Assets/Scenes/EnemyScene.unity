@@ -622,10 +622,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
-  spellProjectilePrefab: {fileID: 5266087419054377740, guid: c5f62d48ec78c4d3f9d23850b3fcaf93, type: 3}
-  spellSpawnPoint: {fileID: 1852973838}
-  spellSpawnForwardOffset: 0.8
-  spellCooldownSeconds: 20
+  reloadAction:
+    m_Name: Reload
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: dcb90b55-7a90-4e50-aa73-ed4c4c450e96
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
 --- !u!143 &510499328
@@ -1022,6 +1027,9 @@ MonoBehaviour:
   aimLayers:
     serializedVersion: 2
     m_Bits: 119
+  initialAmmo: 10
+  cooldownDuration: 0
+  reloadDuration: 2
 --- !u!65 &971966465
 BoxCollider:
   m_ObjectHideFlags: 0

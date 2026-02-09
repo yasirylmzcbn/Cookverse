@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputAction moveAction;
     [SerializeField] private InputAction jumpAction;
     [SerializeField] private InputAction shootAction;
+    [SerializeField] private InputAction reloadAction;
 
     [Header("Spells")]
     [Tooltip("Prefab with SpellProjectile + Rigidbody + Collider.")]
@@ -89,6 +90,7 @@ public class PlayerController : MonoBehaviour
         moveAction?.Enable();
         jumpAction?.Enable();
         shootAction?.Enable();
+        reloadAction?.Enable();
     }
 
     private void OnDisable()
@@ -96,6 +98,7 @@ public class PlayerController : MonoBehaviour
         moveAction?.Disable();
         jumpAction?.Disable();
         shootAction?.Disable();
+        reloadAction?.Disable();
     }
 
     private void EnsureActionsConfigured()
@@ -131,6 +134,11 @@ public class PlayerController : MonoBehaviour
         {
             shootAction = new InputAction("Shoot", InputActionType.Button);
             shootAction.AddBinding("<Mouse>/leftButton");
+        }
+        if (reloadAction == null || reloadAction.bindings.Count == 0)
+        {
+            reloadAction = new InputAction("Shoot", InputActionType.Button);
+            reloadAction.AddBinding("<Keyboard>/r");
         }
     }
 
@@ -210,11 +218,20 @@ public class PlayerController : MonoBehaviour
         // Add a shoot cooldown later
         if (shootAction != null && shootAction.IsPressed())
         {
-            Debug.Log("player shoot");
             Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
             if (potatoShooter != null)
             {
                 potatoShooter.Shoot();
+            }
+        }
+
+        if (reloadAction != null && reloadAction.IsPressed())
+        {
+            Debug.Log("reload pressed");
+            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
+            if (potatoShooter != null)
+            {
+                potatoShooter.TryReload();
             }
         }
     }

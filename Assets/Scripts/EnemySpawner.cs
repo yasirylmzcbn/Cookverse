@@ -13,7 +13,7 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnEnemiesRoutine()
     {
-        float duration = 60f;
+        float duration = 10f;
         float interval = 5f;
         float elapsedTime = 0f;
         while (elapsedTime < duration)

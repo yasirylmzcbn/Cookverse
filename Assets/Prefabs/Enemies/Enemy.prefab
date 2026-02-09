@@ -194,3 +194,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b45a41ec3598e14da1b4093f9cc118b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  health: 10
+  damageColor: {r: 0.97735846, g: 0.9297558, b: 0, a: 1}
+  flashDuration: 0.1
