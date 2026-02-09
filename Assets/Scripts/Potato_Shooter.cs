@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Resources;
 
 public class Potato_Shooter : MonoBehaviour
 {
@@ -43,18 +44,14 @@ public class Potato_Shooter : MonoBehaviour
         if (ammo <= 0)
         {
             state = WeaponState.Empty;
-        }
-        if (state == WeaponState.Empty)
-        {
-            state = WeaponState.Empty;
-            // Not enough ammo, make a click sound in final game and add coroutine to change color in grayboxing
+            //make a click sound or change color in grayboxing
             return;
-
         }
         Vector3 direction = (Shoot_Pos.position - transform.position).normalized;
         Quaternion rotation = Quaternion.LookRotation(direction);
         Instantiate(Bullet, Shoot_Pos.position, rotation);
         ammo -= 1;
+        SetCooldown();
     }
 
     public void TryReload()
@@ -82,14 +79,9 @@ public class Potato_Shooter : MonoBehaviour
         reloadCoroutine = null;
     }
 
-    public void WaitCooldown()
+    public void SetCooldown()
     {
-        if (state == WeaponState.Cooldown)
-        {
-            return;
-        }
-
-        if (shootCooldownCoroutine != null)
+        if (state == WeaponState.Cooldown || shootCooldownCoroutine != null || state == WeaponState.Reloading )
         {
             return;
         }
@@ -101,7 +93,17 @@ public class Potato_Shooter : MonoBehaviour
     IEnumerator WaitCooldownRoutine()
     {
         yield return new WaitForSeconds(shootCooldownDuration);
-        state = WeaponState.Ready;
+        if (state == WeaponState.Cooldown) //so that shooting during reload can't happen
+        {
+            if (ammo <= 0)
+            {
+                state = WeaponState.Empty;
+            }
+            else
+            {
+                state = WeaponState.Ready;
+            }
+        }
         shootCooldownCoroutine = null;
     }
 }
