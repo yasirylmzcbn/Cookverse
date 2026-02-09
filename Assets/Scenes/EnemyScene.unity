@@ -626,11 +626,15 @@ MonoBehaviour:
     m_Name: Reload
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: dcb90b55-7a90-4e50-aa73-ed4c4c450e96
+    m_Id: 1b375e96-9a38-4e92-8e24-be52be487f88
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  spellProjectilePrefab: {fileID: 5266087419054377740, guid: c5f62d48ec78c4d3f9d23850b3fcaf93, type: 3}
+  spellSpawnPoint: {fileID: 1852973838}
+  spellSpawnForwardOffset: 0.8
+  spellCooldownSeconds: 5
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
 --- !u!143 &510499328
@@ -1021,15 +1025,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   Bullet: {fileID: 6888836019528570085, guid: 90cccd0479d47114e8e24ff85aae7c32, type: 3}
   Shoot_Pos: {fileID: 1852973838}
+  initialAmmo: 30
+  shootCooldownDuration: 0
+  reloadDuration: 2
   aimReference: {fileID: 1852973838}
   useCameraRaycastAim: 1
   aimMaxDistance: 200
   aimLayers:
     serializedVersion: 2
     m_Bits: 119
-  initialAmmo: 10
-  cooldownDuration: 0
-  reloadDuration: 2
 --- !u!65 &971966465
 BoxCollider:
   m_ObjectHideFlags: 0
