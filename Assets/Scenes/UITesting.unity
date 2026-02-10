@@ -1000,8 +1000,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09bc031a21b0fd48a514bab72cb66c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  maxHealth: 100
-  currHealth: 100
   healthBarSlider: {fileID: 36881792}
   healthText: {fileID: 177534303}
 --- !u!114 &597589159
@@ -1103,8 +1101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdd93594a7052024d9bf4d587e4f8d9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  magSize: 30
-  currAmmo: 30
+  potatoShooter: {fileID: 0}
   ammoText: {fileID: 669410570}
 --- !u!114 &597589164
 MonoBehaviour:
@@ -2081,6 +2078,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2051959438}
+  - component: {fileID: 2051959439}
   m_Layer: 5
   m_Name: Spells
   m_TagString: Untagged
@@ -2111,6 +2109,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2051959439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051959437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e008002f11772747ae112adbe741e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  spell1Image: {fileID: 519736557}
+  spell2Image: {fileID: 308371959}
+  spell3Image: {fileID: 1838986973}
+  spell4Image: {fileID: 50120094}
+  transparencyAmount: 0.5
+  transparencyDuration: 20
 --- !u!1 &2135913698
 GameObject:
   m_ObjectHideFlags: 0
