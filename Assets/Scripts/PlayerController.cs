@@ -33,6 +33,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputAction shootAction;
     [SerializeField] private InputAction reloadAction;
 
+    [Header("Spells")]
+    [Tooltip("Prefab with SpellProjectile + Rigidbody + Collider.")]
+    [SerializeField] private GameObject spellProjectilePrefab;
+
+    [Tooltip("Optional spawn point for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
+    [SerializeField] private Transform spellSpawnPoint;
+
+    [Tooltip("How far in front of the spawn point the spell appears (avoids colliding with player).")]
+    [SerializeField] private float spellSpawnForwardOffset = 0.8f;
+
+    [Tooltip("Seconds between casts.")]
+    [SerializeField] private float spellCooldownSeconds = 20f;
+
+    private float _nextSpellTime;
+
     Vector3 velocity;
     bool isGrounded;
 
@@ -205,6 +220,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            TryCastSpell1();
+        }
+
         // Add a shoot cooldown later
         if (shootAction != null && shootAction.IsPressed())
         {
@@ -224,7 +244,24 @@ public class PlayerController : MonoBehaviour
                 potatoShooter.TryReload();
             }
         }
+    }
 
+    private void TryCastSpell1()
+    {
+        if (spellProjectilePrefab == null) return;
+        if (Time.time < _nextSpellTime) return;
 
+        Transform spawnRef = spellSpawnPoint != null ? spellSpawnPoint : (InteractorSource != null ? InteractorSource : transform);
+        Vector3 forward = spawnRef.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.0001f)
+            forward = transform.forward;
+        forward.Normalize();
+
+        Vector3 spawnPos = spawnRef.position + forward * spellSpawnForwardOffset;
+        Quaternion spawnRot = Quaternion.LookRotation(forward, Vector3.up);
+
+        Instantiate(spellProjectilePrefab, spawnPos, spawnRot);
+        _nextSpellTime = Time.time + spellCooldownSeconds;
     }
 }
