@@ -58,6 +58,8 @@ public class PlayerController : MonoBehaviour
 
     SwitchCamera switchCamera;
 
+    public bool IsSpell1OnCooldown => Time.time < _nextSpellTime;
+
     void Start()
     {
         switchCamera = FindFirstObjectByType<SwitchCamera>();

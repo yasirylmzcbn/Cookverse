@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class SpellUIScript : MonoBehaviour
 {
+    [Header("References")]
+    public PlayerController playerController;
+
     [Header("Spell UI Images")]
     public Image spell1Image;
     public Image spell2Image;
@@ -13,47 +15,59 @@ public class SpellUIScript : MonoBehaviour
     [Header("Transparency Settings")]
     [Range(0f, 1f)]
     public float transparencyAmount = 0.5f; // 50% transparent
-    public float transparencyDuration = 20f; // how long it stays transparent, hard-coded to 20 to match the spell cooldown in PlayerController.cs for now
 
     private Color originalColor;
 
     void Start()
     {
-        originalColor = spell1Image.color;
+        if (playerController == null)
+        {
+            playerController = FindFirstObjectByType<PlayerController>();
+        }
+
+        if (spell1Image != null)
+        {
+            originalColor = spell1Image.color;
+        }
     }
 
     void Update()
     {
-        // check keyboard input
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
-        {
-            StartCoroutine(FlashTransparency(spell1Image));
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-        {
-            StartCoroutine(FlashTransparency(spell2Image));
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
-        {
-            StartCoroutine(FlashTransparency(spell3Image));
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
-        {
-            StartCoroutine(FlashTransparency(spell4Image));
-        }
+        UpdateSpellTransparency(spell1Image, 1);
+        UpdateSpellTransparency(spell2Image, 2);
+        UpdateSpellTransparency(spell3Image, 3);
+        UpdateSpellTransparency(spell4Image, 4);
     }
 
-    IEnumerator FlashTransparency(Image spellImage)
+    private void UpdateSpellTransparency(Image spellImage, int spellNumber)
     {
-        Color currentColor = spellImage.color;
 
-        Color transparentColor = currentColor;
-        transparentColor.a = transparencyAmount;
-        spellImage.color = transparentColor;
+        bool isOnCooldown = false;
 
-        yield return new WaitForSeconds(transparencyDuration);
+        // read the actual cooldown status from PlayerController
+        switch (spellNumber)
+        {
+            case 1: isOnCooldown = playerController.IsSpell1OnCooldown; break;
+            /* these spells are not implemented yet.
+            case 2: isOnCooldown = playerController.IsSpell2OnCooldown; break;
+            case 3: isOnCooldown = playerController.IsSpell3OnCooldown; break;
+            case 4: isOnCooldown = playerController.IsSpell4OnCooldown; break;
+            */
+        }
 
-        transparentColor.a = originalColor.a;
-        spellImage.color = transparentColor;
+        if (isOnCooldown)
+        {
+            // spell on cooldown, so transparent
+            Color transparentColor = originalColor;
+            transparentColor.a = transparencyAmount;
+            spellImage.color = transparentColor;
+        }
+        else
+        {
+            // spell is ready, so opaque
+            Color readyColor = originalColor;
+            readyColor.a = 1f;
+            spellImage.color = readyColor;
+        }
     }
 }
