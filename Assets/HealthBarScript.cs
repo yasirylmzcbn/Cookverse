@@ -5,7 +5,6 @@ using TMPro;
 public class HealthBarScript : MonoBehaviour
 {
     PlayerController playerController;
-    public int maxHealth, currHealth;
     public Slider healthBarSlider;
     public TextMeshProUGUI healthText;
     
