@@ -76,7 +76,7 @@ public class Enemy : MonoBehaviour
     public void Damage(int d)
     {
         health -= d;
-        if (health < 0)
+        if (health <= 0)
         {
             Die();
         }
