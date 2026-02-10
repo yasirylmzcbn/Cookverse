@@ -566,7 +566,8 @@ GameObject:
   - component: {fileID: 510499329}
   - component: {fileID: 510499328}
   - component: {fileID: 510499327}
-  m_Layer: 3
+  - component: {fileID: 510499330}
+  m_Layer: 0
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -589,6 +590,8 @@ MonoBehaviour:
   speed: 13
   gravity: -9.81
   jumpHeight: 3
+  maxHealth: 100
+  currentHealth: 0
   movementReference: {fileID: 0}
   groundCheck: {fileID: 1749036634}
   groundDistance: 0.4
@@ -682,6 +685,29 @@ Transform:
   - {fileID: 1158290878}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &510499330
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510499326}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &568634286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1025,7 +1051,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   Bullet: {fileID: 6888836019528570085, guid: 90cccd0479d47114e8e24ff85aae7c32, type: 3}
   Shoot_Pos: {fileID: 1852973838}
-  initialAmmo: 30
+  initialAmmo: 10
   shootCooldownDuration: 0
   reloadDuration: 2
   aimReference: {fileID: 1852973838}

@@ -9,6 +9,10 @@ public class Enemy : MonoBehaviour
     public Color damageColor = Color.yellow;
     public float flashDuration = 0.1f;
 
+    public int contactDamage = 10;
+    PlayerController player;
+
+
     Renderer rend;
     MaterialPropertyBlock mpb;
     Color originalColor;
@@ -31,13 +35,25 @@ public class Enemy : MonoBehaviour
     }
     void Start()
     {
-        
+        player = FindFirstObjectByType<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+    
+    void OnTriggerEnter(Collider other)
+    {
+        if (other == null)
+            return;
+
+        var hitPlayer = other.GetComponentInParent<PlayerController>();
+        if (hitPlayer == null)
+            return;
+
+        hitPlayer.TakeDamage(contactDamage);
     }
 
     void FlashDamage()
