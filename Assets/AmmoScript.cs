@@ -6,19 +6,22 @@ using UnityEngine.UI;
 
 public class AmmoScript : MonoBehaviour
 {
-    public int magSize, currAmmo;
+    public Potato_Shooter potatoShooter;
     public TextMeshProUGUI ammoText;
 
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currAmmo = magSize;
+        potatoShooter = FindFirstObjectByType<Potato_Shooter>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        ammoText.text = currAmmo + " / " + magSize;
+        if (potatoShooter != null)
+        {
+            ammoText.text = potatoShooter.ammo + " / " + potatoShooter.initialAmmo;
+        }
     }
 }

@@ -10,7 +10,7 @@ public class Potato_Shooter : MonoBehaviour
     public int initialAmmo;
     public float shootCooldownDuration;
     public float reloadDuration = 2f;
-    private int ammo;
+    public int ammo;
     private Coroutine reloadCoroutine;
     private Coroutine shootCooldownCoroutine;
     enum WeaponState
