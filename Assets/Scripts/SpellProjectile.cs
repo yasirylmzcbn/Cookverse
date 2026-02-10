@@ -15,14 +15,43 @@ public class SpellProjectile : MonoBehaviour
     [Tooltip("Optional: only explode when hitting these layers. If set to Everything (-1), any collision will explode.")]
     [SerializeField] private LayerMask hitLayers = ~0;
 
+    [Tooltip("Whether the explosion overlap should include trigger colliders (common for enemies).")]
+    [SerializeField] private QueryTriggerInteraction explosionQueryTriggers = QueryTriggerInteraction.Collide;
+
     private readonly Collider[] _overlapBuffer = new Collider[64];
 
     private Rigidbody _rb;
     private bool _exploded;
+    private Transform _owner;
 
     private void Awake()
     {
         TryGetComponent(out _rb);
+    }
+
+    public void Initialize(Transform owner)
+    {
+        _owner = owner;
+
+        if (_owner == null) return;
+
+        // Prevent the projectile from immediately colliding with the caster.
+        Collider[] ownerCols = _owner.GetComponentsInChildren<Collider>();
+        Collider[] myCols = GetComponentsInChildren<Collider>();
+
+        for (int i = 0; i < myCols.Length; i++)
+        {
+            Collider myCol = myCols[i];
+            if (myCol == null) continue;
+
+            for (int j = 0; j < ownerCols.Length; j++)
+            {
+                Collider ownerCol = ownerCols[j];
+                if (ownerCol == null) continue;
+
+                Physics.IgnoreCollision(myCol, ownerCol, true);
+            }
+        }
     }
 
     private void Start()
@@ -49,12 +78,24 @@ public class SpellProjectile : MonoBehaviour
         ExplodeAt(collision.GetContact(0).point);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_exploded) return;
+        if (other == null) return;
+
+        // Layer filter
+        if (((1 << other.gameObject.layer) & hitLayers.value) == 0)
+            return;
+
+        ExplodeAt(other.ClosestPoint(transform.position));
+    }
+
     private void ExplodeAt(Vector3 position)
     {
         if (_exploded) return;
         _exploded = true;
 
-        int count = Physics.OverlapSphereNonAlloc(position, areaRadius, _overlapBuffer, ~0, QueryTriggerInteraction.Ignore);
+        int count = Physics.OverlapSphereNonAlloc(position, areaRadius, _overlapBuffer, ~0, explosionQueryTriggers);
 
         // Prevent damaging the same enemy multiple times due to multiple colliders.
         HashSet<Enemy> damaged = new HashSet<Enemy>();

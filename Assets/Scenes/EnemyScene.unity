@@ -171,12 +171,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e008002f11772747ae112adbe741e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  playerController: {fileID: 0}
   spell1Image: {fileID: 426098814}
   spell2Image: {fileID: 1453167495}
   spell3Image: {fileID: 1095560220}
   spell4Image: {fileID: 2118974332}
   transparencyAmount: 0.5
-  transparencyDuration: 20
 --- !u!1 &70678403
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,10 +1096,48 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
-  spellProjectilePrefab: {fileID: 5266087419054377740, guid: c5f62d48ec78c4d3f9d23850b3fcaf93, type: 3}
-  spellSpawnPoint: {fileID: 1852973838}
-  spellSpawnForwardOffset: 0.8
-  spellCooldownSeconds: 5
+  spell1Action:
+    m_Name: Spell 1
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4ab80d3b-2f03-4a39-87d4-7a0d9af205f7
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spell2Action:
+    m_Name: Spell 2
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 449a0a8a-e815-490a-9502-2794c9c705b5
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spell3Action:
+    m_Name: Spell 3
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 29ecff72-4d62-4730-9244-6339446fd1a7
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spell4Action:
+    m_Name: Spell 4
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: e0fe348c-656b-4d32-b173-ca68e364584d
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  spellLoadout:
+  - {fileID: 11400000, guid: ee2119f3837eb4e45a4ae42f61a13a0e, type: 2}
+  - {fileID: 11400000, guid: b487f8ea77b5a4425b8b030ebcd11288, type: 2}
+  - {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
+  - {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
+  spellCastOrigin: {fileID: 0}
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
 --- !u!143 &510499328
@@ -1680,7 +1718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   Bullet: {fileID: 6888836019528570085, guid: 90cccd0479d47114e8e24ff85aae7c32, type: 3}
   Shoot_Pos: {fileID: 1852973838}
-  initialAmmo: 10
+  initialAmmo: 500
   shootCooldownDuration: 0
   reloadDuration: 2
   ammo: 0
@@ -3015,7 +3053,7 @@ Transform:
   m_GameObject: {fileID: 1852973837}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.508}
+  m_LocalPosition: {x: 0, y: 0, z: 0.456}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.04}
   m_ConstrainProportionsScale: 0
   m_Children: []

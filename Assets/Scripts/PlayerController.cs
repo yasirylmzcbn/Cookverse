@@ -33,20 +33,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputAction shootAction;
     [SerializeField] private InputAction reloadAction;
 
+    [Header("Spell Input (New Input System)")]
+    [SerializeField] private InputAction spell1Action;
+    [SerializeField] private InputAction spell2Action;
+    [SerializeField] private InputAction spell3Action;
+    [SerializeField] private InputAction spell4Action;
+
     [Header("Spells")]
-    [Tooltip("Prefab with SpellProjectile + Rigidbody + Collider.")]
-    [SerializeField] private GameObject spellProjectilePrefab;
+    [Tooltip("4-slot spell loadout. Create spells via Assets > Create > Cookverse > Spells and assign them here.")]
+    [SerializeField] private SpellDefinition[] spellLoadout = new SpellDefinition[4];
 
-    [Tooltip("Optional spawn point for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
-    [SerializeField] private Transform spellSpawnPoint;
+    [Tooltip("Optional cast origin for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
+    [SerializeField] private Transform spellCastOrigin;
 
-    [Tooltip("How far in front of the spawn point the spell appears (avoids colliding with player).")]
-    [SerializeField] private float spellSpawnForwardOffset = 0.8f;
-
-    [Tooltip("Seconds between casts.")]
-    [SerializeField] private float spellCooldownSeconds = 20f;
-
-    private float _nextSpellTime;
+    private readonly float[] _nextSpellTimes = new float[4];
 
     Vector3 velocity;
     bool isGrounded;
@@ -58,7 +58,29 @@ public class PlayerController : MonoBehaviour
 
     SwitchCamera switchCamera;
 
-    public bool IsSpell1OnCooldown => Time.time < _nextSpellTime;
+    private float _moveSpeedMultiplier = 1f;
+    private Coroutine _buffCoroutine;
+    private bool _buffActive;
+    private float _buffPrevMoveMultiplier = 1f;
+    private float _buffPrevShootCooldownDuration;
+    private bool _buffHadShooter;
+
+    private Potato_Shooter _potatoShooter;
+    private float _baseShootCooldownDuration;
+    private bool _cachedShooterBase;
+
+    public bool IsSpellOnCooldown(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= _nextSpellTimes.Length) return false;
+        return Time.time < _nextSpellTimes[slotIndex];
+    }
+
+    public SpellDefinition GetSpell(int slotIndex)
+    {
+        if (spellLoadout == null) return null;
+        if (slotIndex < 0 || slotIndex >= spellLoadout.Length) return null;
+        return spellLoadout[slotIndex];
+    }
 
     void Start()
     {
@@ -66,10 +88,22 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage (int amount)
+    public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
         Debug.Log(currentHealth + "/" + maxHealth);
+    }
+
+    public void Heal(int amount)
+    {
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        Debug.Log(currentHealth + "/" + maxHealth);
+    }
+
+    public void ApplyTimedBuff(float moveSpeedMultiplier, float shootCooldownMultiplier, float durationSeconds)
+    {
+        ClearActiveBuff(stopCoroutine: true);
+        _buffCoroutine = StartCoroutine(BuffRoutine(moveSpeedMultiplier, shootCooldownMultiplier, durationSeconds));
     }
 
     private Transform GetMovementReference()
@@ -95,6 +129,8 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         EnsureActionsConfigured();
+        _potatoShooter = GetComponentInChildren<Potato_Shooter>();
+        CacheShooterBaseIfNeeded();
     }
 
     private void OnEnable()
@@ -103,6 +139,11 @@ public class PlayerController : MonoBehaviour
         jumpAction?.Enable();
         shootAction?.Enable();
         reloadAction?.Enable();
+
+        spell1Action?.Enable();
+        spell2Action?.Enable();
+        spell3Action?.Enable();
+        spell4Action?.Enable();
     }
 
     private void OnDisable()
@@ -111,6 +152,11 @@ public class PlayerController : MonoBehaviour
         jumpAction?.Disable();
         shootAction?.Disable();
         reloadAction?.Disable();
+
+        spell1Action?.Disable();
+        spell2Action?.Disable();
+        spell3Action?.Disable();
+        spell4Action?.Disable();
     }
 
     private void EnsureActionsConfigured()
@@ -152,6 +198,36 @@ public class PlayerController : MonoBehaviour
             reloadAction = new InputAction("Shoot", InputActionType.Button);
             reloadAction.AddBinding("<Keyboard>/r");
         }
+
+        // Spells (4 slots). Defaults support both keyboard and gamepad at the same time.
+        if (spell1Action == null || spell1Action.bindings.Count == 0)
+        {
+            spell1Action = new InputAction("Spell1", InputActionType.Button);
+            spell1Action.AddBinding("<Keyboard>/1");
+            spell1Action.AddBinding("<Keyboard>/numpad1");
+            spell1Action.AddBinding("<Gamepad>/dpad/up");
+        }
+        if (spell2Action == null || spell2Action.bindings.Count == 0)
+        {
+            spell2Action = new InputAction("Spell2", InputActionType.Button);
+            spell2Action.AddBinding("<Keyboard>/2");
+            spell2Action.AddBinding("<Keyboard>/numpad2");
+            spell2Action.AddBinding("<Gamepad>/dpad/right");
+        }
+        if (spell3Action == null || spell3Action.bindings.Count == 0)
+        {
+            spell3Action = new InputAction("Spell3", InputActionType.Button);
+            spell3Action.AddBinding("<Keyboard>/3");
+            spell3Action.AddBinding("<Keyboard>/numpad3");
+            spell3Action.AddBinding("<Gamepad>/dpad/down");
+        }
+        if (spell4Action == null || spell4Action.bindings.Count == 0)
+        {
+            spell4Action = new InputAction("Spell4", InputActionType.Button);
+            spell4Action.AddBinding("<Keyboard>/4");
+            spell4Action.AddBinding("<Keyboard>/numpad4");
+            spell4Action.AddBinding("<Gamepad>/dpad/left");
+        }
     }
 
     void Update()
@@ -186,7 +262,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 move = (referenceRight * x) + (referenceForward * z);
         move = Vector3.ClampMagnitude(move, 1f);
-        Vector3 moveVelocity = move * speed;
+        Vector3 moveVelocity = move * (speed * _moveSpeedMultiplier);
         controller.Move(moveVelocity * Time.deltaTime);
 
         if (jumpAction != null && jumpAction.WasPressedThisFrame() && isGrounded)
@@ -222,48 +298,113 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Keyboard.current.digit1Key.wasPressedThisFrame)
-        {
-            TryCastSpell1();
-        }
+        if (spell1Action != null && spell1Action.WasPressedThisFrame()) TryCastSpell(0);
+        if (spell2Action != null && spell2Action.WasPressedThisFrame()) TryCastSpell(1);
+        if (spell3Action != null && spell3Action.WasPressedThisFrame()) TryCastSpell(2);
+        if (spell4Action != null && spell4Action.WasPressedThisFrame()) TryCastSpell(3);
 
         // Add a shoot cooldown later
         if (shootAction != null && shootAction.IsPressed())
         {
-            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
-            if (potatoShooter != null)
-            {
-                potatoShooter.Shoot();
-            }
+            var potatoShooter = GetPotatoShooter();
+            if (potatoShooter != null) potatoShooter.Shoot();
         }
 
         if (reloadAction != null && reloadAction.IsPressed())
         {
             Debug.Log("reload pressed");
-            Potato_Shooter potatoShooter = GetComponentInChildren<Potato_Shooter>();
-            if (potatoShooter != null)
-            {
-                potatoShooter.TryReload();
-            }
+            var potatoShooter = GetPotatoShooter();
+            if (potatoShooter != null) potatoShooter.TryReload();
         }
     }
 
-    private void TryCastSpell1()
+    private void TryCastSpell(int slotIndex)
     {
-        if (spellProjectilePrefab == null) return;
-        if (Time.time < _nextSpellTime) return;
+        SpellDefinition spell = GetSpell(slotIndex);
+        if (spell == null) return;
+        if (IsSpellOnCooldown(slotIndex)) return;
 
-        Transform spawnRef = spellSpawnPoint != null ? spellSpawnPoint : (InteractorSource != null ? InteractorSource : transform);
-        Vector3 forward = spawnRef.forward;
+        Transform origin = spellCastOrigin != null
+            ? spellCastOrigin
+            : (InteractorSource != null ? InteractorSource : transform);
+
+        Vector3 forward = origin != null ? origin.forward : transform.forward;
         forward.y = 0f;
         if (forward.sqrMagnitude < 0.0001f)
             forward = transform.forward;
         forward.Normalize();
 
-        Vector3 spawnPos = spawnRef.position + forward * spellSpawnForwardOffset;
-        Quaternion spawnRot = Quaternion.LookRotation(forward, Vector3.up);
+        var context = new SpellCastContext(this, origin, forward);
+        if (!spell.CanCast(in context)) return;
 
-        Instantiate(spellProjectilePrefab, spawnPos, spawnRot);
-        _nextSpellTime = Time.time + spellCooldownSeconds;
+        spell.Cast(in context);
+        float cd = Mathf.Max(0f, spell.cooldownSeconds);
+        _nextSpellTimes[slotIndex] = Time.time + cd;
+    }
+
+    private Potato_Shooter GetPotatoShooter()
+    {
+        if (_potatoShooter == null)
+            _potatoShooter = GetComponentInChildren<Potato_Shooter>();
+        CacheShooterBaseIfNeeded();
+        return _potatoShooter;
+    }
+
+    private void CacheShooterBaseIfNeeded()
+    {
+        if (_cachedShooterBase) return;
+        if (_potatoShooter == null) return;
+        _baseShootCooldownDuration = _potatoShooter.shootCooldownDuration;
+        _cachedShooterBase = true;
+    }
+
+    private IEnumerator BuffRoutine(float moveSpeedMultiplier, float shootCooldownMultiplier, float durationSeconds)
+    {
+        moveSpeedMultiplier = Mathf.Max(0f, moveSpeedMultiplier);
+        shootCooldownMultiplier = Mathf.Max(0f, shootCooldownMultiplier);
+
+        _buffPrevMoveMultiplier = _moveSpeedMultiplier;
+        _moveSpeedMultiplier = _buffPrevMoveMultiplier * moveSpeedMultiplier;
+
+        var shooter = GetPotatoShooter();
+        _buffHadShooter = shooter != null;
+        if (_buffHadShooter)
+        {
+            CacheShooterBaseIfNeeded();
+            _buffPrevShootCooldownDuration = shooter.shootCooldownDuration;
+            shooter.shootCooldownDuration = _baseShootCooldownDuration * shootCooldownMultiplier;
+        }
+
+        _buffActive = true;
+
+        yield return new WaitForSeconds(durationSeconds);
+
+        ClearActiveBuff(stopCoroutine: false);
+    }
+
+    private void ClearActiveBuff(bool stopCoroutine)
+    {
+        if (stopCoroutine && _buffCoroutine != null)
+        {
+            StopCoroutine(_buffCoroutine);
+            _buffCoroutine = null;
+        }
+
+        if (!_buffActive) return;
+
+        _moveSpeedMultiplier = _buffPrevMoveMultiplier;
+
+        if (_buffHadShooter)
+        {
+            var shooter = GetPotatoShooter();
+            if (shooter != null)
+                shooter.shootCooldownDuration = _buffPrevShootCooldownDuration;
+        }
+
+        _buffActive = false;
+        _buffHadShooter = false;
+        _buffPrevMoveMultiplier = 1f;
+        _buffPrevShootCooldownDuration = 0f;
+        _buffCoroutine = null;
     }
 }

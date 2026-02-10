@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class SpellUIScript : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class SpellUIScript : MonoBehaviour
     [Range(0f, 1f)]
     public float transparencyAmount = 0.5f; // 50% transparent
 
-    private Color originalColor;
+    private readonly Dictionary<Image, Color> _originalColors = new Dictionary<Image, Color>();
 
     void Start()
     {
@@ -25,47 +26,66 @@ public class SpellUIScript : MonoBehaviour
             playerController = FindFirstObjectByType<PlayerController>();
         }
 
-        if (spell1Image != null)
-        {
-            originalColor = spell1Image.color;
-        }
+        CacheOriginalColor(spell1Image);
+        CacheOriginalColor(spell2Image);
+        CacheOriginalColor(spell3Image);
+        CacheOriginalColor(spell4Image);
+
+        TryAssignIcon(spell1Image, 0);
+        TryAssignIcon(spell2Image, 1);
+        TryAssignIcon(spell3Image, 2);
+        TryAssignIcon(spell4Image, 3);
     }
 
     void Update()
     {
-        UpdateSpellTransparency(spell1Image, 1);
-        UpdateSpellTransparency(spell2Image, 2);
-        UpdateSpellTransparency(spell3Image, 3);
-        UpdateSpellTransparency(spell4Image, 4);
+        UpdateSpellTransparency(spell1Image, 0);
+        UpdateSpellTransparency(spell2Image, 1);
+        UpdateSpellTransparency(spell3Image, 2);
+        UpdateSpellTransparency(spell4Image, 3);
     }
 
-    private void UpdateSpellTransparency(Image spellImage, int spellNumber)
+    private void CacheOriginalColor(Image spellImage)
     {
+        if (spellImage == null) return;
+        if (_originalColors.ContainsKey(spellImage)) return;
+        _originalColors[spellImage] = spellImage.color;
+    }
 
-        bool isOnCooldown = false;
+    private void TryAssignIcon(Image spellImage, int slotIndex)
+    {
+        if (spellImage == null) return;
+        if (playerController == null) return;
 
-        // read the actual cooldown status from PlayerController
-        switch (spellNumber)
+        SpellDefinition spell = playerController.GetSpell(slotIndex);
+        if (spell != null && spell.icon != null)
+            spellImage.sprite = spell.icon;
+    }
+
+    private void UpdateSpellTransparency(Image spellImage, int slotIndex)
+    {
+        if (spellImage == null) return;
+        if (playerController == null) return;
+
+        if (!_originalColors.TryGetValue(spellImage, out Color baseColor))
         {
-            case 1: isOnCooldown = playerController.IsSpell1OnCooldown; break;
-            /* these spells are not implemented yet.
-            case 2: isOnCooldown = playerController.IsSpell2OnCooldown; break;
-            case 3: isOnCooldown = playerController.IsSpell3OnCooldown; break;
-            case 4: isOnCooldown = playerController.IsSpell4OnCooldown; break;
-            */
+            baseColor = spellImage.color;
+            _originalColors[spellImage] = baseColor;
         }
+
+        bool isOnCooldown = playerController.IsSpellOnCooldown(slotIndex);
 
         if (isOnCooldown)
         {
             // spell on cooldown, so transparent
-            Color transparentColor = originalColor;
+            Color transparentColor = baseColor;
             transparentColor.a = transparencyAmount;
             spellImage.color = transparentColor;
         }
         else
         {
             // spell is ready, so opaque
-            Color readyColor = originalColor;
+            Color readyColor = baseColor;
             readyColor.a = 1f;
             spellImage.color = readyColor;
         }
