@@ -19,9 +19,6 @@ public class AmmoScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (potatoShooter != null)
-        {
-            ammoText.text = potatoShooter.ammo + " / " + potatoShooter.initialAmmo;
-        }
+        ammoText.text = potatoShooter.ammo + " / " + potatoShooter.initialAmmo;
     }
 }
