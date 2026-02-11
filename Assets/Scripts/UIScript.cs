@@ -49,7 +49,14 @@ public class UIScript : MonoBehaviour
         }
 
         if (_potatoShooter != null && ammoText != null)
+        {
             ammoText.text = _potatoShooter.ammo + " / " + _potatoShooter.initialAmmo;
+
+            // more transparent text during reload
+            var c = ammoText.color;
+            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? 0.3f : 1f;
+            ammoText.color = c;
+        }
 
         if (questText != null)
             questText.text = "> " + string.Join("\n> ", _quests);
