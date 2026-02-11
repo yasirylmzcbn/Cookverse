@@ -12,6 +12,8 @@ public class Enemy : MonoBehaviour
     public int contactDamage = 10;
     PlayerController player;
 
+    public EnemySpawner spawner;
+
 
     Renderer rend;
     MaterialPropertyBlock mpb;
@@ -88,6 +90,7 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
+        spawner.KilledEnemy();
         Destroy(gameObject);
     }
 }
