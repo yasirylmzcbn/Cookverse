@@ -54,7 +54,7 @@ public class UIScript : MonoBehaviour
 
             // more transparent text during reload
             var c = ammoText.color;
-            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? 0.3f : 1f;
+            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? 0.5f : 1f;
             ammoText.color = c;
         }
 
