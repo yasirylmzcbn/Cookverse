@@ -158,8 +158,14 @@ public class PlayerController : MonoBehaviour
             transform.position = respawnPoint.position;
 
         currentHealth = maxHealth;
-        _isDead = false;
+
+        // reset spell cooldowns and buffs
+        for (int i = 0; i < _nextSpellTimes.Length; ++i)
+            _nextSpellTimes[i] = 0f;
+        ClearActiveBuff(stopCoroutine: true);
+
         _potatoShooter?.ResetAmmo();
+        _isDead = false;
 
         controller.enabled = true;
     }
