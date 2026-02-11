@@ -106,7 +106,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -199,6 +199,7 @@ MonoBehaviour:
   damageColor: {r: 0.97735846, g: 0.9297558, b: 0, a: 1}
   flashDuration: 0.1
   contactDamage: 10
+  spawner: {fileID: 0}
 --- !u!54 &-6902579968840462561
 Rigidbody:
   m_ObjectHideFlags: 0
