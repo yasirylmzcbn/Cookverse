@@ -14,9 +14,19 @@ public class Bullet : MonoBehaviour
     {
     }
 
-    private void OnCollisionEnter(Collision collision)
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    Enemy enemy = collision.collider.GetComponentInParent<Enemy>(); //currently hitting the enemy body
+    //    if (enemy != null)
+    //    {
+    //        enemy.Damage(1);
+    //    }
+    //    Destroy(gameObject);
+    //}
+
+    private void OnTriggerEnter(Collider other)
     {
-        Enemy enemy = collision.collider.GetComponentInParent<Enemy>(); //currently hitting the enemy body
+        Enemy enemy = other.GetComponentInParent<Enemy>(); //currently hitting the enemy body
         if (enemy != null)
         {
             enemy.Damage(1);
