@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
-        Debug.Log(currentHealth + "/" + maxHealth);
+        
         if (currentHealth <= 0 && !_isDead)
         {
             _isDead = true;
