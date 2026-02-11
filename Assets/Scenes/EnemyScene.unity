@@ -171,12 +171,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e008002f11772747ae112adbe741e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  playerController: {fileID: 0}
+  playerController: {fileID: 510499327}
   spell1Image: {fileID: 426098814}
   spell2Image: {fileID: 1453167495}
   spell3Image: {fileID: 1095560220}
   spell4Image: {fileID: 2118974332}
   transparencyAmount: 0.5
+--- !u!1 &24765258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 24765259}
+  m_Layer: 0
+  m_Name: RespawnLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &24765259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24765258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -34.974, y: 14.83545, z: 9.08041}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &70678403
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,7 +220,7 @@ GameObject:
   - component: {fileID: 70678405}
   - component: {fileID: 70678404}
   m_Layer: 5
-  m_Name: QuestLists
+  m_Name: QuestText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -494,9 +525,7 @@ GameObject:
   - component: {fileID: 237174317}
   - component: {fileID: 237174316}
   - component: {fileID: 237174315}
-  - component: {fileID: 237174314}
-  - component: {fileID: 237174313}
-  - component: {fileID: 237174312}
+  - component: {fileID: 237174319}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -504,47 +533,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &237174312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 237174311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16e0d4cf103941641aec8822c663ffa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  questText: {fileID: 70678404}
---- !u!114 &237174313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 237174311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdd93594a7052024d9bf4d587e4f8d9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  potatoShooter: {fileID: 0}
-  ammoText: {fileID: 1959504195}
---- !u!114 &237174314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 237174311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b09bc031a21b0fd48a514bab72cb66c4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  healthBarSlider: {fileID: 908322553}
-  healthText: {fileID: 1140212280}
 --- !u!114 &237174315
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,6 +621,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &237174319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237174311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6dfe328605bef4ea3c6a8d24965f93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  playerController: {fileID: 510499327}
+  healthBarSlider: {fileID: 908322553}
+  healthText: {fileID: 1140212280}
+  ammoText: {fileID: 1959504195}
+  questText: {fileID: 70678404}
 --- !u!1 &334679945
 GameObject:
   m_ObjectHideFlags: 0
@@ -1139,6 +1144,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
   - {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
   spellCastOrigin: {fileID: 0}
+  respawnPoint: {fileID: 24765259}
+  respawnDelay: 5
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
 --- !u!143 &510499328
@@ -3347,7 +3354,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 50}
+  m_AnchoredPosition: {x: 0, y: 100}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2114444162
@@ -3404,8 +3411,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -3546,5 +3553,6 @@ SceneRoots:
   - {fileID: 740689713}
   - {fileID: 867598561}
   - {fileID: 510499329}
+  - {fileID: 24765259}
   - {fileID: 1634809587}
   - {fileID: 237174318}

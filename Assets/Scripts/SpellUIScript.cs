@@ -15,18 +15,13 @@ public class SpellUIScript : MonoBehaviour
 
     [Header("Transparency Settings")]
     [Range(0f, 1f)]
-    public float transparencyAmount = 0.5f; // 50% transparent
+    public float transparencyAmount = 0.5f; // 30% transparent
 
     private readonly Dictionary<Image, Color> _originalColors = new Dictionary<Image, Color>();
     private readonly SpellDefinition[] _lastSpells = new SpellDefinition[4];
 
     void Start()
     {
-        if (playerController == null)
-        {
-            playerController = FindFirstObjectByType<PlayerController>();
-        }
-
         CacheOriginalColor(spell1Image);
         CacheOriginalColor(spell2Image);
         CacheOriginalColor(spell3Image);
