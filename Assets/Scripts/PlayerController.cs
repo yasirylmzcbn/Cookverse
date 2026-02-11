@@ -301,6 +301,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (_isDead) return;
+        
         if (currentlyInteracting)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
