@@ -7,8 +7,6 @@ public class Bullet : MonoBehaviour
     public float speed;
     void Start()
     {
-        // Rotate forward by rotation
-        Debug.Log("Bullet instantiated");
         GetComponent<Rigidbody>().linearVelocity = transform.forward * speed;
         Debug.Log(GetComponent<Rigidbody>().linearVelocity);
     }
