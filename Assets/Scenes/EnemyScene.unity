@@ -177,6 +177,37 @@ MonoBehaviour:
   spell3Image: {fileID: 1095560220}
   spell4Image: {fileID: 2118974332}
   transparencyAmount: 0.5
+--- !u!1 &24765258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 24765259}
+  m_Layer: 0
+  m_Name: RespawnLocation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &24765259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24765258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -34.974, y: 14.83545, z: 9.08041}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &70678403
 GameObject:
   m_ObjectHideFlags: 0
@@ -1139,6 +1170,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
   - {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
   spellCastOrigin: {fileID: 0}
+  respawnPoint: {fileID: 24765259}
+  respawnDelay: 5
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
 --- !u!143 &510499328
@@ -3546,5 +3579,6 @@ SceneRoots:
   - {fileID: 740689713}
   - {fileID: 867598561}
   - {fileID: 510499329}
+  - {fileID: 24765259}
   - {fileID: 1634809587}
   - {fileID: 237174318}
