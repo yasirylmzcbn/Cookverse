@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e008002f11772747ae112adbe741e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  playerController: {fileID: 0}
+  playerController: {fileID: 510499327}
   spell1Image: {fileID: 426098814}
   spell2Image: {fileID: 1453167495}
   spell3Image: {fileID: 1095560220}
@@ -633,6 +633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6dfe328605bef4ea3c6a8d24965f93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  playerController: {fileID: 510499327}
   healthBarSlider: {fileID: 908322553}
   healthText: {fileID: 1140212280}
   ammoText: {fileID: 1959504195}

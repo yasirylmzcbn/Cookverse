@@ -22,11 +22,6 @@ public class SpellUIScript : MonoBehaviour
 
     void Start()
     {
-        if (playerController == null)
-        {
-            playerController = FindFirstObjectByType<PlayerController>();
-        }
-
         CacheOriginalColor(spell1Image);
         CacheOriginalColor(spell2Image);
         CacheOriginalColor(spell3Image);

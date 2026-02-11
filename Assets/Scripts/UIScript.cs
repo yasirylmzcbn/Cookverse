@@ -5,6 +5,11 @@ using System.Collections.Generic;
 
 public class UIScript : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private PlayerController playerController;
+    private PlayerController _playerController;
+    private Potato_Shooter _potatoShooter;
+
     [Header("Health UI")]
     [SerializeField] private Slider healthBarSlider;
     [SerializeField] private TextMeshProUGUI healthText;
@@ -15,15 +20,14 @@ public class UIScript : MonoBehaviour
     [Header("Quests UI")]
     [SerializeField] private TextMeshProUGUI questText;
 
-    private PlayerController _playerController;
-    private Potato_Shooter _potatoShooter;
-
     private readonly List<string> _quests = new List<string>();
 
     void Start()
     {
-        _playerController = FindFirstObjectByType<PlayerController>();
-        _potatoShooter = FindFirstObjectByType<Potato_Shooter>();
+        _playerController = playerController;
+
+        if (_playerController != null)
+            _potatoShooter = _playerController.GetComponentInChildren<Potato_Shooter>();
 
         _quests.Add("End Waddle Quackdonald's entire career");
         _quests.Add("Collect exotic meats from Marinara Trench");
