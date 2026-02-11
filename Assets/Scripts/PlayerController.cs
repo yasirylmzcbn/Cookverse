@@ -156,8 +156,10 @@ public class PlayerController : MonoBehaviour
 
         if (respawnPoint != null)
             transform.position = respawnPoint.position;
+
         currentHealth = maxHealth;
         _isDead = false;
+        _potatoShooter?.ResetAmmo();
 
         controller.enabled = true;
     }
