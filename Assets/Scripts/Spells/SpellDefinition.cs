@@ -20,6 +20,12 @@ public abstract class SpellDefinition : ScriptableObject
     public string displayName = "Spell";
     public Sprite icon;
 
+    [Header("Unlock")]
+    [Tooltip("If enabled, the player must unlock the recipe below before this spell can be cast.")]
+    public bool requiresRecipeUnlock;
+
+    public Recipe requiredRecipe;
+
     [Header("Cooldown")]
     [Min(0f)]
     public float cooldownSeconds = 10f;

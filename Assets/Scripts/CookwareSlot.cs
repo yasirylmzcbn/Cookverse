@@ -3,7 +3,7 @@ using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CookwareSlot : MonoBehaviour, ISingleAnchorIngredientSlot
+public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 {
     [Header("State")]
     [Tooltip("If true, ingredient cannot be removed.")]
@@ -57,12 +57,12 @@ public class CookwareSlot : MonoBehaviour, ISingleAnchorIngredientSlot
 
     public bool HasIngredient() => currentIngredient != null;
 
-    public bool CanRemoveIngredient() => !IsOn || currentIngredient.IsCooked();
-    public float SnapRange => snapRange;
+    public override bool CanRemoveIngredient() => !IsOn || (currentIngredient != null && currentIngredient.IsCooked());
+    public override float SnapRange => snapRange;
     public Transform IngredientAnchor => ingredientAnchor;
     public Transform GetAnchor() => IngredientAnchor != null ? IngredientAnchor : transform;
 
-    public bool CanAcceptIngredient(KitchenIngredientController ingredient)
+    public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
         if (HasIngredient()) return false;
@@ -74,12 +74,17 @@ public class CookwareSlot : MonoBehaviour, ISingleAnchorIngredientSlot
         return Vector3.Distance(worldPos, GetAnchor().position);
     }
 
-    public bool IsWithinSnapRange(Vector3 ingredientWorldPos)
+    public override float DistanceToAnchor(Vector3 worldPos, KitchenIngredientController ingredient)
+    {
+        return DistanceToAnchor(worldPos);
+    }
+
+    public override bool IsWithinSnapRange(Vector3 ingredientWorldPos)
     {
         return DistanceToAnchor(ingredientWorldPos) <= snapRange;
     }
 
-    public bool TryPlaceIngredient(KitchenIngredientController ingredient)
+    public override bool TryPlaceIngredient(KitchenIngredientController ingredient)
     {
         if (!CanAcceptIngredient(ingredient)) return false;
 
@@ -91,9 +96,8 @@ public class CookwareSlot : MonoBehaviour, ISingleAnchorIngredientSlot
         return true;
     }
 
-    public bool RemoveIngredient(KitchenIngredientController ingredient)
+    public override bool RemoveIngredient(KitchenIngredientController ingredient)
     {
-        Debug.Log($"RemoveIngredient called on slot {gameObject.name}, isOn={isOn}");
         if (ingredient == null) return false;
         if (currentIngredient != ingredient) return false;
         if (!CanRemoveIngredient()) return false;

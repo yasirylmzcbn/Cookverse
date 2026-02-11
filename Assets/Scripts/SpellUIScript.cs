@@ -18,6 +18,7 @@ public class SpellUIScript : MonoBehaviour
     public float transparencyAmount = 0.5f; // 50% transparent
 
     private readonly Dictionary<Image, Color> _originalColors = new Dictionary<Image, Color>();
+    private readonly SpellDefinition[] _lastSpells = new SpellDefinition[4];
 
     void Start()
     {
@@ -39,10 +40,28 @@ public class SpellUIScript : MonoBehaviour
 
     void Update()
     {
+        RefreshIconIfChanged(spell1Image, 0);
+        RefreshIconIfChanged(spell2Image, 1);
+        RefreshIconIfChanged(spell3Image, 2);
+        RefreshIconIfChanged(spell4Image, 3);
+
         UpdateSpellTransparency(spell1Image, 0);
         UpdateSpellTransparency(spell2Image, 1);
         UpdateSpellTransparency(spell3Image, 2);
         UpdateSpellTransparency(spell4Image, 3);
+    }
+
+    private void RefreshIconIfChanged(Image spellImage, int slotIndex)
+    {
+        if (spellImage == null) return;
+        if (playerController == null) return;
+
+        SpellDefinition current = playerController.GetSpell(slotIndex);
+        if (_lastSpells[slotIndex] == current) return;
+
+        _lastSpells[slotIndex] = current;
+        if (current != null && current.icon != null)
+            spellImage.sprite = current.icon;
     }
 
     private void CacheOriginalColor(Image spellImage)
@@ -73,7 +92,16 @@ public class SpellUIScript : MonoBehaviour
             _originalColors[spellImage] = baseColor;
         }
 
+        bool isUnlocked = playerController.IsSpellUnlocked(slotIndex);
         bool isOnCooldown = playerController.IsSpellOnCooldown(slotIndex);
+
+        if (!isUnlocked)
+        {
+            Color lockedColor = baseColor;
+            lockedColor.a = transparencyAmount;
+            spellImage.color = lockedColor;
+            return;
+        }
 
         if (isOnCooldown)
         {

@@ -69,6 +69,8 @@ public class PlayerController : MonoBehaviour
     private float _baseShootCooldownDuration;
     private bool _cachedShooterBase;
 
+    private PlayerRecipeUnlocks _recipeUnlocks;
+
     public bool IsSpellOnCooldown(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= _nextSpellTimes.Length) return false;
@@ -80,6 +82,45 @@ public class PlayerController : MonoBehaviour
         if (spellLoadout == null) return null;
         if (slotIndex < 0 || slotIndex >= spellLoadout.Length) return null;
         return spellLoadout[slotIndex];
+    }
+
+    public bool IsRecipeUnlocked(Recipe recipe)
+    {
+        if (_recipeUnlocks == null)
+            _recipeUnlocks = GetComponent<PlayerRecipeUnlocks>();
+        return _recipeUnlocks != null && _recipeUnlocks.IsUnlocked(recipe);
+    }
+
+    public bool IsSpellUnlocked(int slotIndex)
+    {
+        SpellDefinition spell = GetSpell(slotIndex);
+        if (spell == null) return false;
+        if (!spell.requiresRecipeUnlock) return true;
+        return IsRecipeUnlocked(spell.requiredRecipe);
+    }
+
+    public bool TryEquipSpell(SpellDefinition spell, int slotIndex = -1)
+    {
+        if (spell == null) return false;
+        if (spellLoadout == null || spellLoadout.Length != 4)
+            spellLoadout = new SpellDefinition[4];
+
+        if (slotIndex >= 0 && slotIndex < spellLoadout.Length)
+        {
+            spellLoadout[slotIndex] = spell;
+            return true;
+        }
+
+        for (int i = 0; i < spellLoadout.Length; i++)
+        {
+            if (spellLoadout[i] == null)
+            {
+                spellLoadout[i] = spell;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void Start()
@@ -131,6 +172,7 @@ public class PlayerController : MonoBehaviour
         EnsureActionsConfigured();
         _potatoShooter = GetComponentInChildren<Potato_Shooter>();
         CacheShooterBaseIfNeeded();
+        _recipeUnlocks = GetComponent<PlayerRecipeUnlocks>();
     }
 
     private void OnEnable()
@@ -322,6 +364,7 @@ public class PlayerController : MonoBehaviour
     {
         SpellDefinition spell = GetSpell(slotIndex);
         if (spell == null) return;
+        if (!IsSpellUnlocked(slotIndex)) return;
         if (IsSpellOnCooldown(slotIndex)) return;
 
         Transform origin = spellCastOrigin != null
