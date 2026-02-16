@@ -4,8 +4,7 @@ using System.Collections;
 public class Enemy : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public float health = 10; 
-    
+    public float health = 10;
     public Color damageColor = Color.yellow;
     public float flashDuration = 0.1f;
 
@@ -33,19 +32,21 @@ public class Enemy : MonoBehaviour
         //if (mpb.HasColor("_BaseColor"))
         //    originalColor = mpb.GetColor("_BaseColor");
         //else
-            originalColor = rend.sharedMaterial.color;
+        originalColor = rend.sharedMaterial.color;
     }
     void Start()
     {
-        player = FindFirstObjectByType<PlayerController>();
+        player = PlayerController.Instance != null
+            ? PlayerController.Instance
+            : FindFirstObjectByType<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
-    
+
     void OnTriggerEnter(Collider other)
     {
         if (other == null)

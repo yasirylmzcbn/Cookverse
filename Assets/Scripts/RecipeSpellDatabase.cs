@@ -29,6 +29,11 @@ public class RecipeSpellDatabase : ScriptableObject
         return spell;
     }
 
+    public IReadOnlyList<Entry> GetEntries()
+    {
+        return entries;
+    }
+
     private void EnsureMap()
     {
         if (_map != null) return;

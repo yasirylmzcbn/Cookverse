@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Text;
 
 public readonly struct SpellCastContext
 {
@@ -17,8 +18,11 @@ public readonly struct SpellCastContext
 public abstract class SpellDefinition : ScriptableObject
 {
     [Header("UI")]
-    public string displayName = "Spell";
     public Sprite icon;
+
+    // Script-defined display name. Override if you want a custom name.
+    // Default is derived from the concrete spell class name (e.g., "PlayerAoEDamageSpell" -> "Player AoE Damage Spell").
+    public virtual string displayName => HumanizeTypeName(GetType().Name);
 
     [Header("Unlock")]
     [Tooltip("If enabled, the player must unlock the recipe below before this spell can be cast.")]
@@ -33,4 +37,39 @@ public abstract class SpellDefinition : ScriptableObject
     public virtual bool CanCast(in SpellCastContext context) => true;
 
     public abstract void Cast(in SpellCastContext context);
+
+    private static string HumanizeTypeName(string typeName)
+    {
+        if (string.IsNullOrEmpty(typeName))
+            return "Spell";
+
+        // Strip common suffix.
+        if (typeName.EndsWith("Spell"))
+            typeName = typeName.Substring(0, typeName.Length - "Spell".Length);
+
+        StringBuilder sb = new StringBuilder(typeName.Length + 8);
+        for (int i = 0; i < typeName.Length; i++)
+        {
+            char c = typeName[i];
+            char prev = i > 0 ? typeName[i - 1] : '\0';
+            char next = i + 1 < typeName.Length ? typeName[i + 1] : '\0';
+
+            bool isUpper = char.IsUpper(c);
+            bool prevIsUpper = i > 0 && char.IsUpper(prev);
+            bool prevIsLower = i > 0 && char.IsLower(prev);
+            bool nextIsLower = i + 1 < typeName.Length && char.IsLower(next);
+
+            // Insert a space:
+            // - between lower->upper transitions ("TimedBuff")
+            // - before the last capital in an acronym when it transitions to lower ("AoE" + "Damage" => "AoE Damage")
+            if (i > 0 && isUpper && (prevIsLower || (prevIsUpper && nextIsLower)))
+                sb.Append(' ');
+
+            sb.Append(c);
+        }
+
+        // Add suffix back for clarity.
+        sb.Append(" Spell");
+        return sb.ToString();
+    }
 }

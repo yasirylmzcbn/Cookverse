@@ -6,6 +6,7 @@ public class HealSpell : SpellDefinition
     [Header("Heal")]
     [Min(0)]
     public int healAmount = 25;
+    public override string displayName => "Heal";
 
     public override void Cast(in SpellCastContext context)
     {

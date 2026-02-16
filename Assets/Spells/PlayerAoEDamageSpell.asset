@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAoEDamageSpell
   displayName: Spell
   icon: {fileID: 0}
+  requiresRecipeUnlock: 1
+  requiredRecipe: 1
   cooldownSeconds: 10
   radius: 5
   damage: 15

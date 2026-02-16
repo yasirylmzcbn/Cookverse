@@ -16,6 +16,7 @@ public class TimedBuffSpell : SpellDefinition
     [Tooltip("Multiplies Potato_Shooter.shootCooldownDuration for the duration. < 1 = faster shooting.")]
     [Min(0f)]
     public float shootCooldownMultiplier = 1f;
+    public override string displayName => "Adrenaline Rush";
 
     public override void Cast(in SpellCastContext context)
     {

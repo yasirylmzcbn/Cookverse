@@ -16,6 +16,8 @@ public class PlayerAoEDamageSpell : SpellDefinition
 
     private readonly Collider[] _overlapBuffer = new Collider[64];
 
+    public override string displayName => "Ground Slam";
+
     public override void Cast(in SpellCastContext context)
     {
         if (context.player == null) return;

@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b425422222a0345abaa7433ccc1e50ee, type: 3}
   m_Name: TimedBuffSpell
   m_EditorClassIdentifier: Assembly-CSharp::TimedBuffSpell
-  displayName: Spell
   icon: {fileID: 0}
+  requiresRecipeUnlock: 1
+  requiredRecipe: 0
   cooldownSeconds: 10
   durationSeconds: 5
-  moveSpeedMultiplier: 1.5
-  shootCooldownMultiplier: 0.1
+  moveSpeedMultiplier: 5
+  shootCooldownMultiplier: 0.3

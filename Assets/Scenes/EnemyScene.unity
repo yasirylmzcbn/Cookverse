@@ -1138,6 +1138,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b487f8ea77b5a4425b8b030ebcd11288, type: 2}
   - {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
   - {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
+  recipeSpellDatabase: {fileID: 11400000, guid: 0a30c31fba1054c27ad06072348c7c0f, type: 2}
+  autoEquipUnlockedSpellsOnSceneLoad: 1
   spellCastOrigin: {fileID: 0}
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
