@@ -53,11 +53,18 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Optional cast origin for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
     [SerializeField] private Transform spellCastOrigin;
 
+    [Header("Respawn")]
+    [SerializeField] private Transform respawnPoint;
+    public float respawnDelay = 5f;
+    private bool _isDead = false;
+    private Coroutine _respawnCoroutine;
+
     private readonly float[] _nextSpellTimes = new float[4];
 
     Vector3 velocity;
     bool isGrounded;
 
+    [Header("Interaction")]
     public Transform InteractorSource;
     public float InteractDistance = 3f;
 
@@ -163,7 +170,35 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
-        Debug.Log(currentHealth + "/" + maxHealth);
+        
+        if (currentHealth <= 0 && !_isDead)
+        {
+            _isDead = true;
+            _respawnCoroutine = StartCoroutine(RespawnRoutine());
+        }
+    }
+
+    private IEnumerator RespawnRoutine()
+    {
+        controller.enabled = false;
+        // death animation / effect would go here
+
+        yield return new WaitForSeconds(respawnDelay);
+
+        if (respawnPoint != null)
+            transform.position = respawnPoint.position;
+
+        currentHealth = maxHealth;
+
+        // reset spell cooldowns and buffs
+        for (int i = 0; i < _nextSpellTimes.Length; ++i)
+            _nextSpellTimes[i] = 0f;
+        ClearActiveBuff(stopCoroutine: true);
+
+        _potatoShooter?.ResetAmmo();
+        _isDead = false;
+
+        controller.enabled = true;
     }
 
     public void Heal(int amount)
@@ -338,6 +373,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (_isDead) return;
+        
         if (currentlyInteracting)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)

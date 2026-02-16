@@ -109,6 +109,16 @@ public class Potato_Shooter : MonoBehaviour
         state = WeaponState.Cooldown;
     }
 
+    // for respawning
+    public void ResetAmmo()
+    {
+        ammo = initialAmmo;
+        state = WeaponState.Ready;
+    }
+
+
+    public bool IsReloading => state == WeaponState.Reloading; // for UI
+
     IEnumerator WaitCooldownRoutine()
     {
         yield return new WaitForSeconds(shootCooldownDuration);
