@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class UIScript : MonoBehaviour
 {
@@ -9,6 +10,48 @@ public class UIScript : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     private PlayerController _playerController;
     private Potato_Shooter _potatoShooter;
+
+    [Header("Runtime")]
+    [Tooltip("How often to retry finding player/shooter references when missing.")]
+    [SerializeField] private float resolveRetryIntervalSeconds = 0.25f;
+    private float _nextResolveTime;
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        _nextResolveTime = 0f;
+        ResolveReferences();
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Player may be recreated/changed depending on scene setup.
+        _playerController = null;
+        _potatoShooter = null;
+        _nextResolveTime = 0f;
+        ResolveReferences();
+    }
+
+    private void ResolveReferences()
+    {
+        if (_playerController == null)
+        {
+            _playerController = playerController != null
+                ? playerController
+                : (PlayerController.Instance != null ? PlayerController.Instance : FindFirstObjectByType<PlayerController>());
+
+            playerController = _playerController;
+        }
+
+        if (_potatoShooter == null && _playerController != null)
+            _potatoShooter = _playerController.GetComponentInChildren<Potato_Shooter>(true);
+    }
 
     [Header("Health UI")]
     [SerializeField] private Slider healthBarSlider;
@@ -24,13 +67,7 @@ public class UIScript : MonoBehaviour
 
     void Start()
     {
-        if (playerController == null)
-        {
-            playerController = FindFirstObjectByType<PlayerController>();
-        }
-
-        if (_playerController != null)
-            _potatoShooter = _playerController.GetComponentInChildren<Potato_Shooter>();
+        ResolveReferences();
 
         _quests.Add("End Waddle Quackdonald's entire career");
         _quests.Add("Collect exotic meats from Marinara Trench");
@@ -39,6 +76,12 @@ public class UIScript : MonoBehaviour
 
     void Update()
     {
+        if ((_playerController == null || _potatoShooter == null) && Time.unscaledTime >= _nextResolveTime)
+        {
+            _nextResolveTime = Time.unscaledTime + Mathf.Max(0.05f, resolveRetryIntervalSeconds);
+            ResolveReferences();
+        }
+
         if (_playerController != null)
         {
             if (healthBarSlider != null)
