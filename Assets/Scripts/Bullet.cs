@@ -26,11 +26,14 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Enemy enemy = other.GetComponentInParent<Enemy>(); //currently hitting the enemy body
-        if (enemy != null)
-        {
-            enemy.Damage(1);
-        }
+        if (other == null)
+            return;
+
+        Enemy enemy = other.GetComponentInParent<Enemy>();
+        if (enemy == null)
+            return;
+
+        enemy.Damage(1);
         Destroy(gameObject);
     }
 }

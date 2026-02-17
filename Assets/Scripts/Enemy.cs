@@ -1,22 +1,29 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public float health = 10;
+    public float health;
     public Color damageColor = Color.yellow;
     public float flashDuration = 0.1f;
-
     public int contactDamage = 10;
-    PlayerController player;
 
-    public EnemySpawner spawner;
-
+    [HideInInspector] public EnemySpawner spawner;
 
     Renderer rend;
     MaterialPropertyBlock mpb;
     Color originalColor;
+
+    [System.Serializable]
+    public class DropEntry
+    {
+        public ItemData itemData;
+        public int weight = 1;
+    }
+    [Header("Item Drops")]
+    [Tooltip("This drop list is weight-based.")]
+    [SerializeField] private List<DropEntry> dropList;
 
     private void Awake()
     {
@@ -30,29 +37,18 @@ public class Enemy : MonoBehaviour
         // Built-in: "_Color"
 
         //if (mpb.HasColor("_BaseColor"))
-        //    originalColor = mpb.GetColor("_BaseColor");
-        //else
         originalColor = rend.sharedMaterial.color;
     }
-    void Start()
-    {
-        player = PlayerController.Instance != null
-            ? PlayerController.Instance
-            : FindFirstObjectByType<PlayerController>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    
     void OnTriggerEnter(Collider other)
     {
         if (other == null)
             return;
 
-        var hitPlayer = other.GetComponentInParent<PlayerController>();
+        if (other.CompareTag("Pickup"))
+            return;
+
+            var hitPlayer = other.GetComponentInParent<PlayerController>();
         if (hitPlayer == null)
             return;
 
@@ -91,6 +87,35 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
+        if (dropList != null && dropList.Count > 0)
+        {
+            int totalWeight = 0;
+            foreach (var entry in dropList)
+            {
+                if (entry.weight > 0)
+                    totalWeight += entry.weight;
+            }
+
+            if (totalWeight > 0)
+            {
+                int roll = Random.Range(0, totalWeight);
+
+                foreach (var entry in dropList)
+                {
+                    if (entry.weight <= 0) continue;
+                    roll -= entry.weight;
+
+                    if (roll < 0)
+                    {
+                        Instantiate(entry.itemData.dropPrefab,
+                                    transform.position,
+                                    Quaternion.identity);
+                        break;
+                    }
+                }
+            }
+        }
+
         spawner.KilledEnemy();
         Destroy(gameObject);
     }
