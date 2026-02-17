@@ -41,9 +41,6 @@ public class Enemy : MonoBehaviour
         // Built-in: "_Color"
 
         //if (mpb.HasColor("_BaseColor"))
-    
-    {
-        
     }
     
     void OnTriggerEnter(Collider other)
