@@ -252,7 +252,6 @@ public class KitchenIngredientController : MonoBehaviour
         // Try place into hovered slot if in its snap range
         if (hoverSlot != null && hoverSlot.IsWithinSnapRange(transform.position) && hoverSlot.TryPlaceIngredient(this))
         {
-            Debug.Log("Inif");
             currentSlot = hoverSlot;
             SetHoverSlot(null);
             return;

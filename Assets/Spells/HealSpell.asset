@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealSpell
   displayName: Spell
   icon: {fileID: 0}
+  requiresRecipeUnlock: 1
+  requiredRecipe: 2
   cooldownSeconds: 10
   healAmount: 50

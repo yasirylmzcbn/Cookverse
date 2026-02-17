@@ -10,7 +10,7 @@ public class ProjectileSpell : SpellDefinition
     [Tooltip("How far in front of the origin the projectile appears (avoids colliding with player).")]
     [Min(0f)]
     public float forwardOffset = 0.8f;
-
+    public override string displayName => "Projectile";
     public override bool CanCast(in SpellCastContext context)
     {
         return projectilePrefab != null;

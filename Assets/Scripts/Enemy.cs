@@ -5,6 +5,10 @@ using System.Collections.Generic;
 public class Enemy : MonoBehaviour
 {
     public float health;
+    
+    
+    
+    
     public Color damageColor = Color.yellow;
     public float flashDuration = 0.1f;
     public int contactDamage = 10;
@@ -37,9 +41,9 @@ public class Enemy : MonoBehaviour
         // Built-in: "_Color"
 
         //if (mpb.HasColor("_BaseColor"))
-        //    originalColor = mpb.GetColor("_BaseColor");
-        //else
-            originalColor = rend.sharedMaterial.color;
+    
+    {
+        
     }
     
     void OnTriggerEnter(Collider other)

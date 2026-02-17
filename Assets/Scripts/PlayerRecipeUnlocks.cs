@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class PlayerRecipeUnlocks : MonoBehaviour
 {
+    public static PlayerRecipeUnlocks Instance { get; private set; }
+
+    private static bool _bootstrapPending;
+    private static List<Recipe> _bootstrapUnlockedOnStart;
+    private static bool _bootstrapPersistToPlayerPrefs;
+    private static string _bootstrapPlayerPrefsKey;
+    private static bool _bootstrapResetUnlocksOnSessionStart;
+
     [Header("Starting unlocks")]
     [SerializeField] private List<Recipe> unlockedOnStart = new List<Recipe>();
 
@@ -11,28 +19,89 @@ public class PlayerRecipeUnlocks : MonoBehaviour
     [SerializeField] private bool persistToPlayerPrefs = true;
     [SerializeField] private string playerPrefsKey = "cookverse.unlockedRecipes";
 
+    [Header("Player Attachment")]
+    [Tooltip("If enabled and this component is attached to the Player, it will move unlock state to a dedicated persistent object and remove itself from the Player.\n\nDisable this if you want the entire Player to persist between scenes.")]
+    [SerializeField] private bool detachFromPlayerOnAwake = false;
+
+    [Tooltip("If enabled, clears any previously saved unlocks when this play session starts (when you press Play).\n\nUnlocks will still persist across scene loads during the current session.")]
+    [SerializeField] private bool resetUnlocksOnSessionStart = false;
+
     private readonly HashSet<Recipe> _unlocked = new HashSet<Recipe>();
 
     public event Action<Recipe> RecipeUnlocked;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning($"Multiple PlayerRecipeUnlocks found. Instance will remain as '{Instance.gameObject.name}', ignoring '{gameObject.name}'.");
+            Destroy(this);
+            return;
+        }
+
+        // If this component is attached to the Player GameObject, persisting it would also persist the whole player,
+        // causing duplicate players across scene loads (and double-input). Instead, bootstrap a dedicated persistent
+        // unlocks object and remove this component from the player.
+        bool attachedToPlayer = GetComponent<PlayerController>() != null || GetComponentInParent<PlayerController>() != null;
+        if (detachFromPlayerOnAwake && attachedToPlayer && !_bootstrapPending)
+        {
+            _bootstrapPending = true;
+            _bootstrapUnlockedOnStart = new List<Recipe>(unlockedOnStart);
+            _bootstrapPersistToPlayerPrefs = persistToPlayerPrefs;
+            _bootstrapPlayerPrefsKey = playerPrefsKey;
+            _bootstrapResetUnlocksOnSessionStart = resetUnlocksOnSessionStart;
+
+            GameObject go = new GameObject("PlayerRecipeUnlocks");
+            go.AddComponent<PlayerRecipeUnlocks>();
+            DontDestroyOnLoad(go);
+
+            Destroy(this);
+            return;
+        }
+
+        if (_bootstrapPending)
+        {
+            // Apply inspector values captured from the player-attached bootstrap.
+            unlockedOnStart = _bootstrapUnlockedOnStart ?? new List<Recipe>();
+            persistToPlayerPrefs = _bootstrapPersistToPlayerPrefs;
+            if (!string.IsNullOrWhiteSpace(_bootstrapPlayerPrefsKey))
+                playerPrefsKey = _bootstrapPlayerPrefsKey;
+            resetUnlocksOnSessionStart = _bootstrapResetUnlocksOnSessionStart;
+
+            _bootstrapPending = false;
+            _bootstrapUnlockedOnStart = null;
+            _bootstrapPlayerPrefsKey = null;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         _unlocked.Clear();
 
-        if (persistToPlayerPrefs)
+        if (resetUnlocksOnSessionStart && persistToPlayerPrefs)
+            PlayerPrefs.DeleteKey(playerPrefsKey);
+
+        if (persistToPlayerPrefs && !resetUnlocksOnSessionStart)
             LoadFromPrefs();
 
         for (int i = 0; i < unlockedOnStart.Count; i++)
             _unlocked.Add(unlockedOnStart[i]);
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     public bool IsUnlocked(Recipe recipe) => _unlocked.Contains(recipe);
 
     public bool Unlock(Recipe recipe)
     {
+        Debug.Log("unlocked recipes before unlock: " + string.Join(", ", _unlocked));
         if (!_unlocked.Add(recipe))
             return false;
-
+        Debug.Log("unlocked recipes after unlock: " + string.Join(", ", _unlocked));
         if (persistToPlayerPrefs)
             SaveToPrefs();
 

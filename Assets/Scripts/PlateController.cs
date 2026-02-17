@@ -23,6 +23,19 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     [Header("Recipe Completion TMP")]
     [SerializeField] public TextMeshProUGUI completionText;
 
+    [Header("Unlock + Spell Grant")]
+    [Tooltip("Optional override; if left empty, this Plate will find the player's PlayerRecipeUnlocks in the scene.")]
+    [SerializeField] private PlayerRecipeUnlocks playerRecipeUnlocks;
+    [Tooltip("Optional. If set and a RecipeSpellDatabase is provided, the unlocked recipe's spell can be equipped.")]
+    [SerializeField] private PlayerController playerController;
+
+    [Tooltip("Optional database to map recipes -> spells.")]
+    [SerializeField] private RecipeSpellDatabase recipeSpellDatabase;
+
+    [Tooltip("If true, when a recipe is completed its mapped spell will be equipped (if available).")]
+    [SerializeField] private bool autoEquipUnlockedSpell = true;
+
+    private bool _unlockedFired;
 
     public Transform ProteinAnchor => proteinAnchor;
     public Transform VegetableAnchor => vegetableAnchor;
@@ -31,9 +44,22 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     public Transform GetProteinAnchor() => proteinAnchor != null ? proteinAnchor : transform;
     public Transform GetVegetableAnchor() => vegetableAnchor != null ? vegetableAnchor : transform;
 
+    private void Awake()
+    {
+        if (playerRecipeUnlocks == null)
+            playerRecipeUnlocks = PlayerRecipeUnlocks.Instance != null
+                ? PlayerRecipeUnlocks.Instance
+                : FindFirstObjectByType<PlayerRecipeUnlocks>();
+
+        if (playerController == null)
+            playerController = PlayerController.Instance != null
+                ? PlayerController.Instance
+                : FindFirstObjectByType<PlayerController>();
+    }
+
     public void Start()
     {
-        requiredIngredients = recipe != null ? Recipes.RecipeIngredients[recipe] : new List<Ingredient>();
+        requiredIngredients = Recipes.RecipeIngredients[recipe];
     }
     public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
@@ -130,15 +156,43 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     public bool IsRecipeComplete()
     {
-        if (recipe == null || proteinIngredient == null || vegetableIngredient == null) return false;
+        if (proteinIngredient == null || vegetableIngredient == null) return false;
         bool hasRequiredProtein = requiredIngredients.Exists(ing => proteinIngredient != null && ing == proteinIngredient.IngredientType);
         bool hasRequiredVegetable = requiredIngredients.Exists(ing => vegetableIngredient != null && ing == vegetableIngredient.IngredientType);
-        if (hasRequiredProtein && hasRequiredVegetable)
+        bool complete = hasRequiredProtein && hasRequiredVegetable;
+        Debug.Log("req:" + hasRequiredProtein + " veg:" + hasRequiredVegetable);
+        if (complete && !_unlockedFired)
         {
+            _unlockedFired = true;
             Debug.Log("Recipe complete: " + recipe);
-            completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
+
+            if (playerRecipeUnlocks != null)
+                playerRecipeUnlocks.Unlock(recipe);
+            else
+                Debug.LogWarning($"No PlayerRecipeUnlocks found. Recipe '{recipe}' won't be saved as unlocked.");
+
+            if (autoEquipUnlockedSpell && recipeSpellDatabase != null && playerController != null)
+            {
+                var spell = recipeSpellDatabase.GetSpellOrNull(recipe);
+                if (spell != null)
+                    playerController.TryEquipSpell(spell);
+            }
+
+            if (completionText != null)
+            {
+                completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
+                StartCoroutine(HideTextCoroutine(5f));
+
+            }
         }
-        return hasRequiredProtein && hasRequiredVegetable;
+        return complete;
     }
 
+    private System.Collections.IEnumerator HideTextCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (completionText != null)
+            completionText.text = "";
+    }
 }
+
