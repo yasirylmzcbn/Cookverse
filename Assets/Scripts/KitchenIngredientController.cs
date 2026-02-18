@@ -57,6 +57,9 @@ public class KitchenIngredientController : MonoBehaviour
     private bool isPreviewSnapped;
     private IngredientSlotBehaviour previewSnappedSlot;
 
+    private CookwareSlot lidHoverSlot;
+    private bool lidHoverInRange;
+
     private IngredientSlotBehaviour currentSlot;
     private IngredientSlotBehaviour hoverSlot;
 
@@ -216,7 +219,38 @@ public class KitchenIngredientController : MonoBehaviour
 
         SetHoverSlot(candidate);
         UpdateHoverSlotPreviewVisibility(pointerWorld);
+        UpdateCookwareLidHover(pointerWorld);
         UpdateDraggedVisualsVisibility();
+    }
+
+    private void UpdateCookwareLidHover(Vector3 pointerWorld)
+    {
+        if (!isDragging)
+            return;
+
+        CookwareSlot cookwareSlot = hoverSlot as CookwareSlot;
+        bool inRange = cookwareSlot != null && cookwareSlot.IsWithinSnapRange(pointerWorld);
+
+        if (cookwareSlot == lidHoverSlot && inRange == lidHoverInRange)
+            return;
+
+        if (lidHoverSlot != null && (cookwareSlot != lidHoverSlot || !inRange))
+            lidHoverSlot.NotifyDragOutOfSnapRangeOrDropped();
+
+        if (cookwareSlot != null && inRange)
+            cookwareSlot.NotifyDragInSnapRange();
+
+        lidHoverSlot = cookwareSlot;
+        lidHoverInRange = inRange;
+    }
+
+    private void CloseAnyCookwareLid()
+    {
+        if (lidHoverSlot != null)
+            lidHoverSlot.NotifyDragOutOfSnapRangeOrDropped();
+
+        lidHoverSlot = null;
+        lidHoverInRange = false;
     }
 
     private void UpdateHoverSlotPreviewVisibility(Vector3 pointerWorld)
@@ -267,6 +301,8 @@ public class KitchenIngredientController : MonoBehaviour
     {
         isDragging = false;
 
+        CloseAnyCookwareLid();
+
         Vector3 pointerWorld = transform.position;
         bool hasPointerWorld = TryGetPointerWorldPoint(out pointerWorld);
 
@@ -304,7 +340,10 @@ public class KitchenIngredientController : MonoBehaviour
         ExitPreviewSnap();
 
         if (hoverSlot is CookwareSlot previousCookwareSlot)
+        {
+            previousCookwareSlot.NotifyDragOutOfSnapRangeOrDropped();
             previousCookwareSlot.HidePreview();
+        }
 
         hoverSlot = slot;
     }
