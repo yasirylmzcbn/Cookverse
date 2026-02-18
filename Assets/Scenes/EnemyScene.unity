@@ -238,37 +238,6 @@ MonoBehaviour:
   spell3Image: {fileID: 1095560220}
   spell4Image: {fileID: 2118974332}
   transparencyAmount: 0.5
---- !u!1 &24765258
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 24765259}
-  m_Layer: 0
-  m_Name: RespawnLocation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &24765259
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 24765258}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -34.974, y: 14.83545, z: 9.08041}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &26371841
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -879,7 +848,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 127
+    m_Bits: 383
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2051,7 +2020,7 @@ MonoBehaviour:
   recipeSpellDatabase: {fileID: 11400000, guid: 0a30c31fba1054c27ad06072348c7c0f, type: 2}
   autoEquipUnlockedSpellsOnSceneLoad: 1
   spellCastOrigin: {fileID: 0}
-  respawnPoint: {fileID: 24765259}
+  respawnPoint: {fileID: 0}
   respawnDelay: 5
   InteractorSource: {fileID: 510499329}
   InteractDistance: 3
@@ -3436,7 +3405,7 @@ MonoBehaviour:
   - {fileID: 733138718}
   - {fileID: 568634287}
   - {fileID: 364518557}
-  enemy: {fileID: 4449353459162960596, guid: 9f6bfe19ed56fcb4aa07712b61eea1d7, type: 3}
+  enemy: {fileID: 4319064042571025655, guid: bc54e2bd2ad770d4da4b4b08f1bc57a1, type: 3}
 --- !u!4 &867598561
 Transform:
   m_ObjectHideFlags: 0
@@ -4980,7 +4949,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 127
+    m_Bits: 383
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -8670,7 +8639,6 @@ SceneRoots:
   - {fileID: 867598561}
   - {fileID: 510499329}
   - {fileID: 777945085}
-  - {fileID: 24765259}
   - {fileID: 1634809587}
   - {fileID: 237174318}
   - {fileID: 672026990}
