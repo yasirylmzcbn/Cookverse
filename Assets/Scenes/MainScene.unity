@@ -2812,7 +2812,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4333027480542367625, guid: 24d4964b45022c64f8d29af3794516ab, type: 3}
       propertyPath: m_Name
-      value: Prop_Pot_02
+      value: Pot
+      objectReference: {fileID: 0}
+    - target: {fileID: 7405238186075876803, guid: 24d4964b45022c64f8d29af3794516ab, type: 3}
+      propertyPath: m_Name
+      value: PotLid
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10384,7 +10388,7 @@ MonoBehaviour:
   recipe: 0
   proteinAnchor: {fileID: 768850188}
   vegetableAnchor: {fileID: 83002422}
-  snapRange: 0.8
+  snapRange: 0.3
   completionText: {fileID: 1098717573}
   playerRecipeUnlocks: {fileID: 0}
   playerController: {fileID: 0}
@@ -11331,7 +11335,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8368094179700348553, guid: fd83c4156fa1b6c4a9f23c1fc1bbbff9, type: 3}
       propertyPath: m_Name
-      value: Prop_Pan_01
+      value: Pan
       objectReference: {fileID: 0}
     - target: {fileID: 9181328905305181235, guid: fd83c4156fa1b6c4a9f23c1fc1bbbff9, type: 3}
       propertyPath: m_LocalScale.x
@@ -11441,8 +11445,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
   isOn: 0
-  ingredientAnchor: {fileID: 0}
-  snapRange: 0.8
+  ingredientAnchor: {fileID: 1421598550}
+  snapRange: 0.4
   showPreview: 1
   previewAlpha: 0.35
   cookRatePerSecond: 0.2
