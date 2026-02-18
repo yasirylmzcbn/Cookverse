@@ -21,6 +21,7 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Portal triggered by: " + other.name);
         if (other.CompareTag("Player"))
         {
             // Collider may be on a child of the player, so resolve from parent.
