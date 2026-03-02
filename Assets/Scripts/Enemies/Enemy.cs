@@ -2,14 +2,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Enemy : MonoBehaviour
+public abstract class Enemy : MonoBehaviour
 {
-    public float health;
-    public Color damageColor = Color.yellow;
-    public float flashDuration = 0.1f;
-    public int contactDamage = 10;
+    [SerializeField] private float health;
+    private bool isDead = false;
+    [SerializeField] private Color damageColor = Color.yellow;
+    [SerializeField] private float flashDuration = 0.1f;
 
-    [HideInInspector] public EnemySpawner spawner;
+    [SerializeField] protected float attackRange = 2f;
+    public float AttackRange => attackRange;
 
     Renderer rend;
     MaterialPropertyBlock mpb;
@@ -32,28 +33,15 @@ public class Enemy : MonoBehaviour
 
         // Grab original color from the material
         rend.GetPropertyBlock(mpb);
-
-        // URP/HDRP: "_BaseColor"
-        // Built-in: "_Color"
-
-        //if (mpb.HasColor("_BaseColor"))
         originalColor = rend.sharedMaterial.color;
     }
-    
-    void OnTriggerEnter(Collider other)
+
+    private void Update()
     {
-        if (other == null)
-            return;
-
-        if (other.CompareTag("Pickup"))
-            return;
-
-            var hitPlayer = other.GetComponentInParent<PlayerController>();
-        if (hitPlayer == null)
-            return;
-
-        hitPlayer.TakeDamage(contactDamage);
+        CheckAttack();
     }
+
+    protected abstract void CheckAttack();
 
     void FlashDamage()
     {
@@ -87,6 +75,8 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
+        if (isDead) return;
+        isDead = true;
         if (dropList != null && dropList.Count > 0)
         {
             int totalWeight = 0;
@@ -116,7 +106,6 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        spawner.KilledEnemy();
         Destroy(gameObject);
     }
 }

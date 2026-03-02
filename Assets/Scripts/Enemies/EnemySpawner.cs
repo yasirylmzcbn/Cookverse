@@ -5,7 +5,6 @@ public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private Transform[] spawners;
     [SerializeField] private GameObject enemy;
-    private int countEnemies = 0;
     private bool doneSpawning = false;
 
     private void Start()
@@ -38,22 +37,6 @@ public class EnemySpawner : MonoBehaviour
         int randomInt = Random.Range(0, spawners.Length);
         Transform randomSpawner = spawners[randomInt];
         GameObject enemyObject = Instantiate(enemy, randomSpawner.position, randomSpawner.rotation);
-        Enemy enemyInstance = enemyObject.GetComponent<Enemy>();
-        if (enemyInstance != null)
-        {
-            enemyInstance.spawner = this;
-        }
-        countEnemies += 1;
-    }
-
-    public void KilledEnemy()
-    {
-        countEnemies -= 1;
-    }
-
-    public int EnemyCount()
-    {
-        return countEnemies;
     }
 
     public bool IsDoneSpawning()

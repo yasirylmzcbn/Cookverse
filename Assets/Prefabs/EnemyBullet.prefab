@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 4447281781105561048}
   - component: {fileID: 1356539694793918385}
   - component: {fileID: 4973155036839625885}
-  - component: {fileID: 4481796287060268162}
   - component: {fileID: 6419235186632422007}
+  - component: {fileID: -912918441243974229}
   m_Layer: 0
-  m_Name: Bullet_Prefab
+  m_Name: EnemyBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114,19 +114,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4481796287060268162
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6888836019528570085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 027cf77f8ff7c6f40a252b11cc06ac4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  speed: 50
 --- !u!54 &6419235186632422007
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -149,8 +136,21 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-912918441243974229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6888836019528570085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f23e29e6d38429f4e8f7e41cbffad0d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBullet
+  speed: 15
