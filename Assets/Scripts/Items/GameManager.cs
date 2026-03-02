@@ -1,15 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, remove later
+    // Difficulty, Inventory, and Saving will be here
+    public static GameManager Instance;
+    [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, hide later
     void Awake()
     {
-        DontDestroyOnLoad(this);
+        // If one already exists and it's not us then destroy the copy
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    public void AddItem(ItemData item, int amount = 1)
+    public void AddInventoryItem(ItemData item, int amount = 1)
     {
         if (items.ContainsKey(item))
         {
@@ -21,7 +31,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void RemoveItem(ItemData item, int amount = 1)
+    public void RemoveInventoryItem(ItemData item, int amount = 1)
     {
         if (!items.ContainsKey(item))
         {
@@ -36,13 +46,13 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public int GetAmount(ItemData item)
+    public int GetInventoryAmount(ItemData item)
     {
         return items.TryGetValue(item, out int amount) ? amount : 0;
     }
 
     //Debugging
-    public string GetAllItemsAsString()
+    public string GetInventoryItemsAsString()
     {
         if (items.Count == 0)
             return "Inventory is empty.";

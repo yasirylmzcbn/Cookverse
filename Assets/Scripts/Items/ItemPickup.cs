@@ -13,9 +13,9 @@ public class ItemPickup : MonoBehaviour
         GetComponent<Collider>().isTrigger = true;
     }
 
-    public void Pickup(Inventory inventory)
+    public void Pickup(GameManager gameManager)
     {
-        inventory.AddItem(itemData);
+        gameManager.AddInventoryItem(itemData);
         Destroy(gameObject);
     }
 
@@ -23,11 +23,10 @@ public class ItemPickup : MonoBehaviour
     {
         if (other == null)
             return;
-
-        var inventory = other.GetComponentInParent<Inventory>();
-        if (inventory == null)
+        if (!other.CompareTag("Pickup"))
             return;
 
-        Pickup(inventory);
+        GameManager gameManager = GetComponent<GameManager>();
+        Pickup(gameManager);
     }
 }
