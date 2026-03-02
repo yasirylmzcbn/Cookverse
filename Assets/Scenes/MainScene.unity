@@ -8818,8 +8818,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2712115251489921090, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3596768669888703369, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4908446894387135627, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2096805503}
     - targetCorrespondingSourceObject: {fileID: 4648406511950137351, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1878806117}
@@ -8848,9 +8852,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2776371998793264749, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 580945789}
-    - targetCorrespondingSourceObject: {fileID: 3596768669888703369, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1404084543}
   m_SourcePrefab: {fileID: 100100000, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
 --- !u!1 &1233862862
 GameObject:
@@ -9850,41 +9851,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8368094179700348553, guid: fd83c4156fa1b6c4a9f23c1fc1bbbff9, type: 3}
   m_PrefabInstance: {fileID: 2011416032}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1404084539 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3596768669888703369, guid: 7f8bf37bb7a312f478ae92d0810f02b4, type: 3}
-  m_PrefabInstance: {fileID: 1204877311}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1404084543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1404084539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f5e96888d356eb44abedd4dfc9c5d2f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnobController
-  kitchenCamera: {fileID: 469138181}
-  cookware: {fileID: 0}
-  cookwareType: 0
-  cookwareSlots:
-  - {fileID: 868018394}
-  - {fileID: 580945785}
-  animator: {fileID: 0}
-  rotationSpeed: 1
-  minAngle: 0
-  maxAngle: 180
-  rotationAxisMode: 0
-  axisSpace: 0
-  rotationAxis: {x: 0, y: 1, z: 0}
-  orientationSourceAxis: 1
-  snapAutoAxisToWorldCardinal: 1
-  mountReference: {fileID: 0}
-  side: 0
-  onThreshold: 30
 --- !u!1 &1408691262
 GameObject:
   m_ObjectHideFlags: 0
@@ -9917,7 +9883,6 @@ Transform:
   m_Children:
   - {fileID: 1637162949}
   - {fileID: 469138178}
-  - {fileID: 2096805503}
   - {fileID: 883070615}
   - {fileID: 1721870319}
   - {fileID: 1863543199}
@@ -12214,7 +12179,7 @@ Transform:
   m_GameObject: {fileID: 2005958086}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -10, y: 1, z: 0}
+  m_LocalPosition: {x: -9.13, y: 1, z: -15.85}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -12529,13 +12494,13 @@ Transform:
   m_GameObject: {fileID: 2096805502}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -30.209206, y: -2.7636068, z: -18.761864}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.17840005, y: 0.89019996, z: 0.33999965}
+  m_LocalScale: {x: 0.59624535, y: 0.7462386, z: 0.6316059}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1785517866}
   - {fileID: 1577630173}
-  m_Father: {fileID: 1408691263}
+  m_Father: {fileID: 883070615}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!136 &2096805504
 CapsuleCollider:
