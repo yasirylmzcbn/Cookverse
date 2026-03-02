@@ -52,6 +52,14 @@ public class KitchenIngredientController : MonoBehaviour
     private Vector3 dragOffset;
     private float lockedY;
 
+    private Transform dragOriginalParent;
+
+    private bool isPreviewSnapped;
+    private IngredientSlotBehaviour previewSnappedSlot;
+
+    private CookwareSlot lidHoverSlot;
+    private bool lidHoverInRange;
+
     private IngredientSlotBehaviour currentSlot;
     private IngredientSlotBehaviour hoverSlot;
 
@@ -169,13 +177,11 @@ public class KitchenIngredientController : MonoBehaviour
     {
         isDragging = true;
 
+        dragOriginalParent = transform.parent;
+
         lockedY = useFixedDragY ? fixedDragY : transform.position.y;
 
-        if (TryGetPointerWorldPoint(out Vector3 pointerWorld))
-        {
-            // dragOffset = transform.position - pointerWorld;
-        }
-        else
+        if (!TryGetPointerWorldPoint(out Vector3 pointerWorld))
             dragOffset = Vector3.zero;
 
         if (rb != null)
@@ -193,40 +199,85 @@ public class KitchenIngredientController : MonoBehaviour
         if (!TryGetPointerWorldPoint(out Vector3 pointerWorld))
             return;
 
-        Vector3 newPos = pointerWorld + dragOffset;
-        newPos.y = lockedY + hoverYOffset;
-        transform.position = newPos;
+        if (!isPreviewSnapped)
+        {
+            Vector3 newPos = pointerWorld + dragOffset;
+            newPos.y = lockedY + hoverYOffset;
+            transform.position = newPos;
+        }
 
-        UpdateHoverPreview();
+        UpdateHoverPreview(pointerWorld);
     }
 
-    private void UpdateHoverPreview()
+    private void UpdateHoverPreview(Vector3 pointerWorld)
     {
         // Prefer slot under cursor (for intent), else nearest in range
         IngredientSlotBehaviour candidate = SphereCastSlotUnderMouse();
 
         if (candidate == null)
-            candidate = FindNearestAcceptingSlotInRange(transform.position);
+            candidate = FindNearestAcceptingSlotInRange(pointerWorld);
 
         SetHoverSlot(candidate);
-        UpdateHoverSlotPreviewVisibility();
+        UpdateHoverSlotPreviewVisibility(pointerWorld);
+        UpdateCookwareLidHover(pointerWorld);
         UpdateDraggedVisualsVisibility();
     }
 
-    private void UpdateHoverSlotPreviewVisibility()
+    private void UpdateCookwareLidHover(Vector3 pointerWorld)
     {
-        if (hoverSlot == null) return;
-
-        bool inRange = hoverSlot.IsWithinSnapRange(transform.position);
-        bool canAccept = hoverSlot.CanAcceptIngredient(this);
-
-        if (hoverSlot is not CookwareSlot cookwareSlot)
+        if (!isDragging)
             return;
 
-        if (inRange && canAccept)
-            cookwareSlot.ShowPreviewFor(this);
+        CookwareSlot cookwareSlot = hoverSlot as CookwareSlot;
+        bool inRange = cookwareSlot != null && cookwareSlot.IsWithinSnapRange(pointerWorld);
+
+        if (cookwareSlot == lidHoverSlot && inRange == lidHoverInRange)
+            return;
+
+        if (lidHoverSlot != null && (cookwareSlot != lidHoverSlot || !inRange))
+            lidHoverSlot.NotifyDragOutOfSnapRangeOrDropped();
+
+        if (cookwareSlot != null && inRange)
+            cookwareSlot.NotifyDragInSnapRange();
+
+        lidHoverSlot = cookwareSlot;
+        lidHoverInRange = inRange;
+    }
+
+    private void CloseAnyCookwareLid()
+    {
+        if (lidHoverSlot != null)
+            lidHoverSlot.NotifyDragOutOfSnapRangeOrDropped();
+
+        lidHoverSlot = null;
+        lidHoverInRange = false;
+    }
+
+    private void UpdateHoverSlotPreviewVisibility(Vector3 pointerWorld)
+    {
+        if (hoverSlot == null)
+        {
+            ExitPreviewSnap();
+            return;
+        }
+
+        if (!hoverSlot.CanAcceptIngredient(this) || !hoverSlot.IsWithinSnapRange(pointerWorld))
+        {
+            ExitPreviewSnap();
+            return;
+        }
+
+        Transform anchor = null;
+
+        if (hoverSlot is ISingleAnchorIngredientSlot singleAnchorSlot)
+            anchor = singleAnchorSlot.GetAnchor();
+        else if (hoverSlot is IDualAnchorIngredientSlot dualAnchorSlot)
+            anchor = IsProteinIngredient ? dualAnchorSlot.GetProteinAnchor() : dualAnchorSlot.GetVegetableAnchor();
+
+        if (anchor != null)
+            EnterPreviewSnap(hoverSlot, anchor);
         else
-            cookwareSlot.HidePreview();
+            ExitPreviewSnap();
     }
 
     private void UpdateDraggedVisualsVisibility()
@@ -249,8 +300,24 @@ public class KitchenIngredientController : MonoBehaviour
     private void EndDragAndTryPlace()
     {
         isDragging = false;
+
+        CloseAnyCookwareLid();
+
+        Vector3 pointerWorld = transform.position;
+        bool hasPointerWorld = TryGetPointerWorldPoint(out pointerWorld);
+
+        // If we were preview-snapped, align back to pointer so SnapInto() doesn't save the anchor as free state.
+        if (isPreviewSnapped)
+        {
+            ExitPreviewSnap();
+            if (hasPointerWorld)
+                AlignToPointer(pointerWorld);
+        }
+
         // Try place into hovered slot if in its snap range
-        if (hoverSlot != null && hoverSlot.IsWithinSnapRange(transform.position) && hoverSlot.TryPlaceIngredient(this))
+        if (hoverSlot != null
+            && (!hasPointerWorld || hoverSlot.IsWithinSnapRange(pointerWorld))
+            && hoverSlot.TryPlaceIngredient(this))
         {
             currentSlot = hoverSlot;
             SetHoverSlot(null);
@@ -269,10 +336,56 @@ public class KitchenIngredientController : MonoBehaviour
     private void SetHoverSlot(IngredientSlotBehaviour slot)
     {
         if (hoverSlot == slot) return;
+
+        ExitPreviewSnap();
+
         if (hoverSlot is CookwareSlot previousCookwareSlot)
+        {
+            previousCookwareSlot.NotifyDragOutOfSnapRangeOrDropped();
             previousCookwareSlot.HidePreview();
+        }
 
         hoverSlot = slot;
+    }
+
+    private void EnterPreviewSnap(IngredientSlotBehaviour slot, Transform anchor)
+    {
+        if (!isDragging) return;
+        if (slot == null) return;
+
+        if (anchor == null) return;
+
+        if (isPreviewSnapped && previewSnappedSlot == slot && transform.parent == anchor)
+            return;
+
+        ExitPreviewSnap();
+
+        isPreviewSnapped = true;
+        previewSnappedSlot = slot;
+
+        transform.SetParent(anchor, true);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+
+        if (rb != null)
+            rb.isKinematic = true;
+    }
+
+    private void ExitPreviewSnap()
+    {
+        if (!isPreviewSnapped)
+            return;
+
+        transform.SetParent(dragOriginalParent, true);
+        isPreviewSnapped = false;
+        previewSnappedSlot = null;
+    }
+
+    private void AlignToPointer(Vector3 pointerWorld)
+    {
+        Vector3 newPos = pointerWorld + dragOffset;
+        newPos.y = lockedY + hoverYOffset;
+        transform.position = newPos;
     }
 
     private IngredientSlotBehaviour SphereCastSlotUnderMouse()

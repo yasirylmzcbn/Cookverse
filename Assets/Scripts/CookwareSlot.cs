@@ -3,6 +3,16 @@ using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+public enum CookwareType
+{
+    None,
+    Pot,
+    Pan,
+    Fryer,
+    Oven,
+    Other
+}
+
 public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 {
     [Header("State")]
@@ -32,6 +42,21 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     [Header("Cooking")]
     [Tooltip("How fast cookLevel increases per second while this slot is On and has an ingredient.")]
     [SerializeField] private float cookRatePerSecond = 0.2f;
+
+    [Header("Lid Animation")]
+    [Tooltip("Animator controlling the pot lid (assign in Inspector).")]
+    [SerializeField] private Animator lidAnimator;
+
+    [Tooltip("Trigger name to play the lid opening animation.")]
+    [SerializeField] private string lidOpenTrigger = "Open";
+
+    [Tooltip("Trigger name to play the lid closing animation.")]
+    [SerializeField] private string lidCloseTrigger = "Close";
+
+    [Tooltip("If true, resets the opposite trigger before setting the new one.")]
+    [SerializeField] private bool resetOppositeTrigger = true;
+
+    private bool _lidIsOpen;
 
     private KitchenIngredientController currentIngredient;
 
@@ -92,6 +117,8 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 
         ingredient.SnapInto(GetAnchor());
 
+        NotifyDragOutOfSnapRangeOrDropped();
+
         HidePreview();
         return true;
     }
@@ -134,5 +161,34 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     private void OnDisable()
     {
         HidePreview();
+        NotifyDragOutOfSnapRangeOrDropped();
+    }
+
+    public void NotifyDragInSnapRange()
+    {
+        if (lidAnimator == null) return;
+        if (_lidIsOpen) return;
+
+        if (resetOppositeTrigger && !string.IsNullOrWhiteSpace(lidCloseTrigger))
+            lidAnimator.ResetTrigger(lidCloseTrigger);
+
+        if (!string.IsNullOrWhiteSpace(lidOpenTrigger))
+            lidAnimator.SetTrigger(lidOpenTrigger);
+
+        _lidIsOpen = true;
+    }
+
+    public void NotifyDragOutOfSnapRangeOrDropped()
+    {
+        if (lidAnimator == null) return;
+        if (!_lidIsOpen) return;
+
+        if (resetOppositeTrigger && !string.IsNullOrWhiteSpace(lidOpenTrigger))
+            lidAnimator.ResetTrigger(lidOpenTrigger);
+
+        if (!string.IsNullOrWhiteSpace(lidCloseTrigger))
+            lidAnimator.SetTrigger(lidCloseTrigger);
+
+        _lidIsOpen = false;
     }
 }
