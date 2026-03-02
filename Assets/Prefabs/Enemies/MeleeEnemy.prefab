@@ -123,10 +123,10 @@ GameObject:
   - component: {fileID: 4637490066776024695}
   - component: {fileID: 7518065302193336739}
   - component: {fileID: 5354711168050443151}
-  - component: {fileID: 7645092982576078453}
   - component: {fileID: -6902579968840462561}
+  - component: {fileID: 3963431768049145428}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: MeleeEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -182,27 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dffcb8e7dde0f445afb558be79adddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
-  player: {fileID: 0}
---- !u!114 &7645092982576078453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4449353459162960596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b45a41ec3598e14da1b4093f9cc118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  health: 10
-  damageColor: {r: 0.97735846, g: 0.9297558, b: 0, a: 1}
-  flashDuration: 0.1
-  contactDamage: 10
-  spawner: {fileID: 0}
-  dropList:
-  - itemData: {fileID: 11400000, guid: e7aec4e41f15be248b3843f5adcfb548, type: 2}
-    weight: 1
+  range: 2
 --- !u!54 &-6902579968840462561
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -230,3 +210,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &3963431768049145428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4449353459162960596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 727693c907f6d6a44acf4dddb1775d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemy
+  health: 10
+  damageColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  flashDuration: 0.1
+  attackRange: 3
+  dropList: []
+  damage: 1
+  attackCooldown: 0.25

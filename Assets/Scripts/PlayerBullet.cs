@@ -2,7 +2,7 @@ using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class PlayerBullet : MonoBehaviour
 {
     public float speed;
     void Start()
@@ -13,16 +13,6 @@ public class Bullet : MonoBehaviour
     void Update()
     {
     }
-
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    Enemy enemy = collision.collider.GetComponentInParent<Enemy>(); //currently hitting the enemy body
-    //    if (enemy != null)
-    //    {
-    //        enemy.Damage(1);
-    //    }
-    //    Destroy(gameObject);
-    //}
 
     private void OnTriggerEnter(Collider other)
     {

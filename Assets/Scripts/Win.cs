@@ -24,7 +24,7 @@ public class Win : MonoBehaviour
         //Debug.Log(!hasWon);
         //Debug.Log(spawner.IsDoneSpawning());
         //Debug.Log(spawner.EnemyCount());
-        if (!hasWon && spawner.IsDoneSpawning() && spawner.EnemyCount() == 0)
+        if (!hasWon && spawner.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
         {
             ShowWin();
         }
