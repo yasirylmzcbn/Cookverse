@@ -3,6 +3,16 @@ using Cookverse.Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+public enum CookwareType
+{
+    None,
+    Pot,
+    Pan,
+    Fryer,
+    Oven,
+    Other
+}
+
 public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 {
     [Header("State")]
