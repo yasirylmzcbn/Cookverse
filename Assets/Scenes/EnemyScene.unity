@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e008002f11772747ae112adbe741e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  playerController: {fileID: 0}
+  playerController: {fileID: 510499327}
   spell1Image: {fileID: 426098814}
   spell2Image: {fileID: 1453167495}
   spell3Image: {fileID: 1095560220}
@@ -1994,6 +1994,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  inventoryToggleAction:
+    m_Name: Inventory Toggle
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 83d7ca9c-da7f-4534-b701-912fde9b94d0
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   spell1Action:
     m_Name: Spell 1
     m_Type: 0
@@ -2031,13 +2040,14 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   spellLoadout:
-  - {fileID: 11400000, guid: ee2119f3837eb4e45a4ae42f61a13a0e, type: 2}
-  - {fileID: 11400000, guid: b487f8ea77b5a4425b8b030ebcd11288, type: 2}
-  - {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
-  - {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   recipeSpellDatabase: {fileID: 11400000, guid: 0a30c31fba1054c27ad06072348c7c0f, type: 2}
-  autoEquipUnlockedSpellsOnSceneLoad: 1
+  autoEquipUnlockedSpellsOnSceneLoad: 0
   spellCastOrigin: {fileID: 0}
+  spellMenu: {fileID: 0}
   respawnPoint: {fileID: 0}
   respawnDelay: 5
   InteractorSource: {fileID: 510499329}

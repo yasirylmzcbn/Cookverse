@@ -11,6 +11,7 @@ public class ProjectileSpell : SpellDefinition
     [Min(0f)]
     public float forwardOffset = 0.8f;
     public override string displayName => "Projectile";
+    public override string description => $"Cast a projectile that can damage enemies.";
     public override bool CanCast(in SpellCastContext context)
     {
         return projectilePrefab != null;

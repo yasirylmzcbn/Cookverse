@@ -10,38 +10,49 @@ public class CameraController : MonoBehaviour
 
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction lookAction;
+    [SerializeField] private InputAction escapeAction;
 
     private float xRotation = 0f;
 
     public Transform playerBody;
 
+    [Header("UI")]
+    [SerializeField] private SpellMenuUI spellMenu;
+
     private void Awake()
     {
         EnsureActionsConfigured();
+        if (spellMenu == null)
+            spellMenu = FindFirstObjectByType<SpellMenuUI>();
     }
 
     private void OnEnable()
     {
         lookAction?.Enable();
+        escapeAction?.Enable();
     }
 
     private void OnDisable()
     {
         lookAction?.Disable();
+        escapeAction?.Disable();
     }
 
     private void EnsureActionsConfigured()
     {
-        if (lookAction != null && lookAction.bindings.Count > 0)
+        if (lookAction == null || lookAction.bindings.Count == 0)
         {
-            return;
+            lookAction = new InputAction("Look", InputActionType.Value);
+            lookAction.AddBinding("<Mouse>/delta");
+            lookAction.AddBinding("<Gamepad>/rightStick");
         }
 
-        lookAction = new InputAction("Look", InputActionType.Value);
-        // Mouse delta (pixels per frame)
-        lookAction.AddBinding("<Mouse>/delta");
-        // Gamepad right stick (-1..1)
-        lookAction.AddBinding("<Gamepad>/rightStick");
+        if (escapeAction == null || escapeAction.bindings.Count == 0)
+        {
+            escapeAction = new InputAction("Escape", InputActionType.Button);
+            escapeAction.AddBinding("<Keyboard>/escape");
+            escapeAction.AddBinding("<Gamepad>/start");
+        }
     }
 
     void Start()
@@ -52,6 +63,18 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        bool menuOpen = spellMenu != null && spellMenu.menuOpen;
+
+        // Escape closes the menu
+        if (menuOpen && escapeAction != null && escapeAction.WasPressedThisFrame())
+        {
+            spellMenu.SetMenuVisible(false);
+            return;
+        }
+
+        // Block camera look while menu is open
+        if (menuOpen) return;
+
         Vector2 lookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
         float mouseX = lookInput.x * sensX * Time.deltaTime;
         float mouseY = lookInput.y * sensY * Time.deltaTime;

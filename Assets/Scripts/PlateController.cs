@@ -174,8 +174,6 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             if (autoEquipUnlockedSpell && recipeSpellDatabase != null && playerController != null)
             {
                 var spell = recipeSpellDatabase.GetSpellOrNull(recipe);
-                if (spell != null)
-                    playerController.TryEquipSpell(spell);
             }
 
             if (completionText != null)

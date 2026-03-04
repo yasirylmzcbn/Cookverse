@@ -17,6 +17,7 @@ public class TimedBuffSpell : SpellDefinition
     [Min(0f)]
     public float shootCooldownMultiplier = 1f;
     public override string displayName => "Adrenaline Rush";
+    public override string description => $"Temporarily boost your move speed by {moveSpeedMultiplier:F0}x and fire rate by {1f / shootCooldownMultiplier:F2}x for {durationSeconds:F1} seconds.";
 
     public override void Cast(in SpellCastContext context)
     {

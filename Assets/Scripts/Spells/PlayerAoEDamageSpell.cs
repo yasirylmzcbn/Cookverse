@@ -17,6 +17,7 @@ public class PlayerAoEDamageSpell : SpellDefinition
     private readonly Collider[] _overlapBuffer = new Collider[64];
 
     public override string displayName => "Ground Slam";
+    public override string description => $"Hit the ground to deal {damage} damage to all enemies within {radius} units.";
 
     public override void Cast(in SpellCastContext context)
     {

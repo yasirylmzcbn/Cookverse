@@ -15,7 +15,7 @@ public class SpellUIScript : MonoBehaviour
 
     [Header("Transparency Settings")]
     [Range(0f, 1f)]
-    public float transparencyAmount = 0.5f; // 50% transparent
+    public float transparencyAmount = 0.5f;
 
     private readonly Dictionary<Image, Color> _originalColors = new Dictionary<Image, Color>();
     private readonly SpellDefinition[] _lastSpells = new SpellDefinition[4];

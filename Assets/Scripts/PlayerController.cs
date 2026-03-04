@@ -35,6 +35,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputAction jumpAction;
     [SerializeField] private InputAction shootAction;
     [SerializeField] private InputAction reloadAction;
+    [SerializeField] private InputAction inventoryToggleAction;
+
 
     [Header("Spell Input (New Input System)")]
     [SerializeField] private InputAction spell1Action;
@@ -45,13 +47,15 @@ public class PlayerController : MonoBehaviour
     [Header("Spells")]
     [Tooltip("4-slot spell loadout. Create spells via Assets > Create > Cookverse > Spells and assign them here.")]
     [SerializeField] private SpellDefinition[] spellLoadout = new SpellDefinition[4];
+    public SpellDefinition[] GetLoadout() => spellLoadout;
     [Tooltip("Optional database used to auto-equip unlocked spells after scene loads.")]
     [SerializeField] private RecipeSpellDatabase recipeSpellDatabase;
-    [Tooltip("If true, equips any unlocked recipe spells when a scene loads.")]
-    [SerializeField] private bool autoEquipUnlockedSpellsOnSceneLoad = true;
 
     [Tooltip("Optional cast origin for spells (e.g., hand or staff tip). If null, uses InteractorSource then transform.")]
     [SerializeField] private Transform spellCastOrigin;
+
+    [Header("UI")]
+    [SerializeField] private SpellMenuUI spellMenu;
 
     [Header("Respawn")]
     [SerializeField] private Transform respawnPoint;
@@ -84,7 +88,6 @@ public class PlayerController : MonoBehaviour
     private bool _cachedShooterBase;
 
     private PlayerRecipeUnlocks _recipeUnlocks;
-
     private void ResolveRecipeUnlocksIfNeeded()
     {
         if (_recipeUnlocks != null) return;
@@ -159,18 +162,23 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    public void UnequipSpell(int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < spellLoadout.Length)
+            spellLoadout[slotIndex] = null;
+    }
+
     void Start()
     {
         switchCamera = FindFirstObjectByType<SwitchCamera>();
         currentHealth = maxHealth;
         ResolveRecipeUnlocksIfNeeded();
-        AutoEquipUnlockedSpells();
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
-        
+
         if (currentHealth <= 0 && !_isDead)
         {
             _isDead = true;
@@ -271,7 +279,6 @@ public class PlayerController : MonoBehaviour
         ResolveRecipeUnlocksIfNeeded();
         _potatoShooter = GetComponentInChildren<Potato_Shooter>(true);
         CacheShooterBaseIfNeeded();
-        AutoEquipUnlockedSpells();
     }
 
     private void OnEnable()
@@ -280,6 +287,7 @@ public class PlayerController : MonoBehaviour
         jumpAction?.Enable();
         shootAction?.Enable();
         reloadAction?.Enable();
+        inventoryToggleAction?.Enable();
 
         spell1Action?.Enable();
         spell2Action?.Enable();
@@ -293,6 +301,7 @@ public class PlayerController : MonoBehaviour
         jumpAction?.Disable();
         shootAction?.Disable();
         reloadAction?.Disable();
+        inventoryToggleAction?.Disable();
 
         spell1Action?.Disable();
         spell2Action?.Disable();
@@ -333,11 +342,19 @@ public class PlayerController : MonoBehaviour
         {
             shootAction = new InputAction("Shoot", InputActionType.Button);
             shootAction.AddBinding("<Mouse>/leftButton");
+            shootAction.AddBinding("<Gamepad>/rightTrigger");
         }
         if (reloadAction == null || reloadAction.bindings.Count == 0)
         {
             reloadAction = new InputAction("Shoot", InputActionType.Button);
             reloadAction.AddBinding("<Keyboard>/r");
+            reloadAction.AddBinding("<Gamepad>/buttonWest");
+        }
+        if (inventoryToggleAction == null || inventoryToggleAction.bindings.Count == 0)
+        {
+            inventoryToggleAction = new InputAction("InventoryToggle", InputActionType.Button);
+            inventoryToggleAction.AddBinding("<Keyboard>/i");
+            inventoryToggleAction.AddBinding("<Gamepad>/buttonSelect");
         }
 
         // Spells (4 slots). Defaults support both keyboard and gamepad at the same time.
@@ -374,7 +391,18 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (_isDead) return;
-        
+
+        if (spellMenu != null && spellMenu.menuOpen)
+        {
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+
+            if (inventoryToggleAction != null && inventoryToggleAction.WasPressedThisFrame())
+                spellMenu.SetMenuVisible(false);
+
+            return;
+        }
+
         if (currentlyInteracting)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
@@ -460,6 +488,15 @@ public class PlayerController : MonoBehaviour
             var potatoShooter = GetPotatoShooter();
             if (potatoShooter != null) potatoShooter.TryReload();
         }
+
+        if (inventoryToggleAction != null && inventoryToggleAction.WasPressedThisFrame())
+        {
+            Debug.Log("Inventory toggle pressed");
+            var isOpen = spellMenu != null && spellMenu.menuOpen;
+            Debug.Log("Found SpellMenuUI: " + spellMenu + " " + isOpen);
+            if (spellMenu != null)
+                spellMenu.SetMenuVisible(!isOpen);
+        }
     }
     private bool IsSpellEquipped(SpellDefinition spell)
     {
@@ -471,25 +508,6 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void AutoEquipUnlockedSpells()
-    {
-        if (!autoEquipUnlockedSpellsOnSceneLoad) return;
-        if (recipeSpellDatabase == null) return;
-
-        var entries = recipeSpellDatabase.GetEntries();
-        if (entries == null) return;
-
-        for (int i = 0; i < entries.Count; i++)
-        {
-            var entry = entries[i];
-            if (entry.spell == null) continue;
-            if (!IsRecipeUnlocked(entry.recipe)) continue;
-            if (IsSpellEquipped(entry.spell)) continue;
-
-            TryEquipSpell(entry.spell);
-        }
     }
 
     private void TryCastSpell(int slotIndex)

@@ -7,6 +7,7 @@ public class HealSpell : SpellDefinition
     [Min(0)]
     public int healAmount = 25;
     public override string displayName => "Heal";
+    public override string description => $"Restore {healAmount} health instantly.";
 
     public override void Cast(in SpellCastContext context)
     {
