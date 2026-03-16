@@ -182,7 +182,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dffcb8e7dde0f445afb558be79adddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
-  range: 2
 --- !u!54 &-6902579968840462561
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -226,6 +225,8 @@ MonoBehaviour:
   damageColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flashDuration: 0.1
   attackRange: 3
-  dropList: []
+  dropList:
+  - itemData: {fileID: 11400000, guid: e7aec4e41f15be248b3843f5adcfb548, type: 2}
+    weight: 1
   damage: 1
   attackCooldown: 0.25

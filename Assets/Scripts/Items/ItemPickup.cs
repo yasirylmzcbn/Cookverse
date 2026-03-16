@@ -26,7 +26,7 @@ public class ItemPickup : MonoBehaviour
         if (!other.CompareTag("Pickup"))
             return;
 
-        GameManager gameManager = GetComponent<GameManager>();
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
         Pickup(gameManager);
     }
 }

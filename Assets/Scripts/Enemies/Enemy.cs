@@ -29,11 +29,9 @@ public abstract class Enemy : MonoBehaviour
     private void Awake()
     {
         rend = GetComponentInChildren<Renderer>();
-        mpb = new MaterialPropertyBlock();
 
-        // Grab original color from the material
-        rend.GetPropertyBlock(mpb);
-        originalColor = rend.sharedMaterial.color;
+        if (rend != null)
+            originalColor = rend.material.color;
     }
 
     private void Update()
@@ -51,13 +49,13 @@ public abstract class Enemy : MonoBehaviour
 
     IEnumerator FlashRoutine()
     {
-        mpb.SetColor("_BaseColor", damageColor);
-        rend.SetPropertyBlock(mpb);
+        if (rend != null)
+            rend.material.color = originalColor * damageColor;
 
         yield return new WaitForSeconds(flashDuration);
 
-        mpb.SetColor("_BaseColor", originalColor);
-        rend.SetPropertyBlock(mpb);
+        if (rend != null)
+        rend.material.color = originalColor;
     }
 
     public void Damage(int d)
