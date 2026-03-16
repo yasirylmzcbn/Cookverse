@@ -23,6 +23,7 @@ public abstract class SpellDefinition : ScriptableObject
     // Script-defined display name. Override if you want a custom name.
     // Default is derived from the concrete spell class name (e.g., "PlayerAoEDamageSpell" -> "Player AoE Damage Spell").
     public virtual string displayName => HumanizeTypeName(GetType().Name);
+    public virtual string description => "placeholder description";
 
     [Header("Unlock")]
     [Tooltip("If enabled, the player must unlock the recipe below before this spell can be cast.")]
