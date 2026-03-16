@@ -9,6 +9,8 @@ public class Win : MonoBehaviour
     private bool hasWon = false;
     public EnemySpawner spawner;
 
+    [SerializeField] private GameObject portal;
+
     void Start()
     {
         winText = GetComponent<TMP_Text>();
@@ -27,6 +29,7 @@ public class Win : MonoBehaviour
         if (!hasWon && spawner.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
         {
             ShowWin();
+            portal.SetActive(true);
         }
     }
 
