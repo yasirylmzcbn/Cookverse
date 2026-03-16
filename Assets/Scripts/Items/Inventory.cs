@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Inventory : MonoBehaviour
 {
     [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, remove later
+    public event Action<ItemData, int> ItemAdded;
+
     void Awake()
     {
         DontDestroyOnLoad(this);
@@ -19,6 +22,9 @@ public class Inventory : MonoBehaviour
         {
             items[item] = amount;
         }
+
+        if (item != null && amount > 0)
+            ItemAdded?.Invoke(item, amount);
     }
 
     public void RemoveItem(ItemData item, int amount = 1)
