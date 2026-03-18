@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ public class GameManager : MonoBehaviour
     // Difficulty, Inventory, and Saving will be here
     public static GameManager Instance;
     [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, hide later
+    public event Action OnInventoryChanged;
     void Awake()
     {
         // If one already exists and it's not us then destroy the copy
@@ -29,6 +31,7 @@ public class GameManager : MonoBehaviour
         {
             items[item] = amount;
         }
+        OnInventoryChanged?.Invoke();
     }
 
     public void RemoveInventoryItem(ItemData item, int amount = 1)
@@ -67,5 +70,10 @@ public class GameManager : MonoBehaviour
         }
 
         return sb.ToString();
+    }
+
+    public IReadOnlyDictionary<ItemData, int> GetItems()
+    {
+        return new Dictionary<ItemData, int>(items);
     }
 }
