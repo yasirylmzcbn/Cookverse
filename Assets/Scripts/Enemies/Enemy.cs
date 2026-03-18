@@ -75,6 +75,9 @@ public abstract class Enemy : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        if (QuestManager.Instance != null)
+            QuestManager.Instance.RegisterEnemyKilled();
+
         if (dropList != null && dropList.Count > 0)
         {
             int totalWeight = 0;

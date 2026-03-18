@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class UIScript : MonoBehaviour
@@ -10,6 +9,8 @@ public class UIScript : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     private PlayerController _playerController;
     private Potato_Shooter _potatoShooter;
+    [SerializeField] private QuestManager questManager;
+    private QuestManager _questManager;
 
     [Header("Runtime")]
     [Tooltip("How often to retry finding player/shooter references when missing.")]
@@ -51,6 +52,15 @@ public class UIScript : MonoBehaviour
 
         if (_potatoShooter == null && _playerController != null)
             _potatoShooter = _playerController.GetComponentInChildren<Potato_Shooter>(true);
+
+        if (_questManager == null)
+        {
+            _questManager = questManager != null ? questManager : QuestManager.Instance;
+            if (_questManager == null)
+                _questManager = FindFirstObjectByType<QuestManager>();
+
+            questManager = _questManager;
+        }
     }
 
     [Header("Health UI")]
@@ -63,15 +73,12 @@ public class UIScript : MonoBehaviour
     [Header("Quests UI")]
     [SerializeField] private TextMeshProUGUI questText;
 
-    private readonly List<string> _quests = new List<string>();
+    [Header("UI Transparency")]
+    [SerializeField, Range(0f, 1f)] private float dimmedAlpha = 0.3f;
 
     void Start()
     {
         ResolveReferences();
-
-        _quests.Add("End Waddle Quackdonald's entire career");
-        _quests.Add("Collect exotic meats from Marinara Trench");
-        _quests.Add("Find the star");
     }
 
     void Update()
@@ -100,11 +107,20 @@ public class UIScript : MonoBehaviour
 
             // more transparent text during reload
             var c = ammoText.color;
-            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? 0.5f : 1f;
+            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? dimmedAlpha : 1f;
             ammoText.color = c;
         }
 
         if (questText != null)
-            questText.text = "> " + string.Join("\n> ", _quests);
+        {
+            if (_questManager != null)
+                questText.text = _questManager.GetQuestDisplayText();
+            else
+                questText.text = "> No active quest";
+
+            var qc = questText.color;
+            qc.a = (_questManager != null && _questManager.IsCompleted) ? dimmedAlpha : 1f;
+            questText.color = qc;
+        }
     }
 }

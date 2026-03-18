@@ -6,6 +6,7 @@ public class MinimapCameraLimits : MonoBehaviour
 
     public GameObject player;
     public float yLimit;
+    private Transform _playerTransform;
 
     private void Awake()
     {
@@ -31,6 +32,47 @@ public class MinimapCameraLimits : MonoBehaviour
 
     private void Update()
     {
-        transform.position = new Vector3(player.transform.position.x, yLimit, player.transform.position.z);
+        if (!TryResolvePlayerTransform())
+            return;
+
+        Vector3 p = _playerTransform.position;
+        transform.position = new Vector3(p.x, yLimit, p.z);
+    }
+
+    private bool TryResolvePlayerTransform()
+    {
+        if (_playerTransform != null)
+            return true;
+
+        if (player != null)
+        {
+            _playerTransform = player.transform;
+            return _playerTransform != null;
+        }
+
+        if (PlayerController.Instance != null)
+        {
+            player = PlayerController.Instance.gameObject;
+            _playerTransform = PlayerController.Instance.transform;
+            return _playerTransform != null;
+        }
+
+        PlayerController foundPlayerController = FindFirstObjectByType<PlayerController>();
+        if (foundPlayerController != null)
+        {
+            player = foundPlayerController.gameObject;
+            _playerTransform = foundPlayerController.transform;
+            return _playerTransform != null;
+        }
+
+        GameObject taggedPlayer = GameObject.FindGameObjectWithTag("Player");
+        if (taggedPlayer != null)
+        {
+            player = taggedPlayer;
+            _playerTransform = taggedPlayer.transform;
+            return _playerTransform != null;
+        }
+
+        return false;
     }
 }

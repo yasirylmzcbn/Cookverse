@@ -244,12 +244,13 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         // Ensure only one PlayerController exists across scene loads.
-        // This prevents double-input (controlling 2 players) and fixes UI/spells binding to the wrong player.
+        // If a scene spawns a new player while one already exists, keep the new scene instance
+        // (it has fresh scene references) and transfer runtime state from the old instance.
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning($"Duplicate PlayerController detected. Keeping '{Instance.gameObject.name}', destroying '{gameObject.name}'.");
-            Destroy(gameObject);
-            return;
+            Debug.LogWarning($"Duplicate PlayerController detected during scene load. Migrating state from '{Instance.gameObject.name}' to '{gameObject.name}' and destroying old instance.");
+            CopyRuntimeStateFrom(Instance);
+            Destroy(Instance.gameObject);
         }
 
         Instance = this;
@@ -262,6 +263,31 @@ public class PlayerController : MonoBehaviour
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void CopyRuntimeStateFrom(PlayerController previous)
+    {
+        if (previous == null) return;
+
+        maxHealth = previous.maxHealth;
+        currentHealth = previous.currentHealth;
+        speed = previous.speed;
+        jumpHeight = previous.jumpHeight;
+        gravity = previous.gravity;
+
+        if (previous.spellLoadout != null)
+        {
+            if (spellLoadout == null || spellLoadout.Length != previous.spellLoadout.Length)
+                spellLoadout = new SpellDefinition[previous.spellLoadout.Length];
+
+            for (int i = 0; i < previous.spellLoadout.Length; i++)
+                spellLoadout[i] = previous.spellLoadout[i];
+        }
+
+        for (int i = 0; i < _nextSpellTimes.Length && i < previous._nextSpellTimes.Length; i++)
+            _nextSpellTimes[i] = previous._nextSpellTimes[i];
+
+        _moveSpeedMultiplier = previous._moveSpeedMultiplier;
     }
 
     private void OnDestroy()
