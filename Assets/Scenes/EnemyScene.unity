@@ -1415,10 +1415,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e007866dc423b2f4da25f9cba6fe5a6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwitchCamera
-  firstPersonCamera: {fileID: 0}
-  thirdPersonCamera: {fileID: 0}
+  firstPersonCamera: {fileID: 1195717447}
+  thirdPersonCamera: {fileID: 382685871}
   kitchenCamera: {fileID: 0}
-  playerBody: {fileID: 0}
+  playerBody: {fileID: 142551280}
   currentKitchenCamera: 0
 --- !u!95 &336891338
 Animator:

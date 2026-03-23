@@ -4931,7 +4931,7 @@ MonoBehaviour:
   playerController: {fileID: 2005958089}
   playerRecipeUnlocks: {fileID: 2005958087}
   recipeSpellDatabase: {fileID: 11400000, guid: 0a30c31fba1054c27ad06072348c7c0f, type: 2}
-  inventoryPanel: {fileID: 0}
+  inventoryPanel: {fileID: 91390159}
   spellMenuRoot: {fileID: 1054950106}
   spellNameText: {fileID: 35759240}
   spellDescText: {fileID: 809598455}
