@@ -15,7 +15,7 @@ public class RangedEnemy : Enemy
     private Transform playerTransform;
     private bool canAttack;
 
-    private void Awake()
+    private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;

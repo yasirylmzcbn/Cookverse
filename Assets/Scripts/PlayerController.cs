@@ -243,14 +243,11 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        // Ensure only one PlayerController exists across scene loads.
-        // If a scene spawns a new player while one already exists, keep the new scene instance
-        // (it has fresh scene references) and transfer runtime state from the old instance.
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning($"Duplicate PlayerController detected during scene load. Migrating state from '{Instance.gameObject.name}' to '{gameObject.name}' and destroying old instance.");
-            CopyRuntimeStateFrom(Instance);
-            Destroy(Instance.gameObject);
+            Debug.LogWarning($"Duplicate PlayerController detected during scene load. Keeping existing instance '{Instance.gameObject.name}' and destroying new instance '{gameObject.name}'.");
+            Destroy(gameObject);
+            return;
         }
 
         Instance = this;

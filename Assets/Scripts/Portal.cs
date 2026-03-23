@@ -35,6 +35,7 @@ public class Portal : MonoBehaviour
 
             if (shooter != null)
             {
+                Debug.Log("Shooter enabled");
                 if (!string.IsNullOrEmpty(sceneToLoad) && sceneToLoad == cookingSceneName)
                     shooter.gameObject.SetActive(false);
                 else if (!string.IsNullOrEmpty(sceneToLoad) && sceneToLoad == combatSceneName)
