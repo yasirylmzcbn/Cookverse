@@ -35,10 +35,10 @@ public class KnobController : MonoBehaviour
     [Tooltip("Explicitly chosen cookware type")]
     [SerializeField] private CookwareType cookwareType;
     [Tooltip("One or more cookware slots controlled by this knob (fryer trays, oven racks, etc.).")]
-    [SerializeField] private CookwareSlot[] cookwareSlots;
+    [SerializeField] protected CookwareSlot[] cookwareSlots;
 
     [Header("Animator")]
-    [Tooltip("Animator controlling the Cookware.")]
+    [Tooltip("Animator that gets triggered when knob is turned on/off")]
     [SerializeField] private Animator animator;
 
     [Header("Rotation Settings")]
@@ -134,7 +134,6 @@ public class KnobController : MonoBehaviour
 
         if (isDragging)
         {
-            Debug.Log("dragging");
             Vector2 currentMousePos = mouse.position.ReadValue();
             Vector2 mouseDelta = currentMousePos - lastMousePos;
 
@@ -152,7 +151,6 @@ public class KnobController : MonoBehaviour
 
             bool newIsOn = currentAngle >= onThreshold;
             bool anyChanged = false;
-            Debug.Log("newIsOn: " + newIsOn);
             if (cookwareSlots != null)
             {
                 for (int i = 0; i < cookwareSlots.Length; i++)
@@ -166,9 +164,19 @@ public class KnobController : MonoBehaviour
                         anyChanged = true;
                 }
             }
-            Debug.Log("anyChanged: " + anyChanged);
             if (anyChanged)
-                OnStateChanged(newIsOn);
+            {
+                if (GetType() == typeof(OvenKnobController))
+                {
+                    Debug.Log("ovenknobcontrolerrrr");
+                    OvenKnobController ovenKnob = this as OvenKnobController;
+                    ovenKnob.OnStateChanged(newIsOn);
+                }
+                else
+                {
+                    OnStateChanged(newIsOn);
+                }
+            }
 
             lastMousePos = currentMousePos;
         }

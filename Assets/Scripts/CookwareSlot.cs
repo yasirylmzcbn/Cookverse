@@ -158,7 +158,7 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
         _previewSource = null;
     }
 
-    private void OnDisable()
+    protected void OnDisable()
     {
         HidePreview();
         NotifyDragOutOfSnapRangeOrDropped();
