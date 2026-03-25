@@ -6137,6 +6137,7 @@ MonoBehaviour:
   rawForm: {fileID: 650247923}
   choppedForm: {fileID: 650247923}
   cookedForm: {fileID: 2057995218}
+  burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
   kitchenCamera: {fileID: 469138181}
   interactLayers:
     serializedVersion: 2
@@ -6864,6 +6865,7 @@ MonoBehaviour:
   rawForm: {fileID: 1141755397}
   choppedForm: {fileID: 1141755397}
   cookedForm: {fileID: 1822668264}
+  burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
   kitchenCamera: {fileID: 469138181}
   interactLayers:
     serializedVersion: 2
@@ -7328,6 +7330,7 @@ MonoBehaviour:
   rawForm: {fileID: 221579764}
   choppedForm: {fileID: 470078259}
   cookedForm: {fileID: 303501784}
+  burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
   kitchenCamera: {fileID: 469138181}
   interactLayers:
     serializedVersion: 2
@@ -12133,6 +12136,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2114661734}
   m_CullTransparentMesh: 1
+--- !u!1 &2118336783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2118336784}
+  - component: {fileID: 2118336785}
+  m_Layer: 0
+  m_Name: OvenInterior
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2118336784
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118336783}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1974601877}
+  - {fileID: 364076572}
+  - {fileID: 1627867128}
+  m_Father: {fileID: 144744755}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &2118336785
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118336783}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 61ea969a2027b4c3680e3b35a374966a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &2693377544517624832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12235,63 +12295,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 122336856457184718, guid: e4636b039935e6143b67a12f4570725b, type: 3}
   m_PrefabInstance: {fileID: 2693377544517624832}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2118336783
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2118336784}
-  - component: {fileID: 2118336785}
-  m_Layer: 0
-  m_Name: OvenInterior
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2118336784
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118336783}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1974601877}
-  - {fileID: 364076572}
-  - {fileID: 1627867128}
-  m_Father: {fileID: 144744755}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &2118336785
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118336783}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 61ea969a2027b4c3680e3b35a374966a, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &3762632273478058404
 PrefabInstance:
   m_ObjectHideFlags: 0
