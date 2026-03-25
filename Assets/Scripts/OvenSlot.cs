@@ -87,10 +87,49 @@ public class OvenSlot : CookwareSlot
     public float DistanceToAnchor2(Vector3 worldPos) =>
         Vector3.Distance(worldPos, GetAnchor2().position);
 
+    public override float DistanceToAnchor(Vector3 worldPos, KitchenIngredientController ingredient)
+    {
+        bool anchor1Available = !HasIngredient() || CurrentIngredient == ingredient;
+        bool anchor2Available = !HasIngredient2() || _ingredient2 == ingredient;
+
+        if (anchor1Available && anchor2Available)
+            return Mathf.Min(DistanceToAnchor(worldPos), DistanceToAnchor2(worldPos));
+
+        if (anchor1Available)
+            return DistanceToAnchor(worldPos);
+
+        if (anchor2Available)
+            return DistanceToAnchor2(worldPos);
+
+        return Mathf.Min(DistanceToAnchor(worldPos), DistanceToAnchor2(worldPos));
+    }
+
     /// <summary>True if worldPos is within snap range of either anchor.</summary>
     public bool IsWithinSnapRangeOfEither(Vector3 worldPos) =>
         IsWithinSnapRange(worldPos) ||
         DistanceToAnchor2(worldPos) <= SnapRange;
+
+    public override bool IsWithinSnapRange(Vector3 ingredientWorldPos)
+    {
+        return DistanceToAnchor(ingredientWorldPos) <= SnapRange
+               || DistanceToAnchor2(ingredientWorldPos) <= SnapRange;
+    }
+
+    public Transform GetPreviewAnchor(Vector3 worldPos, KitchenIngredientController ingredient)
+    {
+        bool anchor1Available = !HasIngredient() || CurrentIngredient == ingredient;
+        bool anchor2Available = !HasIngredient2() || _ingredient2 == ingredient;
+
+        if (anchor1Available && !anchor2Available)
+            return GetAnchor();
+
+        if (!anchor1Available && anchor2Available)
+            return GetAnchor2();
+
+        return DistanceToAnchor(worldPos) <= DistanceToAnchor2(worldPos)
+            ? GetAnchor()
+            : GetAnchor2();
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Placement overrides
@@ -103,13 +142,19 @@ public class OvenSlot : CookwareSlot
         return !HasIngredient() || !HasIngredient2();
     }
 
+    public override bool CanRemoveIngredient()
+    {
+        bool anchor1Removable = CurrentIngredient != null && (!IsOn || CurrentIngredient.IsCooked());
+        bool anchor2Removable = _ingredient2 != null && (!IsOn || _ingredient2.IsCooked());
+        return anchor1Removable || anchor2Removable;
+    }
+
     /// <summary>
     /// Snaps the ingredient to the nearest free anchor.
     /// If both are free, picks the closer one; otherwise fills the empty slot.
     /// </summary>
     public override bool TryPlaceIngredient(KitchenIngredientController ingredient)
     {
-        Debug.Log($"OvenSlot: TryPlaceIngredient called with ingredient={ingredient?.name}");
         if (!CanAcceptIngredient(ingredient)) return false;
 
         bool anchor1Free = !HasIngredient();
@@ -139,7 +184,6 @@ public class OvenSlot : CookwareSlot
             ingredient.SnapInto(GetAnchor2());
             // Ingredient has been placed - treat as "dropped outside range"
             // so the door-close counter is decremented correctly.
-            NotifyDragOutOfSnapRange();
             HidePreview();
             return true;
         }
@@ -149,7 +193,9 @@ public class OvenSlot : CookwareSlot
     public override bool RemoveIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
-        if (!CanRemoveIngredient()) return false;
+
+        bool canRemoveTarget = !IsOn || ingredient.IsCooked();
+        if (!canRemoveTarget) return false;
 
         if (_ingredient2 == ingredient)
         {

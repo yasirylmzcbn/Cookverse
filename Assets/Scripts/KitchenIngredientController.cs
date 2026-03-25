@@ -269,7 +269,9 @@ public class KitchenIngredientController : MonoBehaviour
 
         Transform anchor = null;
 
-        if (hoverSlot is ISingleAnchorIngredientSlot singleAnchorSlot)
+        if (hoverSlot is OvenSlot ovenSlot)
+            anchor = ovenSlot.GetPreviewAnchor(pointerWorld, this);
+        else if (hoverSlot is ISingleAnchorIngredientSlot singleAnchorSlot)
             anchor = singleAnchorSlot.GetAnchor();
         else if (hoverSlot is IDualAnchorIngredientSlot dualAnchorSlot)
             anchor = IsProteinIngredient ? dualAnchorSlot.GetProteinAnchor() : dualAnchorSlot.GetVegetableAnchor();
@@ -351,9 +353,7 @@ public class KitchenIngredientController : MonoBehaviour
     private void EnterPreviewSnap(IngredientSlotBehaviour slot, Transform anchor)
     {
         if (!isDragging) return;
-        if (slot == null) return;
-
-        if (anchor == null) return;
+        if (slot == null || anchor == null) return;
 
         if (isPreviewSnapped && previewSnappedSlot == slot && transform.parent == anchor)
             return;
@@ -363,9 +363,15 @@ public class KitchenIngredientController : MonoBehaviour
         isPreviewSnapped = true;
         previewSnappedSlot = slot;
 
+        Vector3 worldScale = transform.lossyScale;
         transform.SetParent(anchor, true);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
+        transform.localScale = new Vector3(
+            worldScale.x / anchor.lossyScale.x,
+            worldScale.y / anchor.lossyScale.y,
+            worldScale.z / anchor.lossyScale.z
+        );
 
         if (rb != null)
             rb.isKinematic = true;
@@ -489,9 +495,16 @@ public class KitchenIngredientController : MonoBehaviour
         {
             if (!IsCooked())
                 SetToChoppedForm();
+            Vector3 worldScale = transform.lossyScale;
             transform.SetParent(anchor, true);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
+
+            transform.localScale = new Vector3(
+        worldScale.x / anchor.lossyScale.x,
+        worldScale.y / anchor.lossyScale.y,
+        worldScale.z / anchor.lossyScale.z
+    );
         }
 
         if (rb != null)

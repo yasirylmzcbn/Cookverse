@@ -653,6 +653,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1670955222}
   - {fileID: 1705382068}
   - {fileID: 2118336784}
   - {fileID: 1072511593}
@@ -3858,7 +3859,7 @@ Transform:
   m_GameObject: {fileID: 634833055}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.23, z: 0}
+  m_LocalPosition: {x: -0.243, y: 0.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6419,7 +6420,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!1 &1250806685
 GameObject:
   m_ObjectHideFlags: 0
@@ -6557,7 +6558,7 @@ Transform:
   m_GameObject: {fileID: 1264805465}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -0.187, z: 0}
+  m_LocalPosition: {x: 0.197, y: 0.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8453,15 +8454,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1627867127}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.44893265, y: -1.8683815, z: -2.2497807}
-  m_LocalScale: {x: 0.025572585, y: 1.5809261, z: 0.9465717}
+  m_LocalScale: {x: 1.5142045, y: 0.032144967, z: 0.9465717}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1264805466}
   - {fileID: 634833056}
   m_Father: {fileID: 2118336784}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1627867129
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8602,6 +8603,37 @@ Transform:
   - {fileID: 1773044556}
   m_Father: {fileID: 1408691263}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1670955221
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1670955222}
+  m_Layer: 0
+  m_Name: OvenCameraTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1670955222
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670955221}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.9961947, z: -0.08715578, w: 0}
+  m_LocalPosition: {x: -0.46500015, y: -1.384, z: 0.632}
+  m_LocalScale: {x: 1.7981348, y: 1.6548268, z: 1.06}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 144744755}
+  m_LocalEulerAnglesHint: {x: 10, y: 180, z: 0}
 --- !u!1 &1673137010
 GameObject:
   m_ObjectHideFlags: 0
@@ -9126,7 +9158,7 @@ MeshCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
   m_Convex: 1
@@ -9413,6 +9445,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   kitchenCamera: {fileID: 469138181}
   ovenSlot: {fileID: 1627867131}
+  ovenCameraTarget: {fileID: 1670955222}
+  lerpSpeed: 4
   allowDrag: 1
   dragThreshold: 20
 --- !u!1 &1785517865
