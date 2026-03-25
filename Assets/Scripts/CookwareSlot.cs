@@ -69,20 +69,21 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     {
         if (!isOn) return;
         if (currentIngredient == null) return;
-        if (currentIngredient.IsCooked()) return;
 
-        currentIngredient.cookLevel = Mathf.Clamp01(currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime);
-
-        if (currentIngredient.cookLevel >= 1)
+        currentIngredient.cookLevel = currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime;
+        if (currentIngredient.IsCooked())
         {
             currentIngredient.SetToCookedForm();
+        }
+        if (currentIngredient.IsBurnt())
+        {
+            currentIngredient.SetToBurntForm();
         }
     }
 
 
     public bool HasIngredient() => currentIngredient != null;
 
-    public override bool CanRemoveIngredient() => !IsOn || (currentIngredient != null && currentIngredient.IsCooked());
     public override float SnapRange => snapRange;
     public Transform IngredientAnchor => ingredientAnchor;
     public Transform GetAnchor() => IngredientAnchor != null ? IngredientAnchor : transform;
@@ -127,7 +128,6 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     {
         if (ingredient == null) return false;
         if (currentIngredient != ingredient) return false;
-        if (!CanRemoveIngredient()) return false;
 
         currentIngredient = null;
         ingredient.OnRemovedFromSlot();
@@ -158,7 +158,7 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
         _previewSource = null;
     }
 
-    private void OnDisable()
+    protected void OnDisable()
     {
         HidePreview();
         NotifyDragOutOfSnapRangeOrDropped();
