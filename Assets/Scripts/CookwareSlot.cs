@@ -84,7 +84,6 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 
     public bool HasIngredient() => currentIngredient != null;
 
-    public override bool CanRemoveIngredient() => !IsOn || (currentIngredient != null && currentIngredient.IsCooked());
     public override float SnapRange => snapRange;
     public Transform IngredientAnchor => ingredientAnchor;
     public Transform GetAnchor() => IngredientAnchor != null ? IngredientAnchor : transform;
@@ -129,7 +128,6 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     {
         if (ingredient == null) return false;
         if (currentIngredient != ingredient) return false;
-        if (!CanRemoveIngredient()) return false;
 
         currentIngredient = null;
         ingredient.OnRemovedFromSlot();

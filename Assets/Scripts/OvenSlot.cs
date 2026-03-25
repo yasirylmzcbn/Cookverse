@@ -142,13 +142,6 @@ public class OvenSlot : CookwareSlot
         return !HasIngredient() || !HasIngredient2();
     }
 
-    public override bool CanRemoveIngredient()
-    {
-        bool anchor1Removable = CurrentIngredient != null && (!IsOn || CurrentIngredient.IsCooked());
-        bool anchor2Removable = _ingredient2 != null && (!IsOn || _ingredient2.IsCooked());
-        return anchor1Removable || anchor2Removable;
-    }
-
     /// <summary>
     /// Snaps the ingredient to the nearest free anchor.
     /// If both are free, picks the closer one; otherwise fills the empty slot.

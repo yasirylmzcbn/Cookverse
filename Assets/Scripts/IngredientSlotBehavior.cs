@@ -6,7 +6,6 @@ namespace Cookverse.Assets.Scripts
     {
         public abstract float SnapRange { get; }
         public abstract bool CanAcceptIngredient(KitchenIngredientController ingredient);
-        public abstract bool CanRemoveIngredient();
         public abstract bool IsWithinSnapRange(Vector3 ingredientWorldPos);
         public abstract float DistanceToAnchor(Vector3 worldPos, KitchenIngredientController ingredient);
         public abstract bool TryPlaceIngredient(KitchenIngredientController ingredient);

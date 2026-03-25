@@ -111,9 +111,6 @@ public class KitchenIngredientController : MonoBehaviour
 
         if (currentSlot != null)
         {
-            if (!currentSlot.CanRemoveIngredient())
-                return;
-
             currentSlot.RemoveIngredient(this);
             currentSlot = null;
 

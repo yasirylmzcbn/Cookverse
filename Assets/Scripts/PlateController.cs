@@ -126,16 +126,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         return false;
     }
 
-    public override bool CanRemoveIngredient()
-    {
-        // Allow removing from plate (useful while testing).
-        return true;
-    }
-
     public override bool RemoveIngredient(KitchenIngredientController ingredient)
     {
         if (ingredient == null) return false;
-        if (!CanRemoveIngredient()) return false;
+
 
         if (proteinIngredient == ingredient)
         {
