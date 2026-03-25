@@ -213,7 +213,7 @@ public class OvenSlot : CookwareSlot
 
     // NOTE: Unity does not call base.Update() automatically; we must do it
     // ourselves so slot-1 cooking still works.
-    private new void Update()
+    private void Update()
     {
         // Slot 1 - handled by CookwareSlot.Update (private, so we call it via
         // the "new" keyword shadowing; Unity will call this Update, not base).
@@ -222,9 +222,9 @@ public class OvenSlot : CookwareSlot
         CookSlot2();
     }
 
+    // Replicates the cooking logic from CookwareSlot.Update for slot 1
     private void CookSlot1()
     {
-        // Replicate CookwareSlot.Update() logic for the inherited slot.
         if (!IsOn) return;
         var ing = CurrentIngredient;
         if (ing == null || ing.IsCooked()) return;
@@ -232,6 +232,10 @@ public class OvenSlot : CookwareSlot
         ing.cookLevel = Mathf.Clamp01(ing.cookLevel + ovenCookRatePerSecond * Time.deltaTime);
         if (ing.cookLevel >= 1f)
             ing.SetToCookedForm();
+        if (ing.cookLevel >= 1.75f)
+        {
+            ing.SetToBurntForm();
+        }
     }
 
     private void CookSlot2()
@@ -246,25 +250,13 @@ public class OvenSlot : CookwareSlot
             _ingredient2.SetToCookedForm();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Door animation  (mirrors the pot-lid API in CookwareSlot exactly)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Call when a dragged ingredient enters snap range of either anchor.
-    /// Multiple concurrent drags are tracked safely via a counter.
-    /// </summary>
-    public void NotifyDragInSnapRange()
+    public new void NotifyDragInSnapRange()
     {
         _dragsInRange++;
         if (_doorIsOpen) return;
         OpenDoor();
     }
 
-    /// <summary>
-    /// Call when a dragged ingredient leaves snap range or is dropped.
-    /// The door closes only once every active drag has reported out.
-    /// </summary>
     public void NotifyDragOutOfSnapRange()
     {
         _dragsInRange = Mathf.Max(0, _dragsInRange - 1);

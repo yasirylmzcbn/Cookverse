@@ -69,13 +69,15 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
     {
         if (!isOn) return;
         if (currentIngredient == null) return;
-        if (currentIngredient.IsCooked()) return;
 
-        currentIngredient.cookLevel = Mathf.Clamp01(currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime);
-
-        if (currentIngredient.cookLevel >= 1)
+        currentIngredient.cookLevel = currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime;
+        if (currentIngredient.IsCooked())
         {
             currentIngredient.SetToCookedForm();
+        }
+        if (currentIngredient.IsBurnt())
+        {
+            currentIngredient.SetToBurntForm();
         }
     }
 
