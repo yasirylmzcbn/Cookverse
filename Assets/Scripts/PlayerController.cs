@@ -14,6 +14,15 @@ public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance { get; private set; }
 
+    public Transform PlayerBodyTransform => transform;
+
+    [Header("Visuals")]
+    [Tooltip("Optional root object containing the visible body/mesh. If left empty, all child renderers under the player are used.")]
+    [SerializeField] private GameObject bodyVisualRoot;
+
+    private Renderer[] _bodyRenderers;
+    private bool _bodyRenderersCached;
+
     public CharacterController controller;
     public float speed = 10;
     public float gravity = -9.81f * 2;
@@ -86,6 +95,9 @@ public class PlayerController : MonoBehaviour
     private Potato_Shooter _potatoShooter;
     private float _baseShootCooldownDuration;
     private bool _cachedShooterBase;
+
+    private static readonly Dictionary<string, Vector3> _sceneReturnPositions = new Dictionary<string, Vector3>();
+    private static readonly Dictionary<string, Quaternion> _sceneReturnRotations = new Dictionary<string, Quaternion>();
 
     private PlayerRecipeUnlocks _recipeUnlocks;
     private void ResolveRecipeUnlocksIfNeeded()
@@ -168,10 +180,27 @@ public class PlayerController : MonoBehaviour
             spellLoadout[slotIndex] = null;
     }
 
+    public void SetBodyVisible(bool visible)
+    {
+        CacheBodyRenderersIfNeeded();
+
+        if (_bodyRenderers == null)
+            return;
+
+        for (int i = 0; i < _bodyRenderers.Length; i++)
+        {
+            Renderer bodyRenderer = _bodyRenderers[i];
+            if (bodyRenderer != null)
+                bodyRenderer.enabled = visible;
+        }
+    }
+
     void Start()
     {
         switchCamera = FindFirstObjectByType<SwitchCamera>();
         currentHealth = maxHealth;
+        DisableCombat();
+
         ResolveRecipeUnlocksIfNeeded();
     }
 
@@ -252,7 +281,6 @@ public class PlayerController : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         EnsureActionsConfigured();
         _potatoShooter = GetComponentInChildren<Potato_Shooter>(true);
         CacheShooterBaseIfNeeded();
@@ -298,10 +326,58 @@ public class PlayerController : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Scene cameras and other refs live per-scene.
+        currentlyInteracting = false;
         switchCamera = FindFirstObjectByType<SwitchCamera>();
+        spellMenu = FindFirstObjectByType<SpellMenuUI>();
         ResolveRecipeUnlocksIfNeeded();
         _potatoShooter = GetComponentInChildren<Potato_Shooter>(true);
         CacheShooterBaseIfNeeded();
+
+        RestorePositionForScene(scene.name);
+    }
+
+    private void CacheBodyRenderersIfNeeded()
+    {
+        if (_bodyRenderersCached)
+            return;
+
+        if (bodyVisualRoot != null)
+            _bodyRenderers = bodyVisualRoot.GetComponentsInChildren<Renderer>(true);
+        else
+            _bodyRenderers = GetComponentsInChildren<Renderer>(true);
+
+        _bodyRenderersCached = true;
+    }
+
+    public static void RememberPositionForScene(string sceneName, Vector3 position, Quaternion rotation)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+            return;
+
+        _sceneReturnPositions[sceneName] = position;
+        _sceneReturnRotations[sceneName] = rotation;
+    }
+
+    private void RestorePositionForScene(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+            return;
+
+        if (!_sceneReturnPositions.TryGetValue(sceneName, out Vector3 targetPosition))
+            return;
+
+        Quaternion targetRotation = _sceneReturnRotations.TryGetValue(sceneName, out Quaternion savedRotation)
+            ? savedRotation
+            : transform.rotation;
+
+        bool controllerWasEnabled = controller != null && controller.enabled;
+        if (controllerWasEnabled)
+            controller.enabled = false;
+
+        transform.SetPositionAndRotation(targetPosition, targetRotation);
+
+        if (controllerWasEnabled)
+            controller.enabled = true;
     }
 
     private void OnEnable()
@@ -330,6 +406,32 @@ public class PlayerController : MonoBehaviour
         spell2Action?.Disable();
         spell3Action?.Disable();
         spell4Action?.Disable();
+    }
+
+    public void DisableCombat()
+    {
+        shootAction?.Disable();
+        reloadAction?.Disable();
+        _potatoShooter?.gameObject.SetActive(false);
+        inventoryToggleAction?.Enable();
+
+        spell1Action?.Disable();
+        spell2Action?.Disable();
+        spell3Action?.Disable();
+        spell4Action?.Disable();
+    }
+
+    public void EnableCombat()
+    {
+        shootAction?.Enable();
+        reloadAction?.Enable();
+        _potatoShooter?.gameObject.SetActive(true);
+        inventoryToggleAction?.Disable();
+
+        spell1Action?.Enable();
+        spell2Action?.Enable();
+        spell3Action?.Enable();
+        spell4Action?.Enable();
     }
 
     private void EnsureActionsConfigured()
@@ -425,12 +527,12 @@ public class PlayerController : MonoBehaviour
 
             return;
         }
-
         if (currentlyInteracting)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
             {
                 currentlyInteracting = false;
+                Debug.Log("Stopped interacting via input.");
                 switchCamera.ExitKitchenCamera();
             }
             return;

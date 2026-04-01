@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class SpellMenuUI : MonoBehaviour
 {
@@ -34,25 +35,50 @@ public class SpellMenuUI : MonoBehaviour
 
     private void Awake()
     {
-        if (playerController == null) playerController = PlayerController.Instance ?? FindFirstObjectByType<PlayerController>();
-        if (playerRecipeUnlocks == null) playerRecipeUnlocks = PlayerRecipeUnlocks.Instance ?? FindFirstObjectByType<PlayerRecipeUnlocks>();
+        RebindReferences();
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void Start()
     {
+        RebindReferences();
         for (int i = 0; i < diamondSlots.Length; i++)
             diamondSlots[i]?.Init(this);
 
         SetMenuVisible(false);
     }
 
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RebindReferences();
+    }
+
+    private void RebindReferences()
+    {
+        if (PlayerController.Instance != null)
+            playerController = PlayerController.Instance;
+        else if (playerController == null)
+            playerController = FindFirstObjectByType<PlayerController>();
+
+        if (PlayerRecipeUnlocks.Instance != null)
+            playerRecipeUnlocks = PlayerRecipeUnlocks.Instance;
+        else if (playerRecipeUnlocks == null)
+            playerRecipeUnlocks = FindFirstObjectByType<PlayerRecipeUnlocks>();
+    }
+
     public void SetMenuVisible(bool visible)
     {
-
+        RebindReferences();
         menuOpen = visible;
-        spellMenuRoot.SetActive(visible);
-        if (inventoryPanel != null)
-            inventoryPanel.SetActive(visible);
+        if (spellMenuRoot != null)
+            spellMenuRoot.SetActive(visible);
+        if (inventoryPanel != null) inventoryPanel.SetActive(visible);
 
         if (visible)
         {
@@ -75,6 +101,7 @@ public class SpellMenuUI : MonoBehaviour
 
     private void RebuildSpellList()
     {
+        RebindReferences();
         Debug.Log("Rebuilding spell list UI");
         foreach (var ui in _spellSlotUIs)
             if (ui != null) Destroy(ui.gameObject);
@@ -111,6 +138,9 @@ public class SpellMenuUI : MonoBehaviour
 
     private void RefreshDiamonds()
     {
+        RebindReferences();
+        if (playerController == null) return;
+
         for (int i = 0; i < diamondSlots.Length; i++)
         {
             var spell = playerController.GetSpell(i);
@@ -125,6 +155,9 @@ public class SpellMenuUI : MonoBehaviour
 
     public void OnSpellClicked(SpellDefinition spell)
     {
+        RebindReferences();
+        if (playerController == null) return;
+
         if (_selectedDiamondSlot < 0)
         {
             // No slot selected: auto-pick first empty slot, or do nothing
@@ -181,6 +214,9 @@ public class SpellMenuUI : MonoBehaviour
 
     public bool IsEquipped(SpellDefinition spell)
     {
+        RebindReferences();
+        if (playerController == null) return false;
+
         if (spell == null) return false;
         var loadout = playerController.GetLoadout();
         for (int i = 0; i < loadout.Length; i++)

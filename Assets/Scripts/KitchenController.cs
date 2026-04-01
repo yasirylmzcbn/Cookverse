@@ -8,6 +8,7 @@ public class KitchenController : MonoBehaviour, IInteractable
     [SerializeField] private SwitchCamera switchCamera;
     [SerializeField] public Recipe activeRecipe;
     [SerializeField] public List<Ingredient> availableIngredients;
+
     void Start()
     {
         availableIngredients = Recipes.RecipeIngredients[activeRecipe];
@@ -15,10 +16,12 @@ public class KitchenController : MonoBehaviour, IInteractable
 
     bool IInteractable.Interact()
     {
+        if (switchCamera == null)
+            switchCamera = FindFirstObjectByType<SwitchCamera>();
+
         if (switchCamera != null)
         {
-            switchCamera.SwitchToKitchenCamera(SwitchCamera.KitchenCameras.Stove);
-            return true;
+            return switchCamera.SwitchToKitchenCamera(SwitchCamera.KitchenCameras.Stove);
         }
         return false;
     }

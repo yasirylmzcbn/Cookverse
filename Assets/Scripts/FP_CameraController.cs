@@ -14,8 +14,6 @@ public class CameraController : MonoBehaviour
 
     private float xRotation = 0f;
 
-    public Transform playerBody;
-
     [Header("UI")]
     [SerializeField] private SpellMenuUI spellMenu;
 
@@ -63,6 +61,10 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        Transform playerBody = PlayerController.Instance != null ? PlayerController.Instance.PlayerBodyTransform : null;
+        if (playerBody == null)
+            return;
+
         bool menuOpen = spellMenu != null && spellMenu.menuOpen;
 
         // Escape closes the menu

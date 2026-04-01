@@ -7,7 +7,6 @@ public class SwitchCamera : MonoBehaviour
     public GameObject firstPersonCamera;
     public GameObject thirdPersonCamera;
     public GameObject kitchenCamera;
-    public GameObject playerBody;
     // TODO add more kitchen cameras once models are created
     public enum KitchenCameras { Stove, Oven, Sink, Fryer, Microwave, }
     private Dictionary<KitchenCameras, GameObject> cameras;
@@ -15,20 +14,53 @@ public class SwitchCamera : MonoBehaviour
     bool kitchenCam = false;
     bool firstPerson = true;
 
+    private static bool IsAlive(GameObject go) => go != null;
+
+    private static void SetActiveSafe(GameObject go, bool active)
+    {
+        if (IsAlive(go))
+            go.SetActive(active);
+    }
+
     public bool IsInKitchenCamera => kitchenCam;
     public bool IsInkitchenCamera => kitchenCam && currentKitchenCamera == KitchenCameras.Stove;
 
     void Start()
     {
-        firstPersonCamera.SetActive(true);
-        thirdPersonCamera.SetActive(false);
-        kitchenCamera.SetActive(false);
+        SetActiveSafe(firstPersonCamera, true);
+        SetActiveSafe(thirdPersonCamera, false);
+        SetActiveSafe(kitchenCamera, false);
         currentKitchenCamera = KitchenCameras.Stove;
         cameras = new Dictionary<KitchenCameras, GameObject>()
         {
             { KitchenCameras.Stove, kitchenCamera },
             // TODO Add other kitchen cameras here when implemented
         };
+    }
+
+    private bool TryGetKitchenCamera(KitchenCameras cam, out GameObject target)
+    {
+        target = null;
+
+        if (cameras == null)
+        {
+            cameras = new Dictionary<KitchenCameras, GameObject>()
+            {
+                { KitchenCameras.Stove, kitchenCamera },
+            };
+        }
+
+        if (!cameras.TryGetValue(cam, out target) || !IsAlive(target))
+        {
+            // Keep Stove in sync in case scene references changed.
+            if (cam == KitchenCameras.Stove && IsAlive(kitchenCamera))
+            {
+                cameras[KitchenCameras.Stove] = kitchenCamera;
+                target = kitchenCamera;
+            }
+        }
+
+        return IsAlive(target);
     }
 
     void Update()
@@ -45,45 +77,55 @@ public class SwitchCamera : MonoBehaviour
         {
             if (firstPerson)
             {
-                firstPersonCamera.SetActive(false);
-                thirdPersonCamera.SetActive(true);
+                SetActiveSafe(firstPersonCamera, false);
+                SetActiveSafe(thirdPersonCamera, true);
                 firstPerson = false;
             }
             else
             {
-                thirdPersonCamera.SetActive(false);
-                firstPersonCamera.SetActive(true);
+                SetActiveSafe(thirdPersonCamera, false);
+                SetActiveSafe(firstPersonCamera, true);
                 firstPerson = true;
             }
         }
     }
 
-    public void SwitchToKitchenCamera(KitchenCameras cam)
+    public bool SwitchToKitchenCamera(KitchenCameras cam)
     {
-        playerBody.SetActive(false);
+        if (!TryGetKitchenCamera(cam, out GameObject targetKitchenCam))
+            return false;
+
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.SetBodyVisible(false);
+
         kitchenCam = true;
-        firstPersonCamera.SetActive(false);
-        thirdPersonCamera.SetActive(false);
-        cameras[cam].SetActive(true);
+        SetActiveSafe(firstPersonCamera, false);
+        SetActiveSafe(thirdPersonCamera, false);
+        SetActiveSafe(targetKitchenCam, true);
         currentKitchenCamera = cam;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        return true;
     }
 
     public void ExitKitchenCamera()
     {
-        playerBody.SetActive(true);
+        Debug.Log("Exiting kitchen camera");
+
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.SetBodyVisible(true);
+
         kitchenCam = false;
-        kitchenCamera.SetActive(false);
+        SetActiveSafe(kitchenCamera, false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (firstPerson)
         {
-            firstPersonCamera.SetActive(true);
+            SetActiveSafe(firstPersonCamera, true);
         }
         else
         {
-            thirdPersonCamera.SetActive(true);
+            SetActiveSafe(thirdPersonCamera, true);
         }
     }
 }
