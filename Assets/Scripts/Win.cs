@@ -7,7 +7,7 @@ public class Win : MonoBehaviour
 {
     private TMP_Text winText;
     private bool hasWon = false;
-    public EnemySpawner spawner;
+    public WaveManager waveManager;
 
     [SerializeField] private GameObject portal;
 
@@ -19,6 +19,7 @@ public class Win : MonoBehaviour
         {
             winText.enabled = false;
         }
+        waveManager = FindObjectsByType<WaveManager>(FindObjectsSortMode.None)?[0];
     }
 
     void Update()
@@ -26,7 +27,7 @@ public class Win : MonoBehaviour
         //Debug.Log(!hasWon);
         //Debug.Log(spawner.IsDoneSpawning());
         //Debug.Log(spawner.EnemyCount());
-        if (!hasWon && spawner.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
+        if (!hasWon && waveManager.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
         {
             ShowWin();
             portal.SetActive(true);

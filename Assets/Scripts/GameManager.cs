@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
 {
     // Difficulty, Inventory, and Saving will be here
     public static GameManager Instance;
+    float waveMultiplier = 1;
+    float waveMultiplierIncrement = 1.1f;
     [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, hide later
     public event Action OnInventoryChanged;
     void Awake()
@@ -33,6 +35,7 @@ public class GameManager : MonoBehaviour
             items[item] = amount;
         }
         OnInventoryChanged?.Invoke();
+        Debug.Log(GetInventoryItemsAsString());
     }
 
     public void RemoveInventoryItem(ItemData item, int amount = 1)
@@ -48,6 +51,8 @@ public class GameManager : MonoBehaviour
         {
             items.Remove(item);
         }
+        OnInventoryChanged?.Invoke();
+        Debug.Log(GetInventoryItemsAsString());
     }
 
     public int GetInventoryAmount(ItemData item)
@@ -76,5 +81,15 @@ public class GameManager : MonoBehaviour
     public IReadOnlyDictionary<ItemData, int> GetItems()
     {
         return new Dictionary<ItemData, int>(items);
+    }
+
+    public void WaveCompleted()
+    {
+        waveMultiplier *= waveMultiplierIncrement;
+    }
+
+    public float GetWaveMultiplier()
+    {
+        return waveMultiplier;
     }
 }
