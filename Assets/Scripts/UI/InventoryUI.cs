@@ -1,37 +1,44 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
     public Transform content;
     public GameObject itemPrefab;
-    private GameManager gameManager;
     private bool isRefreshing = false;
 
     void Start()
     {
-        GameManager gameManager = FindAnyObjectByType<GameManager>();
-        gameManager.OnInventoryChanged += RefreshUI;
+        isRefreshing = false;
+        GameManager.Instance.OnInventoryChanged += RefreshUI;
         RefreshUI();
     }
 
-    void RefreshUI()
+    public void RefreshUI()
     {
         if (isRefreshing) return;
         isRefreshing = true;
+        content = GameObject.FindWithTag("InventoryContent")?.transform;
+        Debug.Log(GameObject.FindWithTag("InventoryContent"));
 
         for (int i = content.childCount - 1; i >= 0; i--)
         {
-            Destroy(content.GetChild(i).gameObject);
+            if (content.GetChild(i).gameObject != null) Destroy(content.GetChild(i).gameObject);
         }
 
-        foreach (var (item, amount) in GameManager.Instance.GetItems())
+        Debug.Log(GameManager.Instance?.GetInventoryItemsAsString());
+        foreach (var (item, amount) in GameManager.Instance?.GetItems())
         {
             GameObject obj = Instantiate(itemPrefab, content);
+            Debug.Log(obj);
+            Debug.Log(obj == null);
             InventoryItemUI itemui = obj.GetComponent<InventoryItemUI>();
             itemui.itemName.text = item.itemName;
             itemui.itemAmount.text = "x" + amount.ToString();
         }
 
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
         isRefreshing = false;
     }
 }

@@ -48,9 +48,11 @@ public class SpellMenuUI : MonoBehaviour
 
     public void SetMenuVisible(bool visible)
     {
+
         menuOpen = visible;
         spellMenuRoot.SetActive(visible);
-        if (inventoryPanel != null) inventoryPanel.SetActive(visible);
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(visible);
 
         if (visible)
         {
@@ -59,6 +61,7 @@ public class SpellMenuUI : MonoBehaviour
             RebuildSpellList();
             RefreshDiamonds();
             ClearDescription();
+            inventoryPanel.GetComponent<InventoryUI>().RefreshUI();
         }
         else
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public abstract class Enemy : MonoBehaviour
 {
+    private bool healthSet = false;
     [SerializeField] private float health;
     private bool isDead = false;
     [SerializeField] private Color damageColor = Color.yellow;
@@ -68,6 +69,15 @@ public abstract class Enemy : MonoBehaviour
         else
         {
             FlashDamage();
+        }
+    }
+
+    public void SetHealthMultiplier(float multiplier)
+    {
+        if (!healthSet)
+        {
+            health *= multiplier;
+            healthSet = true;
         }
     }
 

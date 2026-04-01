@@ -515,10 +515,11 @@ public class PlayerController : MonoBehaviour
         if (inventoryToggleAction != null && inventoryToggleAction.WasPressedThisFrame())
         {
             Debug.Log("Inventory toggle pressed");
+            if (spellMenu == null)
+            spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
             var isOpen = spellMenu != null && spellMenu.menuOpen;
-            Debug.Log("Found SpellMenuUI: " + spellMenu + " " + isOpen);
             if (spellMenu != null)
-                spellMenu.SetMenuVisible(!isOpen);
+            spellMenu.SetMenuVisible(!isOpen);
         }
     }
     private bool IsSpellEquipped(SpellDefinition spell)
