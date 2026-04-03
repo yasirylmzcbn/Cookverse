@@ -9,6 +9,7 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     [SerializeField] private Image iconImage;
     [SerializeField] private Image backgroundImage;
+    [SerializeField] private TextMeshProUGUI spellNameText;
     [SerializeField] private Color normalColor = new Color(0.2f, 0.2f, 0.3f, 0.9f);
     [SerializeField] private Color hoveredColor = new Color(0.4f, 0.4f, 0.6f, 1f);
     [SerializeField] private Color equippedColor = new Color(0.2f, 0.5f, 0.3f, 1f);
@@ -23,6 +24,8 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             iconImage.sprite = spell.icon;
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
+        if (spellNameText != null)
+            spellNameText.text = spell.displayName;
     }
 
     public void SetEquippedVisual(bool equipped)
