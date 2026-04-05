@@ -18,8 +18,18 @@ public class InventoryUI : MonoBehaviour
     {
         if (isRefreshing) return;
         isRefreshing = true;
-        content = GameObject.FindWithTag("InventoryContent")?.transform;
-        Debug.Log(GameObject.FindWithTag("InventoryContent"));
+        var all = Resources.FindObjectsOfTypeAll<Transform>();
+
+        foreach (var t in all)
+        {
+            if (t.CompareTag("InventoryContent"))
+            {
+                content = t;
+                break;
+            }
+        }
+        //Debug.Log(GameObject.FindWithTag("InventoryContent"));
+        Debug.Log(content);
 
         for (int i = content.childCount - 1; i >= 0; i--)
         {
