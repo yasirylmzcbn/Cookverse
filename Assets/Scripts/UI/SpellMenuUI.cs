@@ -11,6 +11,7 @@ public class SpellMenuUI : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     [SerializeField] private PlayerRecipeUnlocks playerRecipeUnlocks;
     [SerializeField] private RecipeSpellDatabase recipeSpellDatabase;
+    [SerializeField] private CameraController firstPersonCameraController;
 
     [Header("Panels")]
     [SerializeField] private GameObject spellMenuRoot;
@@ -84,6 +85,8 @@ public class SpellMenuUI : MonoBehaviour
 
         if (visible)
         {
+            // lock looking around with cam, unlcok cursor
+            firstPersonCameraController.enabled = false;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             RebuildSpellList();
@@ -93,6 +96,8 @@ public class SpellMenuUI : MonoBehaviour
         }
         else
         {
+            // restore normal looking around, lock cursor
+            firstPersonCameraController.enabled = true;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _selectedDiamondSlot = -1;
