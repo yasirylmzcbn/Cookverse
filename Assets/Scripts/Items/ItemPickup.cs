@@ -8,9 +8,11 @@ public class ItemPickup : MonoBehaviour
 
     private void Awake()
     {
-        Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb == null)
+            rb = gameObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
-        GetComponent<Collider>().isTrigger = true;
+        // GetComponent<Collider>().isTrigger = true;
     }
 
     public void Pickup(GameManager gameManager)

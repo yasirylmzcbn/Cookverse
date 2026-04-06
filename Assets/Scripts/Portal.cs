@@ -50,6 +50,7 @@ public class Portal : MonoBehaviour
                 else if (sceneToLoad == combatSceneName)
                     playerController.EnableCombat();
 
+                playerController.ResetCombatState();
             }
             Potato_Shooter shooter = other.GetComponentInParent<Potato_Shooter>();
             if (shooter == null)

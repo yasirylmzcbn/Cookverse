@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
+    public GameObject pickupTrigger;
 
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction moveAction;
@@ -533,6 +534,7 @@ public class PlayerController : MonoBehaviour
             {
                 currentlyInteracting = false;
                 Debug.Log("Stopped interacting via input.");
+                EnablePickupTrigger(true);
                 switchCamera.ExitKitchenCamera();
             }
             return;
@@ -590,7 +592,13 @@ public class PlayerController : MonoBehaviour
                     interactable = hit.rigidbody.GetComponentInParent<IInteractable>();
 
                 if (interactable != null)
+                {
                     currentlyInteracting = interactable.Interact();
+                    // if interacting, disable picking up
+                    EnablePickupTrigger(!currentlyInteracting);
+                    Debug.Log("Enabled pickup trigger: " + !currentlyInteracting);
+
+                }
                 Debug.Log("Interactable: " + interactable);
             }
         }
@@ -618,10 +626,10 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Inventory toggle pressed");
             if (spellMenu == null)
-            spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
+                spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
             var isOpen = spellMenu != null && spellMenu.menuOpen;
             if (spellMenu != null)
-            spellMenu.SetMenuVisible(!isOpen);
+                spellMenu.SetMenuVisible(!isOpen);
         }
     }
     private bool IsSpellEquipped(SpellDefinition spell)
@@ -670,6 +678,12 @@ public class PlayerController : MonoBehaviour
         spell.Cast(in context);
         float cd = Mathf.Max(0f, spell.cooldownSeconds);
         _nextSpellTimes[slotIndex] = Time.time + cd;
+    }
+
+    public void EnablePickupTrigger(bool enable)
+    {
+        if (pickupTrigger != null)
+            pickupTrigger.SetActive(enable);
     }
 
     private Potato_Shooter GetPotatoShooter()
@@ -736,5 +750,14 @@ public class PlayerController : MonoBehaviour
         _buffPrevMoveMultiplier = 1f;
         _buffPrevShootCooldownDuration = 0f;
         _buffCoroutine = null;
+    }
+
+    public void ResetCombatState()
+    {
+        for (int i = 0; i < _nextSpellTimes.Length; ++i)
+            _nextSpellTimes[i] = 0f;
+        ClearActiveBuff(stopCoroutine: true);
+        _potatoShooter?.ResetAmmo();
+        currentHealth = maxHealth;
     }
 }

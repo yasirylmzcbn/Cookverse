@@ -226,7 +226,7 @@ MonoBehaviour:
   flashDuration: 0.1
   attackRange: 3
   dropList:
-  - itemData: {fileID: 11400000, guid: e7aec4e41f15be248b3843f5adcfb548, type: 2}
+  - itemData: {fileID: 11400000, guid: 0f30e51203a8442debf66656aa344e66, type: 2}
     weight: 1
   damage: 1
   attackCooldown: 0.25

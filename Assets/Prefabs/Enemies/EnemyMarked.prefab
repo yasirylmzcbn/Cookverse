@@ -189,9 +189,13 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3963431768049145428, guid: 9f6bfe19ed56fcb4aa07712b61eea1d7, type: 3}
+      propertyPath: dropList.Array.data[0].itemData
+      value: 
+      objectReference: {fileID: 11400000, guid: 0f30e51203a8442debf66656aa344e66, type: 2}
     - target: {fileID: 4449353459162960596, guid: 9f6bfe19ed56fcb4aa07712b61eea1d7, type: 3}
       propertyPath: m_Name
-      value: EnemyWithMarker
+      value: EnemyMarked
       objectReference: {fileID: 0}
     - target: {fileID: 4637490066776024695, guid: 9f6bfe19ed56fcb4aa07712b61eea1d7, type: 3}
       propertyPath: m_LocalPosition.x

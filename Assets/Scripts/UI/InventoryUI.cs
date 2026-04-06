@@ -18,8 +18,8 @@ public class InventoryUI : MonoBehaviour
     {
         if (isRefreshing) return;
         isRefreshing = true;
-        var all = Resources.FindObjectsOfTypeAll<Transform>();
 
+        var all = Resources.FindObjectsOfTypeAll<Transform>();
         foreach (var t in all)
         {
             if (t.CompareTag("InventoryContent"))
@@ -28,23 +28,34 @@ public class InventoryUI : MonoBehaviour
                 break;
             }
         }
-        //Debug.Log(GameObject.FindWithTag("InventoryContent"));
+
         Debug.Log(content);
 
         for (int i = content.childCount - 1; i >= 0; i--)
         {
-            if (content.GetChild(i).gameObject != null) Destroy(content.GetChild(i).gameObject);
+            if (content.GetChild(i).gameObject != null)
+                Destroy(content.GetChild(i).gameObject);
         }
 
         Debug.Log(GameManager.Instance?.GetInventoryItemsAsString());
+
         foreach (var (item, amount) in GameManager.Instance?.GetItems())
         {
             GameObject obj = Instantiate(itemPrefab, content);
-            Debug.Log(obj);
-            Debug.Log(obj == null);
             InventoryItemUI itemui = obj.GetComponent<InventoryItemUI>();
+
+            // ── Text display ──────────────────────────────────────────────────
             itemui.itemName.text = item.itemName;
             itemui.itemAmount.text = "x" + amount.ToString();
+
+            // ── Data needed for drag-and-drop ─────────────────────────────────
+            // These MUST be set so InventoryItemUI.OnBeginDrag can read them.
+            itemui.itemData = item;
+            itemui.amount = amount;
+
+            // ── Icon ──────────────────────────────────────────────────────────
+            if (itemui.icon != null && item.icon != null)
+                itemui.icon.sprite = item.icon;
         }
 
         Canvas.ForceUpdateCanvases();

@@ -13,8 +13,9 @@ public class SpellMenuUI : MonoBehaviour
     [SerializeField] private RecipeSpellDatabase recipeSpellDatabase;
 
     [Header("Panels")]
-    [SerializeField] private GameObject inventoryPanel;   // top half — wire up later
-    [SerializeField] private GameObject spellMenuRoot;    // bottom half container
+    [SerializeField] private GameObject spellMenuRoot;
+    [SerializeField] private GameObject inventoryPanel;
+    [SerializeField] private GameObject hotbarPanel;
 
     [Header("Description Panel (left 25%)")]
     [SerializeField] private TextMeshProUGUI spellNameText;
@@ -79,6 +80,7 @@ public class SpellMenuUI : MonoBehaviour
         if (spellMenuRoot != null)
             spellMenuRoot.SetActive(visible);
         if (inventoryPanel != null) inventoryPanel.SetActive(visible);
+        if (hotbarPanel != null) hotbarPanel.SetActive(visible);
 
         if (visible)
         {

@@ -13,6 +13,7 @@ public class SwitchCamera : MonoBehaviour
     public KitchenCameras currentKitchenCamera;
     bool kitchenCam = false;
     bool firstPerson = true;
+    [SerializeField] private GameObject hotbarUIPanel;
 
     private static bool IsAlive(GameObject go) => go != null;
 
@@ -102,6 +103,7 @@ public class SwitchCamera : MonoBehaviour
         SetActiveSafe(firstPersonCamera, false);
         SetActiveSafe(thirdPersonCamera, false);
         SetActiveSafe(targetKitchenCam, true);
+        SetActiveSafe(hotbarUIPanel, true);
         currentKitchenCamera = cam;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -117,6 +119,7 @@ public class SwitchCamera : MonoBehaviour
 
         kitchenCam = false;
         SetActiveSafe(kitchenCamera, false);
+        SetActiveSafe(hotbarUIPanel, false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (firstPerson)

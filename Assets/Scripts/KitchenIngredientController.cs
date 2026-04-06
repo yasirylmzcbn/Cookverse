@@ -121,6 +121,15 @@ public class KitchenIngredientController : MonoBehaviour
         BeginDragInternal();
     }
 
+    /// <summary>
+    /// Called by HotbarWorldDrop after spawning this ingredient under the cursor.
+    /// Skips the raycast ownership check (not needed — we just created this object)
+    /// </summary>
+    public void BeginDragFromHotbar()
+    {
+        BeginDragInternal();
+    }
+
     private bool IsTopmostIngredientUnderPointer()
     {
         if (kitchenCamera == null || Mouse.current == null) return false;
@@ -189,7 +198,6 @@ public class KitchenIngredientController : MonoBehaviour
 
         // transform.SetParent(null, true);
         SetHoverSlot(null);
-
     }
 
     private void DragMove()
@@ -215,6 +223,7 @@ public class KitchenIngredientController : MonoBehaviour
         if (candidate == null)
             candidate = FindNearestAcceptingSlotInRange(pointerWorld);
 
+        Debug.Log("Hover candidate: " + (candidate != null ? candidate.name : "null"));
         SetHoverSlot(candidate);
         UpdateHoverSlotPreviewVisibility(pointerWorld);
         UpdateCookwareLidHover(pointerWorld);
@@ -299,6 +308,7 @@ public class KitchenIngredientController : MonoBehaviour
 
     private void EndDragAndTryPlace()
     {
+        Debug.Log("Ending drag of " + name);
         isDragging = false;
 
         CloseAnyCookwareLid();
