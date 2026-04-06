@@ -6,7 +6,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private EnemySpawner[] spawners;
     private float timeBetweenWaves = 3f;
     private int currentWave = 1;
-    private int lastWave = 5;
+    private int lastWave = 2;
     private bool done = false;
     private void Start()
     {
