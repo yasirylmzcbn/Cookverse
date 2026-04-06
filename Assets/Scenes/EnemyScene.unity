@@ -2978,6 +2978,8 @@ MonoBehaviour:
   aimLayers:
     serializedVersion: 2
     m_Bits: 119
+  fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
+  fireSfxVolume: 1
 --- !u!65 &737363647
 BoxCollider:
   m_ObjectHideFlags: 0
