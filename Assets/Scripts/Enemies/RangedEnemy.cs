@@ -39,30 +39,90 @@ public class RangedEnemy : Enemy
         canAttack = false;
 
         Attack();
+        GetComponent<EnemyMovementAI>().AttackAnimation();
 
         yield return new WaitForSeconds(attackCooldown);
 
         canAttack = true;
     }
 
+    //void Attack()
+    //{
+    //    if (enemyBulletPrefab == null || firePoint == null) return;
+
+    //    Vector3 direction = (playerTransform.position - firePoint.position).normalized;
+
+    //    GameObject bullet = Instantiate(
+    //        enemyBulletPrefab,
+    //        firePoint.position,
+    //        Quaternion.LookRotation(direction)
+    //    );
+
+    //    Rigidbody rb = bullet.GetComponent<Rigidbody>();
+    //    if (rb != null)
+    //    {
+    //        rb.linearVelocity = direction * bulletSpeed;
+    //    }
+
+    //    bullet.GetComponent<EnemyBullet>().damage = damage;
+    //}
+
     void Attack()
     {
         if (enemyBulletPrefab == null || firePoint == null) return;
 
-        Vector3 direction = (playerTransform.position - firePoint.position).normalized;
+        //Vector3 targetPos = playerTransform.position;
+        Vector3 targetPos = playerTransform.position - Vector3.up * 1.3f;
+        Vector3 startPos = firePoint.position;
+
+        Vector3 launchVelocity;
+        if (!CalculateLaunchVelocity(startPos, targetPos, bulletSpeed, out launchVelocity))
+        {
+            // Target is too far for the given speed, just aim directly as fallback
+            launchVelocity = (targetPos - startPos).normalized * bulletSpeed;
+        }
 
         GameObject bullet = Instantiate(
             enemyBulletPrefab,
-            firePoint.position,
-            Quaternion.LookRotation(direction)
+            startPos,
+            Quaternion.LookRotation(launchVelocity)
         );
 
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.linearVelocity = direction * bulletSpeed;
+            rb.useGravity = true;
+            rb.linearVelocity = launchVelocity;
         }
 
         bullet.GetComponent<EnemyBullet>().damage = damage;
+    }
+
+    bool CalculateLaunchVelocity(Vector3 start, Vector3 target, float speed, out Vector3 velocity)
+    {
+        Vector3 toTarget = target - start;
+        float g = Physics.gravity.magnitude;
+
+        // Flatten to get horizontal distance
+        Vector3 toTargetFlat = new Vector3(toTarget.x, 0, toTarget.z);
+        float horizontalDist = toTargetFlat.magnitude;
+        float verticalDist = toTarget.y;
+
+        // Calculate launch angle using projectile motion formula
+        float speedSq = speed * speed;
+        float discriminant = speedSq * speedSq - g * (g * horizontalDist * horizontalDist + 2 * verticalDist * speedSq);
+
+        if (discriminant < 0)
+        {
+            velocity = Vector3.zero;
+            return false; // Out of range
+        }
+
+        // Use the lower angle for a flatter, faster throw
+        float angle = Mathf.Atan2(speedSq - Mathf.Sqrt(discriminant), g * horizontalDist);
+
+        Vector3 flatDirection = toTargetFlat.normalized;
+        velocity = flatDirection * speed * Mathf.Cos(angle) + Vector3.up * speed * Mathf.Sin(angle);
+        return true;
     }
 }

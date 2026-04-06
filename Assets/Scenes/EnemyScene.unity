@@ -1369,7 +1369,6 @@ MonoBehaviour:
   firstPersonCamera: {fileID: 1195717447}
   thirdPersonCamera: {fileID: 382685871}
   kitchenCamera: {fileID: 0}
-  playerBody: {fileID: 142551280}
   currentKitchenCamera: 0
 --- !u!95 &336891338
 Animator:
@@ -2023,6 +2022,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2e713ab1fe5044899695ccdf582e7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  bodyVisualRoot: {fileID: 0}
   controller: {fileID: 454283863}
   speed: 13
   gravity: -9.81
@@ -5066,7 +5066,6 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
-  playerBody: {fileID: 454283864}
   spellMenu: {fileID: 0}
 --- !u!114 &1195717450
 MonoBehaviour:

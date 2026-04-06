@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.GraphicsBuffer;
@@ -47,5 +48,10 @@ public class EnemyMovementAI : MonoBehaviour
             anim.SetFloat("Speed", speedValue);
             lastSpeed = speedValue;
         }
+    }
+
+    public void AttackAnimation()
+    {
+        anim?.SetTrigger("Attack");
     }
 }
