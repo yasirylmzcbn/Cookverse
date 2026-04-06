@@ -19,6 +19,8 @@ public class EnemyBullet : MonoBehaviour
         if (other == null)
             return;
 
+        if (!other.CompareTag("Player")) return;
+
         PlayerController player = other.GetComponentInParent<PlayerController>();
         if (player == null)
             return;

@@ -34,6 +34,7 @@ public class MeleeEnemy : Enemy
         canAttack = false;
 
         Attack();
+        GetComponent<EnemyMovementAI>().AttackAnimation();
 
         yield return new WaitForSeconds(attackCooldown);
 
