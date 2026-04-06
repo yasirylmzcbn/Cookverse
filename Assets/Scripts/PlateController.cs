@@ -2,6 +2,7 @@ using Cookverse.Assets.Scripts;
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlot
 {
@@ -46,15 +47,32 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     private void Awake()
     {
-        if (playerRecipeUnlocks == null)
-            playerRecipeUnlocks = PlayerRecipeUnlocks.Instance != null
-                ? PlayerRecipeUnlocks.Instance
-                : FindFirstObjectByType<PlayerRecipeUnlocks>();
+        RebindReferences();
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
-        if (playerController == null)
-            playerController = PlayerController.Instance != null
-                ? PlayerController.Instance
-                : FindFirstObjectByType<PlayerController>();
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RebindReferences();
+    }
+
+    private void RebindReferences()
+    {
+        if (PlayerRecipeUnlocks.Instance != null)
+            playerRecipeUnlocks = PlayerRecipeUnlocks.Instance;
+        else if (playerRecipeUnlocks == null)
+            playerRecipeUnlocks = FindFirstObjectByType<PlayerRecipeUnlocks>();
+
+        if (PlayerController.Instance != null)
+            playerController = PlayerController.Instance;
+        else if (playerController == null)
+            playerController = FindFirstObjectByType<PlayerController>();
     }
 
     public void Start()
@@ -150,6 +168,8 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     public bool IsRecipeComplete()
     {
+        RebindReferences();
+
         if (proteinIngredient == null || vegetableIngredient == null) return false;
         bool hasRequiredProtein = requiredIngredients.Exists(ing => proteinIngredient != null && ing == proteinIngredient.IngredientType);
         bool hasRequiredVegetable = requiredIngredients.Exists(ing => vegetableIngredient != null && ing == vegetableIngredient.IngredientType);
