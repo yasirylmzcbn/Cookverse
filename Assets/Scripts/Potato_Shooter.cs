@@ -33,6 +33,11 @@ public class Potato_Shooter : MonoBehaviour
     [Tooltip("Layers the aim ray can hit.")]
     [SerializeField] private LayerMask aimLayers = ~0;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip fireSfx;
+    [Range(0f, 1f)]
+    [SerializeField] private float fireSfxVolume = 1f;
+
     private SwitchCamera _switchCamera;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
@@ -69,6 +74,8 @@ public class Potato_Shooter : MonoBehaviour
 
         Quaternion rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
         Instantiate(Bullet, Shoot_Pos.position, rotation);
+        if (fireSfx != null)
+            AudioSource.PlayClipAtPoint(fireSfx, Shoot_Pos.position, fireSfxVolume);
         ammo -= 1;
         SetCooldown();
     }
