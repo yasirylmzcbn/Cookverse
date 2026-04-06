@@ -72,6 +72,15 @@ public class SpellMenuUI : MonoBehaviour
             playerRecipeUnlocks = PlayerRecipeUnlocks.Instance;
         else if (playerRecipeUnlocks == null)
             playerRecipeUnlocks = FindFirstObjectByType<PlayerRecipeUnlocks>();
+
+        if (firstPersonCameraController == null)
+        {
+            if (playerController != null)
+                firstPersonCameraController = playerController.GetComponentInChildren<CameraController>(true);
+
+            if (firstPersonCameraController == null)
+                firstPersonCameraController = FindFirstObjectByType<CameraController>(FindObjectsInactive.Include);
+        }
     }
 
     public void SetMenuVisible(bool visible)
@@ -86,7 +95,8 @@ public class SpellMenuUI : MonoBehaviour
         if (visible)
         {
             // lock looking around with cam, unlcok cursor
-            firstPersonCameraController.enabled = false;
+            if (firstPersonCameraController != null)
+                firstPersonCameraController.enabled = false;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             RebuildSpellList();
@@ -97,7 +107,8 @@ public class SpellMenuUI : MonoBehaviour
         else
         {
             // restore normal looking around, lock cursor
-            firstPersonCameraController.enabled = true;
+            if (firstPersonCameraController != null)
+                firstPersonCameraController.enabled = true;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _selectedDiamondSlot = -1;

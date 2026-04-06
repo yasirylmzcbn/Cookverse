@@ -66,10 +66,10 @@ public class SwitchCamera : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current.vKey.wasPressedThisFrame)
-        {
-            CycleCameraMode();
-        }
+        // if (Keyboard.current.vKey.wasPressedThisFrame)
+        // {
+        //     CycleCameraMode();
+        // }
     }
 
     public void CycleCameraMode()
