@@ -113,6 +113,14 @@ public class KnobController : MonoBehaviour
     {
         if (mouse == null) return;
 
+        if (!SwitchCamera.IsKitchenInteractionAllowed())
+        {
+            isDragging = false;
+            return;
+        }
+
+        if (kitchenCamera == null) return;
+
         // Check for mouse click on this object
         if (mouse.leftButton.wasPressedThisFrame)
         {

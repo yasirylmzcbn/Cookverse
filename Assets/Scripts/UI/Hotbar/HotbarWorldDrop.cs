@@ -30,6 +30,12 @@ public class HotbarWorldDrop : MonoBehaviour
     // Returns the spawned ingredient so HotbarSlot can forget about it.
     public KitchenIngredientController SpawnAndBeginDrag(ItemData itemData)
     {
+        if (!SwitchCamera.IsKitchenInteractionAllowed())
+        {
+            Debug.Log("[HotbarWorldDrop] Ignoring world-drop spawn while not in kitchen view.");
+            return null;
+        }
+
         if (itemData == null || itemData.dropPrefab == null)
         {
             Debug.LogWarning($"[HotbarWorldDrop] {itemData?.itemName} has no dropPrefab — cannot spawn in kitchen.");

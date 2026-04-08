@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class SwitchCamera : MonoBehaviour
 {
+    private static SwitchCamera _instance;
+
     public GameObject firstPersonCamera;
     public GameObject thirdPersonCamera;
     public GameObject kitchenCamera;
@@ -25,6 +27,23 @@ public class SwitchCamera : MonoBehaviour
 
     public bool IsInKitchenCamera => kitchenCam;
     public bool IsInkitchenCamera => kitchenCam && currentKitchenCamera == KitchenCameras.Stove;
+
+    public static bool IsKitchenInteractionAllowed()
+    {
+        if (_instance == null)
+            _instance = FindFirstObjectByType<SwitchCamera>();
+
+        return _instance != null
+               && _instance.kitchenCam
+               && Cursor.visible
+               && Cursor.lockState == CursorLockMode.None;
+    }
+
+    private void Awake()
+    {
+        if (_instance == null)
+            _instance = this;
+    }
 
     void Start()
     {
@@ -103,7 +122,6 @@ public class SwitchCamera : MonoBehaviour
         SetActiveSafe(firstPersonCamera, false);
         SetActiveSafe(thirdPersonCamera, false);
         SetActiveSafe(targetKitchenCam, true);
-        SetActiveSafe(hotbarUIPanel, true);
         currentKitchenCamera = cam;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -119,7 +137,6 @@ public class SwitchCamera : MonoBehaviour
 
         kitchenCam = false;
         SetActiveSafe(kitchenCamera, false);
-        SetActiveSafe(hotbarUIPanel, false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (firstPerson)

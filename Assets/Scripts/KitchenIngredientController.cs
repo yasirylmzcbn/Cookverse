@@ -91,6 +91,18 @@ public class KitchenIngredientController : MonoBehaviour
     {
         if (Mouse.current == null) return;
 
+        if (!SwitchCamera.IsKitchenInteractionAllowed())
+        {
+            if (isDragging)
+            {
+                isDragging = false;
+                ExitPreviewSnap();
+                CloseAnyCookwareLid();
+                SetHoverSlot(null);
+            }
+            return;
+        }
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
             TryBeginDrag();
 

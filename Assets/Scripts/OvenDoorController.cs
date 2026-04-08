@@ -78,6 +78,14 @@ public class OvenDoorController : MonoBehaviour
     {
         if (_mouse == null) return;
 
+        if (!SwitchCamera.IsKitchenInteractionAllowed())
+        {
+            _isDragging = false;
+            _dragConsumed = false;
+            HandleCameraLerp();
+            return;
+        }
+
         HandleInput();
         HandleCameraLerp();
     }
