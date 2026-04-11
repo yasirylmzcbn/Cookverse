@@ -67,7 +67,7 @@ MonoBehaviour:
   fixedDragY: 0.9
   hoverYOffset: 0.02
   rb: {fileID: 2271485988209750029}
-  snapSphereCastRadius: 0.4
+  snapSphereCastRadius: 0.3
   slotSearchRadius: 2
   hideDraggedVisualsInSnapRange: 1
   cookLevel: 0

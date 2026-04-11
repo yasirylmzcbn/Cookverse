@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+    , IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public SpellDefinition Spell { get; private set; }
 
@@ -15,6 +16,18 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private Color equippedColor = new Color(0.2f, 0.5f, 0.3f, 1f);
 
     private SpellMenuUI _menu;
+    private static GameObject _dragGhost;
+    private Canvas _rootCanvas;
+
+    private Canvas RootCanvas
+    {
+        get
+        {
+            if (_rootCanvas == null)
+                _rootCanvas = GetComponentInParent<Canvas>();
+            return _rootCanvas;
+        }
+    }
 
     public void Init(SpellDefinition spell, SpellMenuUI menu)
     {
@@ -49,5 +62,55 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerClick(PointerEventData e)
     {
         _menu.OnSpellClicked(Spell);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (Spell == null || RootCanvas == null) return;
+
+        if (_dragGhost != null) Destroy(_dragGhost);
+
+        _dragGhost = new GameObject("SpellDragGhost");
+        _dragGhost.transform.SetParent(RootCanvas.transform, false);
+        _dragGhost.transform.SetAsLastSibling();
+
+        Image ghostImage = _dragGhost.AddComponent<Image>();
+        ghostImage.sprite = iconImage != null ? iconImage.sprite : null;
+        ghostImage.color = new Color(1f, 1f, 1f, 0.75f);
+        ghostImage.raycastTarget = false;
+
+        RectTransform rt = _dragGhost.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(60f, 60f);
+
+        SpellDragDropItem payload = GetComponent<SpellDragDropItem>();
+        if (payload == null) payload = gameObject.AddComponent<SpellDragDropItem>();
+        payload.spell = Spell;
+        payload.sourceDiamondSlot = -1;
+
+        MoveDragGhost(eventData);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        MoveDragGhost(eventData);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (_dragGhost != null)
+        {
+            Destroy(_dragGhost);
+            _dragGhost = null;
+        }
+    }
+
+    private void MoveDragGhost(PointerEventData eventData)
+    {
+        if (_dragGhost == null || RootCanvas == null) return;
+
+        RectTransform canvasRT = RootCanvas.GetComponent<RectTransform>();
+        Camera cam = RootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : eventData.pressEventCamera;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, eventData.position, cam, out Vector2 localPoint))
+            _dragGhost.GetComponent<RectTransform>().localPosition = localPoint;
     }
 }

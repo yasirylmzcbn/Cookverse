@@ -173,37 +173,17 @@ public class SpellMenuUI : MonoBehaviour
     public void OnSpellClicked(SpellDefinition spell)
     {
         RebindReferences();
-        if (playerController == null) return;
+        if (playerController == null || spell == null) return;
 
         if (_selectedDiamondSlot < 0)
         {
-            // No slot selected: auto-pick first empty slot, or do nothing
-            for (int i = 0; i < 4; i++)
-            {
-                if (playerController.GetSpell(i) == null)
-                {
-                    playerController.TryEquipSpell(spell, i);
-                    RefreshDiamonds();
-                    return;
-                }
-            }
-            // All slots full — show hint in description area
-            if (spellDescText != null)
-                spellDescText.text = "Select a diamond slot first, then click a spell to assign it.";
+            if (!TryAutoEquipSpell(spell) && spellDescText != null)
+                spellDescText.text = "All spell slots are full. Drag to replace or select a diamond slot first.";
             return;
         }
 
-        // If this spell is already in another slot, remove it from there first
-        var loadout = playerController.GetLoadout();
-        for (int i = 0; i < loadout.Length; i++)
-        {
-            if (loadout[i] == spell && i != _selectedDiamondSlot)
-                playerController.UnequipSpell(i);
-        }
-
-        playerController.TryEquipSpell(spell, _selectedDiamondSlot);
+        AssignSpellToSlot(spell, _selectedDiamondSlot);
         _selectedDiamondSlot = -1;  // deselect after assigning
-        RefreshDiamonds();
     }
 
     // ── Hover description ─────────────────────────────────────
@@ -239,5 +219,68 @@ public class SpellMenuUI : MonoBehaviour
         for (int i = 0; i < loadout.Length; i++)
             if (loadout[i] == spell) return true;
         return false;
+    }
+
+    public SpellDefinition GetEquippedSpell(int slotIndex)
+    {
+        RebindReferences();
+        if (playerController == null) return null;
+        return playerController.GetSpell(slotIndex);
+    }
+
+    public bool AssignSpellToSlot(SpellDefinition spell, int slotIndex)
+    {
+        RebindReferences();
+        if (playerController == null || spell == null) return false;
+        if (slotIndex < 0 || slotIndex >= diamondSlots.Length) return false;
+
+        var loadout = playerController.GetLoadout();
+        for (int i = 0; i < loadout.Length; i++)
+        {
+            if (i != slotIndex && loadout[i] == spell)
+                playerController.UnequipSpell(i);
+        }
+
+        bool equipped = playerController.TryEquipSpell(spell, slotIndex);
+        if (equipped)
+            RefreshDiamonds();
+        return equipped;
+    }
+
+    public bool TryAutoEquipSpell(SpellDefinition spell)
+    {
+        RebindReferences();
+        if (playerController == null || spell == null) return false;
+
+        for (int i = 0; i < diamondSlots.Length; i++)
+        {
+            if (playerController.GetSpell(i) == null)
+                return AssignSpellToSlot(spell, i);
+        }
+
+        return false;
+    }
+
+    public bool SwapEquippedSlots(int sourceIndex, int targetIndex)
+    {
+        RebindReferences();
+        if (playerController == null) return false;
+        if (sourceIndex < 0 || sourceIndex >= diamondSlots.Length) return false;
+        if (targetIndex < 0 || targetIndex >= diamondSlots.Length) return false;
+        if (sourceIndex == targetIndex) return false;
+
+        SpellDefinition sourceSpell = playerController.GetSpell(sourceIndex);
+        SpellDefinition targetSpell = playerController.GetSpell(targetIndex);
+
+        playerController.UnequipSpell(sourceIndex);
+        playerController.UnequipSpell(targetIndex);
+
+        if (sourceSpell != null)
+            playerController.TryEquipSpell(sourceSpell, targetIndex);
+        if (targetSpell != null)
+            playerController.TryEquipSpell(targetSpell, sourceIndex);
+
+        RefreshDiamonds();
+        return true;
     }
 }

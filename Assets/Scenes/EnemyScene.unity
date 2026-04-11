@@ -9719,8 +9719,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159267c05cbb4134fa0a74de2c59c6ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  waveManager: {fileID: 0}
+  waveManager: {fileID: 683446838}
   portal: {fileID: 732345816}
+  portalDistanceFromPlayer: 10
 --- !u!1 &2118974330
 GameObject:
   m_ObjectHideFlags: 0

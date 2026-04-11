@@ -66,7 +66,19 @@ public class Portal : MonoBehaviour
 
             Scene activeScene = SceneManager.GetActiveScene();
             Vector3 safeReturnPosition = playerTransform.position + GetSafeReturnOffset();
-            PlayerController.RememberPositionForScene(activeScene.name, safeReturnPosition, playerTransform.rotation);
+            Vector3 awayFromPortal = safeReturnPosition - transform.position;
+            awayFromPortal.y = 0f;
+            if (awayFromPortal.sqrMagnitude < 0.0001f)
+            {
+                awayFromPortal = GetSafeReturnOffset();
+                awayFromPortal.y = 0f;
+            }
+
+            Quaternion spawnRotation = awayFromPortal.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(awayFromPortal.normalized, Vector3.up)
+                : playerTransform.rotation;
+
+            PlayerController.RememberPositionForScene(activeScene.name, safeReturnPosition, spawnRotation);
 
             if (shooter != null)
             {

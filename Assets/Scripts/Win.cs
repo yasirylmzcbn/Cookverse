@@ -10,6 +10,8 @@ public class Win : MonoBehaviour
     public WaveManager waveManager;
 
     [SerializeField] private GameObject portal;
+    private Transform playerTransform;
+    [SerializeField] private float portalDistanceFromPlayer = 2f;
 
     void Start()
     {
@@ -20,6 +22,12 @@ public class Win : MonoBehaviour
             winText.enabled = false;
         }
         waveManager = FindObjectsByType<WaveManager>(FindObjectsSortMode.None)?[0];
+
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (playerTransform == null)
+        {
+            Debug.LogError("Player transform not found. Make sure the player GameObject has the 'Player' tag.");
+        }
     }
 
     void Update()
@@ -30,6 +38,12 @@ public class Win : MonoBehaviour
         if (!hasWon && waveManager.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
         {
             ShowWin();
+            Vector3 forward = playerTransform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+            Vector3 portalPosition = playerTransform.position + forward * portalDistanceFromPlayer;
+            portalPosition.y = 3.34f;
+            portal.transform.position = portalPosition;
             portal.SetActive(true);
         }
     }

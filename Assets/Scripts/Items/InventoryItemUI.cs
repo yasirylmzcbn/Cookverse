@@ -4,7 +4,8 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 public class InventoryItemUI : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler,
+    IPointerClickHandler
 {
     [Header("Display")]
     public Image icon;
@@ -18,6 +19,7 @@ public class InventoryItemUI : MonoBehaviour,
     // ── Drag state ────────────────────────────────────────────────────────────
     private static GameObject _dragGhost;
     private Canvas _rootCanvas;
+    private InventoryUI _inventoryUI;
 
     private Canvas RootCanvas
     {
@@ -98,6 +100,19 @@ public class InventoryItemUI : MonoBehaviour,
             Destroy(_dragGhost);
             _dragGhost = null;
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (itemData == null) return;
+
+        _inventoryUI?.TryQuickEquipToHotbar(itemData, amount);
+    }
+
+    public void BindInventoryUI(InventoryUI inventoryUI)
+    {
+        _inventoryUI = inventoryUI;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

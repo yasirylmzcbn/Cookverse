@@ -528,6 +528,15 @@ public class PlayerController : MonoBehaviour
 
             return;
         }
+        if (inventoryToggleAction != null && inventoryToggleAction.WasPressedThisFrame())
+        {
+            Debug.Log("Inventory toggle pressed");
+            if (spellMenu == null)
+                spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
+            var isOpen = spellMenu != null && spellMenu.menuOpen;
+            if (spellMenu != null)
+                spellMenu.SetMenuVisible(!isOpen);
+        }
         if (currentlyInteracting)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
@@ -620,16 +629,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("reload pressed");
             var potatoShooter = GetPotatoShooter();
             if (potatoShooter != null) potatoShooter.TryReload();
-        }
-
-        if (inventoryToggleAction != null && inventoryToggleAction.WasPressedThisFrame())
-        {
-            Debug.Log("Inventory toggle pressed");
-            if (spellMenu == null)
-                spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
-            var isOpen = spellMenu != null && spellMenu.menuOpen;
-            if (spellMenu != null)
-                spellMenu.SetMenuVisible(!isOpen);
         }
     }
     private bool IsSpellEquipped(SpellDefinition spell)

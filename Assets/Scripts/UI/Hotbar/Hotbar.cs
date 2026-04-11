@@ -16,6 +16,8 @@ public class Hotbar : MonoBehaviour
     [Tooltip("Assign the 3 HotbarSlot components here.")]
     [SerializeField] private HotbarSlot[] slots = new HotbarSlot[3];
 
+    public int SlotCount => slots != null ? slots.Length : 0;
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     /// <summary>Returns the item held in a given slot (0-based), or null if empty.</summary>
@@ -51,6 +53,25 @@ public class Hotbar : MonoBehaviour
     {
         foreach (var slot in slots)
             slot?.ClearSlot();
+    }
+
+    /// <summary>
+    /// Places the item in the first empty slot. Returns false if all slots are filled.
+    /// </summary>
+    public bool TryEquipFirstEmpty(ItemData item, int amount)
+    {
+        if (item == null || slots == null) return false;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] != null && slots[i].IsEmpty)
+            {
+                slots[i].SetItem(item, amount);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

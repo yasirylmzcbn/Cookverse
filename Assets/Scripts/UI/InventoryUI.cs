@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
     public Transform content;
     public GameObject itemPrefab;
     private bool isRefreshing = false;
+    private Hotbar _hotbar;
+    [SerializeField] private TextMeshProUGUI feedbackText;
 
     void Start()
     {
@@ -52,6 +55,7 @@ public class InventoryUI : MonoBehaviour
             // These MUST be set so InventoryItemUI.OnBeginDrag can read them.
             itemui.itemData = item;
             itemui.amount = amount;
+            itemui.BindInventoryUI(this);
 
             // ── Icon ──────────────────────────────────────────────────────────
             if (itemui.icon != null && item.icon != null)
@@ -61,5 +65,31 @@ public class InventoryUI : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
         isRefreshing = false;
+    }
+
+    public bool TryQuickEquipToHotbar(ItemData item, int amount)
+    {
+        if (item == null) return false;
+
+        if (_hotbar == null)
+            _hotbar = FindFirstObjectByType<Hotbar>(FindObjectsInactive.Include);
+
+        if (_hotbar == null)
+        {
+            SetFeedback("No hotbar found.");
+            return false;
+        }
+
+        bool equipped = _hotbar.TryEquipFirstEmpty(item, amount);
+        if (!equipped)
+            SetFeedback("Hotbar is full. Drag an item to replace a slot.");
+
+        return equipped;
+    }
+
+    private void SetFeedback(string message)
+    {
+        if (feedbackText != null)
+            feedbackText.text = message;
     }
 }
