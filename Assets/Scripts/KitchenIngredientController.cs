@@ -143,7 +143,7 @@ public class KitchenIngredientController : MonoBehaviour
     /// </summary>
     public void BeginDragFromHotbar()
     {
-        BeginDragInternal();
+        BeginDragInternal(forceFixedHeight: true);
     }
 
     public void SetHotbarSource(HotbarSlot hotbarSlot, ItemData itemData)
@@ -203,13 +203,20 @@ public class KitchenIngredientController : MonoBehaviour
         return bestIngredient == this;
     }
 
-    private void BeginDragInternal()
+    private void BeginDragInternal(bool forceFixedHeight = false)
     {
         isDragging = true;
 
         dragOriginalParent = transform.parent;
 
-        lockedY = useFixedDragY ? fixedDragY : transform.position.y;
+        lockedY = (forceFixedHeight || useFixedDragY) ? fixedDragY : transform.position.y;
+
+        if (forceFixedHeight)
+        {
+            Vector3 pos = transform.position;
+            pos.y = lockedY + hoverYOffset;
+            transform.position = pos;
+        }
 
         if (!TryGetPointerWorldPoint(out Vector3 pointerWorld))
             dragOffset = Vector3.zero;

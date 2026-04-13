@@ -64,8 +64,8 @@ MonoBehaviour:
     m_Bits: 4294967295
   surfaceRayDistance: 1000
   useFixedDragY: 0
-  fixedDragY: 0.9
-  hoverYOffset: 0.02
+  fixedDragY: 1.8
+  hoverYOffset: 0.01
   rb: {fileID: 2271485988209750029}
   snapSphereCastRadius: 0.3
   slotSearchRadius: 2

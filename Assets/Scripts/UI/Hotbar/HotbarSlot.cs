@@ -36,6 +36,7 @@ public class HotbarSlot : MonoBehaviour,
     private static GameObject _dragGhost;
     private Canvas _rootCanvas;
     private bool _dragLeftUI;   // true once the ghost has left all UI elements
+    private bool _worldDragHandedOff;
 
     private GameManager gameManager;
 
@@ -108,6 +109,15 @@ public class HotbarSlot : MonoBehaviour,
         if (IsEmpty) return;
 
         _dragLeftUI = false;
+        _worldDragHandedOff = false;
+
+        // In kitchen interaction mode, skip UI ghost dragging and hand off
+        // directly to world ingredient drag so one gesture handles everything.
+        if (SwitchCamera.IsKitchenInteractionAllowed() && TryBeginWorldDragFromHotbar())
+        {
+            _worldDragHandedOff = true;
+            return;
+        }
 
         _dragGhost = new GameObject("HotbarDragGhost");
         _dragGhost.transform.SetParent(RootCanvas.transform, false);
@@ -133,6 +143,9 @@ public class HotbarSlot : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (_worldDragHandedOff)
+            return;
+
         MoveDragGhost(eventData);
 
         // Track the moment the cursor leaves all UI — marks this as a world-drop gesture.
@@ -147,6 +160,9 @@ public class HotbarSlot : MonoBehaviour,
             Destroy(_dragGhost);
             _dragGhost = null;
         }
+
+        if (_worldDragHandedOff)
+            return;
 
         // Cursor released over the game world (not a UI drop target) → world drop.
         // If it ended on a UI slot, OnDrop() on that slot already handled it.
@@ -191,6 +207,33 @@ public class HotbarSlot : MonoBehaviour,
 
         if (gameManager != null)
             gameManager.RemoveInventoryItem(droppedItem);
+    }
+
+    private bool TryBeginWorldDragFromHotbar()
+    {
+        if (IsEmpty) return false;
+
+        if (worldDrop == null)
+            worldDrop = GetComponentInParent<HotbarWorldDrop>();
+
+        if (worldDrop == null)
+            return false;
+
+        ItemData droppedItem = HeldItem;
+        KitchenIngredientController ingredient = worldDrop.SpawnAndBeginDrag(droppedItem, this);
+        if (ingredient == null)
+            return false;
+
+        HeldAmount--;
+        if (HeldAmount <= 0)
+            ClearSlot();
+        else
+            RefreshDisplay();
+
+        if (gameManager != null)
+            gameManager.RemoveInventoryItem(droppedItem);
+
+        return true;
     }
 
     public void RestoreDroppedIngredient(ItemData item)
