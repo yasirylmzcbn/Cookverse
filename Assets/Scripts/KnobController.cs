@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 
 public class KnobController : MonoBehaviour
@@ -42,9 +43,24 @@ public class KnobController : MonoBehaviour
     [SerializeField] private Animator animator;
 
     [Header("Rotation Settings")]
-    [SerializeField] private float rotationSpeed = 1f;
     [SerializeField] private float minAngle = 0f;
     [SerializeField] private float maxAngle = 180f;
+
+    [Header("Click Toggle")]
+    [Tooltip("Angle used when the knob is toggled OFF.")]
+    [SerializeField] private float offAngle = 0f;
+
+    [Tooltip("Angle used when the knob is toggled ON.")]
+    [SerializeField] private float onAngle = 90f;
+
+    [Tooltip("If enabled, knob rotates smoothly to ON/OFF instead of snapping instantly.")]
+    [SerializeField] private bool smoothTurn = true;
+
+    [Tooltip("How long the smooth turn takes in seconds.")]
+    [SerializeField, Min(0f)] private float turnDuration = 0.15f;
+
+    [Tooltip("Interpolation curve used for smooth turning.")]
+    [SerializeField] private AnimationCurve turnCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     [Tooltip("How the knob decides which axis to rotate around.")]
     [SerializeField] private RotationAxisMode rotationAxisMode = RotationAxisMode.Manual;
@@ -66,13 +82,12 @@ public class KnobController : MonoBehaviour
 
     [Header("State")]
     [SerializeField] public BurnerSide side;
-    [SerializeField] private float onThreshold = 30f; // Angle at which stove turns on
 
-    private bool isDragging = false;
     private float currentAngle = 0f;
-    private Vector2 lastMousePos;
+    private bool isOnState = false;
     private Mouse mouse;
     private StoveScript stove;
+    private Coroutine turnCoroutine;
 
     private Quaternion initialLocalRotation;
     private Quaternion initialWorldRotation;
@@ -107,6 +122,8 @@ public class KnobController : MonoBehaviour
             }
             cookwareSlots[i].IsOn = false;
         }
+
+        SetState(false, immediate: true);
     }
 
     void Update()
@@ -115,13 +132,12 @@ public class KnobController : MonoBehaviour
 
         if (!SwitchCamera.IsKitchenInteractionAllowed())
         {
-            isDragging = false;
             return;
         }
 
         if (kitchenCamera == null) return;
 
-        // Check for mouse click on this object
+        // Click this knob to toggle directly between OFF and ON angles.
         if (mouse.leftButton.wasPressedThisFrame)
         {
             Ray ray = kitchenCamera.ScreenPointToRay(mouse.position.ReadValue());
@@ -129,65 +145,95 @@ public class KnobController : MonoBehaviour
             {
                 if (hit.collider.gameObject == gameObject)
                 {
-                    isDragging = true;
-                    lastMousePos = mouse.position.ReadValue();
+                    ToggleState();
                 }
             }
         }
+    }
 
-        if (mouse.leftButton.wasReleasedThisFrame)
+    private void ToggleState()
+    {
+        bool newIsOn = !isOnState;
+        SetState(newIsOn);
+    }
+
+    private void SetState(bool isOn, bool immediate = false)
+    {
+        isOnState = isOn;
+        float targetAngle = isOn ? onAngle : offAngle;
+
+        if (turnCoroutine != null)
         {
-            isDragging = false;
+            StopCoroutine(turnCoroutine);
+            turnCoroutine = null;
         }
 
-        if (isDragging)
+        float clampedTargetAngle = Mathf.Clamp(targetAngle, minAngle, maxAngle);
+        if (immediate || !smoothTurn || turnDuration <= 0f)
         {
-            Vector2 currentMousePos = mouse.position.ReadValue();
-            Vector2 mouseDelta = currentMousePos - lastMousePos;
-
-            // Calculate rotation based on horizontal mouse movement
-            float rotationAmount = mouseDelta.x * rotationSpeed;
-            currentAngle += rotationAmount;
-            currentAngle = Mathf.Clamp(currentAngle, minAngle, maxAngle);
+            currentAngle = clampedTargetAngle;
             ApplyKnobRotation(currentAngle);
-
-            if (stove != null)
-            {
-                stove.ApplyVisuals(side, GetHeatLevel());
-
-            }
-
-            bool newIsOn = currentAngle >= onThreshold;
-            bool anyChanged = false;
-            if (cookwareSlots != null)
-            {
-                for (int i = 0; i < cookwareSlots.Length; i++)
-                {
-                    CookwareSlot slot = cookwareSlots[i];
-                    if (slot == null) continue;
-
-                    bool wasOn = slot.IsOn;
-                    slot.IsOn = newIsOn;
-                    if (wasOn != newIsOn)
-                        anyChanged = true;
-                }
-            }
-            if (anyChanged)
-            {
-                if (GetType() == typeof(OvenKnobController))
-                {
-                    Debug.Log("ovenknobcontrolerrrr");
-                    OvenKnobController ovenKnob = this as OvenKnobController;
-                    ovenKnob.OnStateChanged(newIsOn);
-                }
-                else
-                {
-                    OnStateChanged(newIsOn);
-                }
-            }
-
-            lastMousePos = currentMousePos;
+            UpdateHeatVisuals();
         }
+        else
+        {
+            turnCoroutine = StartCoroutine(AnimateToAngle(clampedTargetAngle));
+        }
+
+        UpdateCookwareState(isOn);
+    }
+
+    private void UpdateCookwareState(bool isOn)
+    {
+        if (stove != null)
+            stove.ApplyVisuals(side, GetHeatLevel());
+
+        bool anyChanged = false;
+        if (cookwareSlots != null)
+        {
+            for (int i = 0; i < cookwareSlots.Length; i++)
+            {
+                CookwareSlot slot = cookwareSlots[i];
+                if (slot == null) continue;
+
+                bool wasOn = slot.IsOn;
+                slot.IsOn = isOn;
+                if (wasOn != isOn)
+                    anyChanged = true;
+            }
+        }
+
+        if (anyChanged)
+            OnStateChanged(isOn);
+    }
+
+    private IEnumerator AnimateToAngle(float targetAngle)
+    {
+        float startAngle = currentAngle;
+        float elapsed = 0f;
+
+        while (elapsed < turnDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / turnDuration);
+            float curvedT = turnCurve != null ? turnCurve.Evaluate(t) : t;
+
+            currentAngle = Mathf.Lerp(startAngle, targetAngle, curvedT);
+            ApplyKnobRotation(currentAngle);
+            UpdateHeatVisuals();
+            yield return null;
+        }
+
+        currentAngle = targetAngle;
+        ApplyKnobRotation(currentAngle);
+        UpdateHeatVisuals();
+        turnCoroutine = null;
+    }
+
+    private void UpdateHeatVisuals()
+    {
+        if (stove != null)
+            stove.ApplyVisuals(side, GetHeatLevel());
     }
 
     private void ApplyKnobRotation(float angleDegrees)
