@@ -78,9 +78,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KitchenIngredientController
   ingredientType: 5
   rawForm: {fileID: 2910483639006140095}
-  choppedForm: {fileID: 2910483639006140095}
-  cookedForm: {fileID: 6504491841459510738}
+  choppedForm: {fileID: 6504491841459510738}
+  cookedVisualMode: 0
+  cookedMaterial: {fileID: 2100000, guid: de44a84f407414d0cb4175f59e7b9c0d, type: 2}
   burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
+  cookedForm: {fileID: 0}
   kitchenCamera: {fileID: 0}
   interactLayers:
     serializedVersion: 2
@@ -92,7 +94,7 @@ MonoBehaviour:
   useFixedDragY: 1
   fixedDragY: 1.8
   hoverYOffset: 0.01
-  rb: {fileID: 0}
+  rb: {fileID: 5814127926277621932}
   snapSphereCastRadius: 0.25
   slotSearchRadius: 2
   hideDraggedVisualsInSnapRange: 1
@@ -187,6 +189,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1924163986513514769, guid: a1bb48d934bc96546857f05ec064b984, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9866fda0e61a7904087eb0ec5ab17e03, type: 2}
     m_RemovedComponents:
     - {fileID: 2121592167335256260, guid: a1bb48d934bc96546857f05ec064b984, type: 3}
     m_RemovedGameObjects: []

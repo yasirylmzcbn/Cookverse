@@ -449,7 +449,7 @@ Transform:
   m_GameObject: {fileID: 83002421}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.067}
+  m_LocalPosition: {x: 0, y: 0.06, z: 0.067}
   m_LocalScale: {x: 0.71428573, y: 0.71428573, z: 0.71428573}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4991,7 +4991,7 @@ Transform:
   m_GameObject: {fileID: 768850187}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.081}
+  m_LocalPosition: {x: 0, y: 0.06, z: -0.081}
   m_LocalScale: {x: 0.71428573, y: 0.71428573, z: 0.71428573}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6469,9 +6469,36 @@ MonoBehaviour:
   cookwareType: 0
   cookwareSlots: []
   animator: {fileID: 0}
-  rotationSpeed: 1
   minAngle: 0
-  maxAngle: 180
+  maxAngle: 270
+  offAngle: 0
+  onAngle: 270
+  smoothTurn: 1
+  turnDuration: 0.45
+  turnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rotationAxisMode: 0
   axisSpace: 0
   rotationAxis: {x: 0, y: 1, z: 0}
@@ -6479,7 +6506,6 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
-  onThreshold: 30
 --- !u!1 &1153405404
 GameObject:
   m_ObjectHideFlags: 0
@@ -7602,7 +7628,7 @@ Transform:
   m_GameObject: {fileID: 1369411308}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.12, y: 0, z: 1.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8943,9 +8969,36 @@ MonoBehaviour:
   cookwareType: 0
   cookwareSlots: []
   animator: {fileID: 0}
-  rotationSpeed: 1
   minAngle: 0
-  maxAngle: 180
+  maxAngle: 270
+  offAngle: 0
+  onAngle: 270
+  smoothTurn: 1
+  turnDuration: 0.45
+  turnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rotationAxisMode: 0
   axisSpace: 0
   rotationAxis: {x: 0, y: 1, z: 0}
@@ -8953,7 +9006,6 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
-  onThreshold: 30
 --- !u!136 &1619708037
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9495,14 +9547,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703511411}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
   m_LocalPosition: {x: -26.872, y: -2.54, z: -19.069}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 489793759}
   m_Father: {fileID: 1721870319}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!114 &1703511413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9600,9 +9652,36 @@ MonoBehaviour:
   cookwareSlots:
   - {fileID: 1627867131}
   animator: {fileID: 0}
-  rotationSpeed: 1
   minAngle: 0
-  maxAngle: 180
+  maxAngle: 270
+  offAngle: 0
+  onAngle: 270
+  smoothTurn: 1
+  turnDuration: 0.45
+  turnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rotationAxisMode: 0
   axisSpace: 0
   rotationAxis: {x: 0, y: 1, z: 0}
@@ -9610,7 +9689,6 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
-  onThreshold: 30
 --- !u!1001 &1715191302
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10207,7 +10285,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1773253111}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8650b9a32cf7d44598ff36793e0c0e0f, type: 3}
   m_Name: 
@@ -12212,9 +12290,36 @@ MonoBehaviour:
   - {fileID: 868018394}
   - {fileID: 580945785}
   animator: {fileID: 1302122580}
-  rotationSpeed: 1
   minAngle: 0
-  maxAngle: 180
+  maxAngle: 270
+  offAngle: 0
+  onAngle: 270
+  smoothTurn: 1
+  turnDuration: 0.45
+  turnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rotationAxisMode: 0
   axisSpace: 0
   rotationAxis: {x: 0, y: 1, z: 0}
@@ -12222,7 +12327,6 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
-  onThreshold: 30
 --- !u!1 &2102608535
 GameObject:
   m_ObjectHideFlags: 0
@@ -12760,10 +12864,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Steak
       objectReference: {fileID: 0}
+    - target: {fileID: 2910483639006140095, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4702994609908841479, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9866fda0e61a7904087eb0ec5ab17e03, type: 2}
     - target: {fileID: 5278088429593523794, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
       propertyPath: kitchenCamera
       value: 
       objectReference: {fileID: 469138181}
+    - target: {fileID: 6504491841459510738, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8501692464528522965, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
       propertyPath: m_LocalPosition.x
       value: -26.93795

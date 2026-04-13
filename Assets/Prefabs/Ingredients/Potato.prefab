@@ -52,8 +52,10 @@ MonoBehaviour:
   ingredientType: 0
   rawForm: {fileID: 3498744251461418284}
   choppedForm: {fileID: 3498744251461418284}
-  cookedForm: {fileID: 9036642638271840958}
+  cookedVisualMode: 1
+  cookedMaterial: {fileID: 0}
   burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
+  cookedForm: {fileID: 9036642638271840958}
   kitchenCamera: {fileID: 0}
   interactLayers:
     serializedVersion: 2

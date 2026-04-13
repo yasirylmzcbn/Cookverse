@@ -4,6 +4,12 @@ using UnityEngine.InputSystem;
 
 public class KitchenIngredientController : MonoBehaviour
 {
+    public enum CookedVisualMode
+    {
+        ChoppedMaterialSwap,
+        CookedMesh
+    }
+
     [Header("Ingredient")]
     [SerializeField] private Ingredient ingredientType;
 
@@ -16,8 +22,10 @@ public class KitchenIngredientController : MonoBehaviour
     [Header("Forms")]
     [SerializeField] private GameObject rawForm;
     [SerializeField] private GameObject choppedForm;
-    [SerializeField] private GameObject cookedForm;
+    [SerializeField] private CookedVisualMode cookedVisualMode = CookedVisualMode.ChoppedMaterialSwap;
+    [SerializeField] private Material cookedMaterial;
     [SerializeField] private Material burntMaterial;
+    [SerializeField] private GameObject cookedForm;
 
     [Header("Dragging")]
     [Tooltip("Fixed kitchen camera (assign in Inspector).")]
@@ -70,6 +78,11 @@ public class KitchenIngredientController : MonoBehaviour
 
     public float cookLevel = 0f; // 0 = raw, 1 = cooked, 1.75 = burnt
 
+    private Renderer[] choppedRenderers;
+    private Material[][] choppedOriginalMaterials;
+    private Renderer[] cookedRenderers;
+    private Material[][] cookedOriginalMaterials;
+
     // Remembers where the ingredient was last sitting freely (counter/table/etc.)
     private struct FreeState
     {
@@ -88,7 +101,139 @@ public class KitchenIngredientController : MonoBehaviour
     private void Awake()
     {
         if (rb == null) TryGetComponent(out rb);
+        CacheChoppedMaterials();
+        CacheCookedMaterials();
         SaveFreeState();
+    }
+
+    private void CacheChoppedMaterials()
+    {
+        GameObject choppedTarget = GetChoppedVisualObject();
+        if (choppedTarget == null)
+        {
+            choppedRenderers = System.Array.Empty<Renderer>();
+            choppedOriginalMaterials = System.Array.Empty<Material[]>();
+            return;
+        }
+
+        choppedRenderers = choppedTarget.GetComponentsInChildren<Renderer>(true);
+        choppedOriginalMaterials = new Material[choppedRenderers.Length][];
+
+        for (int i = 0; i < choppedRenderers.Length; i++)
+            choppedOriginalMaterials[i] = GetRendererMaterials(choppedRenderers[i]);
+    }
+
+    private void CacheCookedMaterials()
+    {
+        GameObject cookedTarget = GetCookedVisualObject();
+        if (cookedTarget == null)
+        {
+            cookedRenderers = System.Array.Empty<Renderer>();
+            cookedOriginalMaterials = System.Array.Empty<Material[]>();
+            return;
+        }
+
+        cookedRenderers = cookedTarget.GetComponentsInChildren<Renderer>(true);
+        cookedOriginalMaterials = new Material[cookedRenderers.Length][];
+
+        for (int i = 0; i < cookedRenderers.Length; i++)
+            cookedOriginalMaterials[i] = GetRendererMaterials(cookedRenderers[i]);
+    }
+
+    private void RestoreChoppedOriginalMaterials()
+    {
+        if (choppedRenderers == null || choppedOriginalMaterials == null) return;
+
+        for (int i = 0; i < choppedRenderers.Length && i < choppedOriginalMaterials.Length; i++)
+        {
+            if (choppedRenderers[i] == null || choppedOriginalMaterials[i] == null) continue;
+            SetRendererMaterials(choppedRenderers[i], choppedOriginalMaterials[i]);
+        }
+    }
+
+    private void RestoreCookedOriginalMaterials()
+    {
+        if (cookedRenderers == null || cookedOriginalMaterials == null) return;
+
+        for (int i = 0; i < cookedRenderers.Length && i < cookedOriginalMaterials.Length; i++)
+        {
+            if (cookedRenderers[i] == null || cookedOriginalMaterials[i] == null) continue;
+            SetRendererMaterials(cookedRenderers[i], cookedOriginalMaterials[i]);
+        }
+    }
+
+    private void ApplyMaterialToChopped(Material material)
+    {
+        if (material == null || choppedRenderers == null) return;
+
+        for (int i = 0; i < choppedRenderers.Length; i++)
+        {
+            if (choppedRenderers[i] == null) continue;
+
+            Material[] mats = GetRendererMaterials(choppedRenderers[i]);
+            for (int m = 0; m < mats.Length; m++)
+                mats[m] = material;
+
+            SetRendererMaterials(choppedRenderers[i], mats);
+        }
+    }
+
+    private void ApplyMaterialToCooked(Material material)
+    {
+        if (material == null || cookedRenderers == null) return;
+
+        for (int i = 0; i < cookedRenderers.Length; i++)
+        {
+            if (cookedRenderers[i] == null) continue;
+
+            Material[] mats = GetRendererMaterials(cookedRenderers[i]);
+            for (int m = 0; m < mats.Length; m++)
+                mats[m] = material;
+
+            SetRendererMaterials(cookedRenderers[i], mats);
+        }
+    }
+
+    private static Material[] GetRendererMaterials(Renderer renderer)
+    {
+        if (renderer == null) return System.Array.Empty<Material>();
+        return IsPrefabObject(renderer) ? renderer.sharedMaterials : renderer.materials;
+    }
+
+    private static void SetRendererMaterials(Renderer renderer, Material[] materials)
+    {
+        if (renderer == null || materials == null) return;
+
+        if (IsPrefabObject(renderer))
+            renderer.sharedMaterials = materials;
+        else
+            renderer.materials = materials;
+    }
+
+    private static bool IsPrefabObject(Renderer renderer)
+    {
+        return renderer == null || !renderer.gameObject.scene.IsValid();
+    }
+
+    private static bool IsValidSceneObject(GameObject go)
+    {
+        return go != null && go.scene.IsValid();
+    }
+
+    private GameObject GetChoppedVisualObject()
+    {
+        if (IsValidSceneObject(choppedForm))
+            return choppedForm;
+
+        if (choppedForm != null && rawForm != null)
+            Debug.LogWarning($"[{name}] choppedForm is not a valid scene object. Falling back to rawForm.");
+
+        return rawForm;
+    }
+
+    private GameObject GetCookedVisualObject()
+    {
+        return IsValidSceneObject(cookedForm) ? cookedForm : null;
     }
 
     private void Update()
@@ -579,39 +724,69 @@ public class KitchenIngredientController : MonoBehaviour
 
     public void SetToRawForm()
     {
-        rawForm.SetActive(true);
-        choppedForm.SetActive(false);
-        cookedForm.SetActive(false);
+        GameObject choppedTarget = GetChoppedVisualObject();
+        GameObject cookedTarget = GetCookedVisualObject();
+
+        if (rawForm != null) rawForm.SetActive(true);
+        if (choppedTarget != null && choppedTarget != rawForm) choppedTarget.SetActive(false);
+        if (cookedTarget != null) cookedTarget.SetActive(false);
+        RestoreChoppedOriginalMaterials();
+        RestoreCookedOriginalMaterials();
     }
 
     public void SetToChoppedForm()
     {
-        rawForm.SetActive(false);
-        choppedForm.SetActive(true);
-        cookedForm.SetActive(false);
+        GameObject choppedTarget = GetChoppedVisualObject();
+        GameObject cookedTarget = GetCookedVisualObject();
+
+        if (rawForm != null) rawForm.SetActive(choppedTarget == rawForm);
+        if (choppedTarget != null) choppedTarget.SetActive(true);
+        if (cookedTarget != null) cookedTarget.SetActive(false);
+        RestoreChoppedOriginalMaterials();
+        RestoreCookedOriginalMaterials();
     }
 
     public void SetToCookedForm()
     {
-        rawForm.SetActive(false);
-        choppedForm.SetActive(false);
-        cookedForm.SetActive(true);
+        GameObject choppedTarget = GetChoppedVisualObject();
+        GameObject cookedTarget = GetCookedVisualObject();
+
+        if (rawForm != null) rawForm.SetActive(false);
+
+        if (cookedVisualMode == CookedVisualMode.CookedMesh && cookedTarget != null)
+        {
+            if (choppedTarget != null && choppedTarget != rawForm) choppedTarget.SetActive(false);
+            cookedTarget.SetActive(true);
+            RestoreCookedOriginalMaterials();
+        }
+        else
+        {
+            if (rawForm != null) rawForm.SetActive(choppedTarget == rawForm);
+            if (choppedTarget != null) choppedTarget.SetActive(true);
+            if (cookedTarget != null) cookedTarget.SetActive(false);
+            ApplyMaterialToChopped(cookedMaterial);
+        }
     }
 
     public void SetToBurntForm()
     {
-        if (burntMaterial != null)
+        GameObject choppedTarget = GetChoppedVisualObject();
+        GameObject cookedTarget = GetCookedVisualObject();
+
+        if (rawForm != null) rawForm.SetActive(false);
+
+        if (cookedVisualMode == CookedVisualMode.CookedMesh && cookedTarget != null)
         {
-            Renderer[] renderers = cookedForm.GetComponentsInChildren<Renderer>();
-            foreach (Renderer rend in renderers)
-            {
-                Material[] mats = rend.materials;
-                for (int i = 0; i < mats.Length; i++)
-                {
-                    mats[i] = burntMaterial;
-                }
-                rend.materials = mats;
-            }
+            if (choppedTarget != null && choppedTarget != rawForm) choppedTarget.SetActive(false);
+            cookedTarget.SetActive(true);
+            ApplyMaterialToCooked(burntMaterial);
+        }
+        else
+        {
+            if (rawForm != null) rawForm.SetActive(choppedTarget == rawForm);
+            if (choppedTarget != null) choppedTarget.SetActive(true);
+            if (cookedTarget != null) cookedTarget.SetActive(false);
+            ApplyMaterialToChopped(burntMaterial);
         }
     }
 

@@ -53,8 +53,10 @@ MonoBehaviour:
   ingredientType: 2
   rawForm: {fileID: 1544849334864511687}
   choppedForm: {fileID: 3270002228608154616}
-  cookedForm: {fileID: 4267448937642568216}
+  cookedVisualMode: 0
+  cookedMaterial: {fileID: 2100000, guid: de7de3cb42e564eb99f0413d5ec620d0, type: 2}
   burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
+  cookedForm: {fileID: 0}
   kitchenCamera: {fileID: 0}
   interactLayers:
     serializedVersion: 2
@@ -197,11 +199,6 @@ PrefabInstance:
 --- !u!4 &3491088637204754594 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3405248517301900384, guid: e41b9cce28c2aa542abacad6d2c5af47, type: 3}
-  m_PrefabInstance: {fileID: 2248151506971354306}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &4267448937642568216 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2596905523559583450, guid: e41b9cce28c2aa542abacad6d2c5af47, type: 3}
   m_PrefabInstance: {fileID: 2248151506971354306}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5816916629701653704
