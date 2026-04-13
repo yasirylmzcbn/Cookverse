@@ -105,11 +105,15 @@ public class SpellMenuUI : MonoBehaviour
         }
         else
         {
-            // restore normal looking around, lock cursor
+            // If we're in kitchen interaction mode, keep the cursor available.
+            SwitchCamera switchCamera = FindFirstObjectByType<SwitchCamera>();
+            bool keepKitchenCursor = switchCamera != null && switchCamera.IsInKitchenCamera;
+
             if (firstPersonCameraController != null)
-                firstPersonCameraController.enabled = true;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+                firstPersonCameraController.enabled = !keepKitchenCursor;
+
+            Cursor.lockState = keepKitchenCursor ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = keepKitchenCursor;
             _selectedDiamondSlot = -1;
         }
     }
