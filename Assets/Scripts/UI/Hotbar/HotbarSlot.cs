@@ -37,6 +37,8 @@ public class HotbarSlot : MonoBehaviour,
     private Canvas _rootCanvas;
     private bool _dragLeftUI;   // true once the ghost has left all UI elements
 
+    private GameManager gameManager;
+
     private Canvas RootCanvas
     {
         get
@@ -48,7 +50,12 @@ public class HotbarSlot : MonoBehaviour,
     }
 
     // ── Unity lifecycle ───────────────────────────────────────────────────────
-    private void Start() => RefreshDisplay();
+    private void Start()
+    {
+        gameManager = GameManager.Instance;
+        Debug.Log("gamemanager: " + (gameManager != null ? "FOUND" : "NULL"));
+        RefreshDisplay();
+    }
 
     // ── Public API ────────────────────────────────────────────────────────────
 
@@ -170,9 +177,35 @@ public class HotbarSlot : MonoBehaviour,
             return;
         }
 
-        // Spawn the 3-D ingredient and hand drag control to KitchenIngredientController.
-        // Item stays in hotbar (infinite use — consumed only by a completed recipe).
-        worldDrop.SpawnAndBeginDrag(HeldItem);
+        ItemData droppedItem = HeldItem;
+        KitchenIngredientController ingredient = worldDrop.SpawnAndBeginDrag(droppedItem, this);
+        if (ingredient == null)
+            return;
+
+        // reduce the ingredient stack only after the world object successfully spawns
+        HeldAmount--;
+        if (HeldAmount <= 0)
+            ClearSlot();
+        else
+            RefreshDisplay();
+
+        if (gameManager != null)
+            gameManager.RemoveInventoryItem(droppedItem);
+    }
+
+    public void RestoreDroppedIngredient(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        if (HeldItem == null)
+            HeldItem = item;
+
+        HeldAmount++;
+        RefreshDisplay();
+
+        if (gameManager != null)
+            gameManager.AddInventoryItem(item);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

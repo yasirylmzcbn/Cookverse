@@ -58,6 +58,10 @@ public class KitchenIngredientController : MonoBehaviour
     private bool isPreviewSnapped;
     private IngredientSlotBehaviour previewSnappedSlot;
 
+    private HotbarSlot sourceHotbarSlot;
+    private ItemData sourceHotbarItem;
+    private bool spawnedFromHotbar;
+
     private CookwareSlot lidHoverSlot;
     private bool lidHoverInRange;
 
@@ -140,6 +144,13 @@ public class KitchenIngredientController : MonoBehaviour
     public void BeginDragFromHotbar()
     {
         BeginDragInternal();
+    }
+
+    public void SetHotbarSource(HotbarSlot hotbarSlot, ItemData itemData)
+    {
+        sourceHotbarSlot = hotbarSlot;
+        sourceHotbarItem = itemData;
+        spawnedFromHotbar = hotbarSlot != null && itemData != null;
     }
 
     private bool IsTopmostIngredientUnderPointer()
@@ -342,12 +353,22 @@ public class KitchenIngredientController : MonoBehaviour
             && hoverSlot.TryPlaceIngredient(this))
         {
             currentSlot = hoverSlot;
+            spawnedFromHotbar = false;
+            sourceHotbarSlot = null;
+            sourceHotbarItem = null;
             SetHoverSlot(null);
             return;
         }
 
         // Not placed: keep where dropped
         SetHoverSlot(null);
+
+        if (spawnedFromHotbar)
+        {
+            ReturnToHotbarInventory();
+            Destroy(gameObject);
+            return;
+        }
 
         if (rb != null)
             rb.isKinematic = false;
@@ -537,6 +558,16 @@ public class KitchenIngredientController : MonoBehaviour
     {
         RestoreFreeState();
         if (!IsCooked() && !IsBurnt()) SetToRawForm();
+    }
+
+    private void ReturnToHotbarInventory()
+    {
+        if (sourceHotbarSlot != null)
+            sourceHotbarSlot.RestoreDroppedIngredient(sourceHotbarItem);
+
+        sourceHotbarSlot = null;
+        sourceHotbarItem = null;
+        spawnedFromHotbar = false;
     }
 
     public void SetToRawForm()

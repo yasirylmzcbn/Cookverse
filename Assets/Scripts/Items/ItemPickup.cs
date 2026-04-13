@@ -17,6 +17,10 @@ public class ItemPickup : MonoBehaviour
 
     public void Pickup(GameManager gameManager)
     {
+        KitchenIngredientController ingredient = GetComponent<KitchenIngredientController>();
+        if (ingredient != null && (ingredient.IsCooked() || ingredient.IsBurnt()))
+            return;
+
         gameManager.AddInventoryItem(itemData);
         Destroy(gameObject);
     }

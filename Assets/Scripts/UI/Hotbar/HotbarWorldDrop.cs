@@ -28,7 +28,7 @@ public class HotbarWorldDrop : MonoBehaviour
 
     // Called by HotbarSlot when the UI drag leaves the canvas into the scene.
     // Returns the spawned ingredient so HotbarSlot can forget about it.
-    public KitchenIngredientController SpawnAndBeginDrag(ItemData itemData)
+    public KitchenIngredientController SpawnAndBeginDrag(ItemData itemData, HotbarSlot sourceSlot)
     {
         if (!SwitchCamera.IsKitchenInteractionAllowed())
         {
@@ -67,6 +67,8 @@ public class HotbarWorldDrop : MonoBehaviour
         // ── Wire up the camera and layer masks if not already set in prefab ──
         if (ingredient.kitchenCamera == null)
             ingredient.kitchenCamera = cam;
+
+        ingredient.SetHotbarSource(sourceSlot, itemData);
 
         // ── Tell the ingredient to start dragging immediately ─────────────────
         // We call the public entry point that mirrors what Update() does on
