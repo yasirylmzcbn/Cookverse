@@ -36,7 +36,7 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Portal triggered by: " + other.name);
+        //Debug.Log("Portal triggered by: " + other.name);
         if (other.CompareTag("Player"))
         {
             Transform playerTransform = null;

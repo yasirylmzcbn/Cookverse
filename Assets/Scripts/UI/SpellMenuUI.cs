@@ -90,6 +90,7 @@ public class SpellMenuUI : MonoBehaviour
         if (spellMenuRoot != null)
             spellMenuRoot.SetActive(visible);
         if (inventoryPanel != null) inventoryPanel.SetActive(visible);
+        if (hotbarPanel != null) hotbarPanel.SetActive(visible);
 
         if (visible)
         {

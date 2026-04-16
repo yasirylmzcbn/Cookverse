@@ -4,12 +4,23 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public enum Difficulty
+    {
+        None,
+        Easy,
+        Medium,
+        Hard,
+        Boss
+    }
     // Difficulty, Inventory, and Saving will be here
     public static GameManager Instance;
-    float waveMultiplier = 1;
     float waveMultiplierIncrement = 1.1f;
+    private int currentWave = 1;
+    private int lastWave = 2;
     [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, hide later
     public event Action OnInventoryChanged;
+    private Difficulty lastCompletedDifficulty = Difficulty.None;
+    private Difficulty currentDifficulty = Difficulty.None;
     void Awake()
     {
         // If one already exists and it's not us then destroy the copy
@@ -21,6 +32,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        SetEasyDifficulty();
     }
 
     public void AddInventoryItem(ItemData item, int amount = 1)
@@ -84,11 +96,59 @@ public class GameManager : MonoBehaviour
 
     public void WaveCompleted()
     {
-        waveMultiplier *= waveMultiplierIncrement;
+        currentWave++;
+        if (currentWave == lastWave)
+        {
+            if (currentDifficulty > lastCompletedDifficulty)
+            {
+                lastCompletedDifficulty = currentDifficulty;
+            }
+
+        }
+        
     }
 
     public float GetWaveMultiplier()
     {
-        return waveMultiplier;
+        return MathF.Pow(waveMultiplierIncrement, currentWave);
+    }
+
+    public int CurrentWave()
+    {
+        return currentWave;
+    }
+
+    public int LastWave()
+    {
+        return lastWave;
+    }
+
+    public void SetEasyDifficulty()
+    {
+        currentWave = 1;
+        lastWave = 5;
+        currentDifficulty = Difficulty.Easy;
+    }
+
+    public void SetMediumDifficulty()
+    {
+        currentWave = 10;
+        lastWave = 20;
+        currentDifficulty = Difficulty.Medium;
+    }
+
+    public void SetHardDifficulty()
+    {
+        currentWave = 20;
+        lastWave = 30;
+        currentDifficulty = Difficulty.Hard;
+    }
+
+    public void SetBossDifficulty()
+    {
+        //add a boss bool to spawn in one wave and then turn it off
+        currentWave = 30;
+        lastWave = 40;
+        currentDifficulty = Difficulty.Boss;
     }
 }
