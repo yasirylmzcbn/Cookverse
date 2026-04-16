@@ -103,11 +103,11 @@ public class UIScript : MonoBehaviour
 
         if (_potatoShooter != null && ammoText != null)
         {
-            ammoText.text = _potatoShooter.ammo + " / " + _potatoShooter.initialAmmo;
+            ammoText.text = _potatoShooter.currentAmmo + " / " + _potatoShooter.maxAmmo;
 
             // more transparent text during reload
             var c = ammoText.color;
-            c.a = (_potatoShooter.ammo <= 0 || _potatoShooter.IsReloading) ? dimmedAlpha : 1f;
+            c.a = (_potatoShooter.currentAmmo <= 0 || _potatoShooter.IsReloading) ? dimmedAlpha : 1f;
             ammoText.color = c;
         }
 

@@ -9,6 +9,7 @@ public class WaveManager : MonoBehaviour
     private void Start()
     {
         done = false;
+        GameManager.Instance.EnsureStartingWave(); //called every time player enters other world
         StartCoroutine(WaveLoop());
     }
 

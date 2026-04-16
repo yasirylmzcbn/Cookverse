@@ -5,14 +5,23 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    public float sensX = 50f;
+    public float sensX = 45f;
     public float sensY = 37f;
+
+    [Header("Smoothing")]
+    [SerializeField, Range(0f, 1f)] private float smoothing = 0.1f; // 0 = no smoothing, higher = more lag
 
     [Header("Input (New Input System)")]
     [SerializeField] private InputAction lookAction;
     [SerializeField] private InputAction escapeAction;
 
     private float xRotation = 0f;
+    private float targetXRotation = 0f;
+    private float targetYRotation = 0f;
+    private float currentYRotation = 0f;
+
+    private Vector2 smoothedInput = Vector2.zero;
+    private Vector2 inputVelocity = Vector2.zero; // used for SmoothDamp
 
     [Header("UI")]
     [SerializeField] private SpellMenuUI spellMenu;
@@ -44,7 +53,6 @@ public class CameraController : MonoBehaviour
             lookAction.AddBinding("<Mouse>/delta");
             lookAction.AddBinding("<Gamepad>/rightStick");
         }
-
         if (escapeAction == null || escapeAction.bindings.Count == 0)
         {
             escapeAction = new InputAction("Escape", InputActionType.Button);
@@ -57,34 +65,46 @@ public class CameraController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // Sync starting Y rotation so we don't snap on first frame
+        Transform playerBody = PlayerController.Instance?.PlayerBodyTransform;
+        if (playerBody != null)
+            targetYRotation = currentYRotation = playerBody.eulerAngles.y;
     }
 
     void Update()
     {
         Transform playerBody = PlayerController.Instance != null ? PlayerController.Instance.PlayerBodyTransform : null;
-        if (playerBody == null)
-            return;
+        if (playerBody == null) return;
 
         bool menuOpen = spellMenu != null && spellMenu.menuOpen;
 
-        // Escape closes the menu
         if (menuOpen && escapeAction != null && escapeAction.WasPressedThisFrame())
         {
             spellMenu.SetMenuVisible(false);
             return;
         }
 
-        // Block camera look while menu is open
         if (menuOpen) return;
 
-        Vector2 lookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
-        float mouseX = lookInput.x * sensX * Time.deltaTime;
-        float mouseY = lookInput.y * sensY * Time.deltaTime;
+        // --- Read raw input ---
+        Vector2 rawInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
+
+        // --- Smooth the input with SmoothDamp ---
+        // smoothTime closer to 0 = snappier, closer to 0.1+ = floatier
+        float smoothTime = Mathf.Lerp(0.01f, 0.12f, smoothing);
+        smoothedInput = Vector2.SmoothDamp(smoothedInput, rawInput, ref inputVelocity, smoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
+
+        // --- Apply sensitivity ---
+        float mouseX = smoothedInput.x * sensX * 0.01f;
+        float mouseY = smoothedInput.y * sensY * 0.01f;
+
+        currentYRotation += mouseX;
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        playerBody.Rotate(Vector3.up * mouseX);
+        playerBody.rotation = Quaternion.Euler(0f, currentYRotation, 0f);
     }
 }
