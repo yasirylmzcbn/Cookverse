@@ -94,18 +94,39 @@ public class GameManager : MonoBehaviour
         return new Dictionary<ItemData, int>(items);
     }
 
+    public void EnsureStartingWave()
+    {
+        switch (currentDifficulty)
+        {
+            case Difficulty.None:
+            case Difficulty.Easy:
+                SetEasyDifficulty();
+                break;
+
+            case Difficulty.Medium:
+                SetMediumDifficulty();
+                break;
+
+            case Difficulty.Hard:
+                SetHardDifficulty();
+                break;
+
+            case Difficulty.Boss:
+                SetBossDifficulty();
+                break;
+        }
+    }
+
     public void WaveCompleted()
     {
         currentWave++;
-        if (currentWave == lastWave)
+        if (currentWave >= lastWave)
         {
             if (currentDifficulty > lastCompletedDifficulty)
             {
                 lastCompletedDifficulty = currentDifficulty;
             }
-
         }
-        
     }
 
     public float GetWaveMultiplier()

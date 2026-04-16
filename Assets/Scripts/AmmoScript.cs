@@ -48,7 +48,7 @@ public class AmmoScript : MonoBehaviour
             return;
         }
 
-        ammoText.text = potatoShooter.ammo + " / " + potatoShooter.initialAmmo;
+        ammoText.text = potatoShooter.currentAmmo + " / " + potatoShooter.maxAmmo;
     }
 
     private void ResolveShooter(bool force = false)

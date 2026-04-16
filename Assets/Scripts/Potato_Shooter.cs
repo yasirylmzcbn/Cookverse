@@ -7,10 +7,10 @@ public class Potato_Shooter : MonoBehaviour
 
     public GameObject Bullet;
     public Transform Shoot_Pos;
-    public int initialAmmo;
+    public int maxAmmo;
     public float shootCooldownDuration;
     public float reloadDuration = 2f;
-    public int ammo;
+    public int currentAmmo;
     private Coroutine reloadCoroutine;
     private Coroutine shootCooldownCoroutine;
     enum WeaponState
@@ -43,7 +43,7 @@ public class Potato_Shooter : MonoBehaviour
     private void Awake()
     {
         _switchCamera = FindFirstObjectByType<SwitchCamera>();
-        ammo = initialAmmo;
+        currentAmmo = maxAmmo;
 
     }
 
@@ -58,7 +58,7 @@ public class Potato_Shooter : MonoBehaviour
         {
             return;
         }
-        if (ammo <= 0)
+        if (currentAmmo <= 0)
         {
             state = WeaponState.Empty;
             //make a click sound or change color in grayboxing
@@ -76,7 +76,7 @@ public class Potato_Shooter : MonoBehaviour
         Instantiate(Bullet, Shoot_Pos.position, rotation);
         if (fireSfx != null)
             AudioSource.PlayClipAtPoint(fireSfx, Shoot_Pos.position, fireSfxVolume);
-        ammo -= 1;
+        currentAmmo -= 1;
         SetCooldown();
     }
 
@@ -100,7 +100,7 @@ public class Potato_Shooter : MonoBehaviour
     {
         //animation
         yield return new WaitForSeconds(reloadDuration);
-        ammo = initialAmmo;
+        currentAmmo = maxAmmo;
         state = WeaponState.Ready;
         reloadCoroutine = null;
     }
@@ -119,7 +119,7 @@ public class Potato_Shooter : MonoBehaviour
     // for respawning
     public void ResetAmmo()
     {
-        ammo = initialAmmo;
+        currentAmmo = maxAmmo;
         state = WeaponState.Ready;
     }
 
@@ -131,7 +131,7 @@ public class Potato_Shooter : MonoBehaviour
         yield return new WaitForSeconds(shootCooldownDuration);
         if (state == WeaponState.Cooldown) //so that shooting during reload can't happen
         {
-            if (ammo <= 0)
+            if (currentAmmo <= 0)
             {
                 state = WeaponState.Empty;
             }
@@ -178,6 +178,8 @@ public class Potato_Shooter : MonoBehaviour
             return toHit.sqrMagnitude > 0.0001f ? toHit.normalized : aim.forward;
         }
 
-        return aim.forward;
+        //return aim.forward;
+        Vector3 farPoint = aim.position + aim.forward * aimMaxDistance;
+        return (farPoint - Shoot_Pos.position).normalized;
     }
 }
