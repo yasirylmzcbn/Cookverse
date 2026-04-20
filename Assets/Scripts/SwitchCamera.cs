@@ -9,7 +9,6 @@ public class SwitchCamera : MonoBehaviour
     public GameObject firstPersonCamera;
     public GameObject thirdPersonCamera;
     public GameObject kitchenCamera;
-    // TODO add more kitchen cameras once models are created
     public enum KitchenCameras { Stove, Oven, Sink, Fryer, Microwave, }
     private Dictionary<KitchenCameras, GameObject> cameras;
     public KitchenCameras currentKitchenCamera;
@@ -142,6 +141,13 @@ public class SwitchCamera : MonoBehaviour
         if (firstPerson)
         {
             SetActiveSafe(firstPersonCamera, true);
+
+            CameraController fpController = firstPersonCamera != null
+                ? firstPersonCamera.GetComponentInChildren<CameraController>(true)
+                : null;
+
+            if (fpController != null)
+                fpController.enabled = true;
         }
         else
         {

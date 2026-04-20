@@ -759,4 +759,10 @@ public class PlayerController : MonoBehaviour
         _potatoShooter?.ResetAmmo();
         currentHealth = maxHealth;
     }
+
+    public void EndInteraction()
+    {
+        currentlyInteracting = false;
+        EnablePickupTrigger(true);
+    }
 }
