@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PortalMaterial
+  m_Name: PortalEmitterMaterial
   m_Shader: {fileID: -6465566751694194690, guid: 4a00f00911b8d43d4986eef636565a6f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
