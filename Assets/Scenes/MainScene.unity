@@ -11130,7 +11130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   Bullet: {fileID: 6888836019528570085, guid: 90cccd0479d47114e8e24ff85aae7c32, type: 3}
   Shoot_Pos: {fileID: 2030017362}
-  maxAmmo: 0
+  maxAmmo: 100
   shootCooldownDuration: 0.1
   reloadDuration: 2
   currentAmmo: 0
