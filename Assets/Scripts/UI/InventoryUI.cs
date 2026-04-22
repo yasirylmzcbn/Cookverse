@@ -22,17 +22,14 @@ public class InventoryUI : MonoBehaviour
         if (isRefreshing) return;
         isRefreshing = true;
 
-        var all = Resources.FindObjectsOfTypeAll<Transform>();
-        foreach (var t in all)
-        {
-            if (t.CompareTag("InventoryContent"))
-            {
-                content = t;
-                break;
-            }
-        }
+        if (content == null)
+            ResolveContent();
 
-        Debug.Log(content);
+        if (content == null)
+        {
+            isRefreshing = false;
+            return;
+        }
 
         for (int i = content.childCount - 1; i >= 0; i--)
         {
@@ -63,8 +60,25 @@ public class InventoryUI : MonoBehaviour
         }
 
         Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
+        RectTransform rect = content.GetComponent<RectTransform>();
+        if (rect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
         isRefreshing = false;
+    }
+
+    private void ResolveContent()
+    {
+        var all = Resources.FindObjectsOfTypeAll<Transform>();
+        foreach (var t in all)
+        {
+            if (t != null && t.CompareTag("InventoryContent"))
+            {
+                content = t;
+                return;
+            }
+        }
+
+        content = null;
     }
 
     public bool TryQuickEquipToHotbar(ItemData item, int amount)
