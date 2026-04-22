@@ -29,6 +29,10 @@ public abstract class Enemy : MonoBehaviour
     [Header("Item Drops")]
     [Tooltip("This drop list is weight-based.")]
     [SerializeField] private List<DropEntry> dropList;
+    
+    [Header("Audio")]
+    [SerializeField] protected AudioClip attackSound;
+    protected AudioSource audioSource;
 
     private void Awake()
     {
@@ -36,6 +40,22 @@ public abstract class Enemy : MonoBehaviour
 
         if (rend != null)
             originalColor = rend.material.color;
+            
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f; // 3D sound
+    }
+
+    protected void PlayAttackSound()
+    {
+        if (attackSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
     }
 
     private void Update()

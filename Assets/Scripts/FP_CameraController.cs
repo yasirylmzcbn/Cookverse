@@ -87,6 +87,8 @@ public class CameraController : MonoBehaviour
 
         if (menuOpen) return;
 
+        if (Time.timeScale == 0f) return;
+
         // --- Read raw input ---
         Vector2 rawInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
 
