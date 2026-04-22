@@ -19,3 +19,9 @@ MonoBehaviour:
     spell: {fileID: 11400000, guid: b487f8ea77b5a4425b8b030ebcd11288, type: 2}
   - recipe: 0
     spell: {fileID: 11400000, guid: b165a1cacc40543188281e6a5d2fd78c, type: 2}
+  - recipe: 3
+    spell: {fileID: 11400000, guid: 5fd951e65cc2640aca3ecc236547784e, type: 2}
+  - recipe: 3
+    spell: {fileID: 11400000, guid: d7a5eeb4f652d0d4db20912fdacf86e4, type: 2}
+  - recipe: 3
+    spell: {fileID: 11400000, guid: 53b2d20c4870aa04e948502bb2ea33a1, type: 2}

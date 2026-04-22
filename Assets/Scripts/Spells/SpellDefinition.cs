@@ -26,9 +26,8 @@ public abstract class SpellDefinition : ScriptableObject
     public virtual string description => "placeholder description";
 
     [Header("Unlock")]
-    [Tooltip("If enabled, the player must unlock the recipe below before this spell can be cast.")]
+    [Tooltip("If enabled, the player must unlock the recipe below before this spell can be cast. This being disabled does not automatically add it to the user's inventory.")]
     public bool requiresRecipeUnlock;
-
     public Recipe requiredRecipe;
 
     [Header("Cooldown")]

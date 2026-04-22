@@ -1,6 +1,8 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -12,10 +14,11 @@ public abstract class Enemy : MonoBehaviour
 
     [SerializeField] protected float attackRange = 2f;
     public float AttackRange => attackRange;
+    private bool isStunned = false;
 
-    Renderer rend;
-    MaterialPropertyBlock mpb;
-    Color originalColor;
+    private Renderer[] enemyRenderers;
+    private Material[][] enemyMaterials;
+    private Color[][] originalColors;
 
     [System.Serializable]
     public class DropEntry
@@ -26,17 +29,53 @@ public abstract class Enemy : MonoBehaviour
     [Header("Item Drops")]
     [Tooltip("This drop list is weight-based.")]
     [SerializeField] private List<DropEntry> dropList;
+    
+    [Header("Audio")]
+    [SerializeField] protected AudioClip attackSound;
+    protected AudioSource audioSource;
 
     private void Awake()
     {
-        rend = GetComponentInChildren<Renderer>();
+        enemyRenderers = GetComponentsInChildren<Renderer>(true);
+        enemyMaterials = new Material[enemyRenderers.Length][];
+        originalColors = new Color[enemyRenderers.Length][];
 
-        if (rend != null)
-            originalColor = rend.material.color;
+        for (int i = 0; i < enemyRenderers.Length; i++)
+        {
+            if (enemyRenderers[i] == null)
+                continue;
+
+            enemyMaterials[i] = enemyRenderers[i].materials;
+            originalColors[i] = new Color[enemyMaterials[i].Length];
+
+            for (int m = 0; m < enemyMaterials[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    originalColors[i][m] = mat.color;
+            }
+        }
+            
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f; // 3D sound
+    }
+
+    protected void PlayAttackSound()
+    {
+        if (attackSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(attackSound);
+        }
     }
 
     private void Update()
     {
+        if (isStunned) return;
         CheckAttack();
     }
 
@@ -50,13 +89,33 @@ public abstract class Enemy : MonoBehaviour
 
     IEnumerator FlashRoutine()
     {
-        if (rend != null)
-            rend.material.color = originalColor * damageColor;
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            if (enemyMaterials[i] == null || originalColors[i] == null)
+                continue;
+
+            for (int m = 0; m < enemyMaterials[i].Length && m < originalColors[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    mat.color = originalColors[i][m] * damageColor;
+            }
+        }
 
         yield return new WaitForSeconds(flashDuration);
 
-        if (rend != null)
-        rend.material.color = originalColor;
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            if (enemyMaterials[i] == null || originalColors[i] == null)
+                continue;
+
+            for (int m = 0; m < enemyMaterials[i].Length && m < originalColors[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    mat.color = originalColors[i][m];
+            }
+        }
     }
 
     public void Damage(int d)
@@ -118,5 +177,22 @@ public abstract class Enemy : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    public void Stun(float duration)
+    {
+        StopCoroutine(nameof(StunRoutine)); //resets the duration if stunned while already stunned
+        StartCoroutine(StunRoutine(duration));
+    }
+
+    private IEnumerator StunRoutine(float duration)
+    {
+        isStunned = true;
+        EnemyMovementAI enemyMovement = GetComponent<EnemyMovementAI>();
+        enemyMovement.StunMovement();
+
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+        enemyMovement.RestoreMovement();
     }
 }
