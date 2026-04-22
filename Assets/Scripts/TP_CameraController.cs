@@ -73,6 +73,7 @@ public class CameraMove : MonoBehaviour
     private void LateUpdate()
     {
         if (lookAt == null) return;
+        if (Time.timeScale == 0f) return;
 
         Vector2 lookInput = lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
 
