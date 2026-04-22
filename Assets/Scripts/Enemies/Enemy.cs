@@ -13,9 +13,9 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float attackRange = 2f;
     public float AttackRange => attackRange;
 
-    Renderer rend;
-    MaterialPropertyBlock mpb;
-    Color originalColor;
+    private Renderer[] enemyRenderers;
+    private Material[][] enemyMaterials;
+    private Color[][] originalColors;
 
     [System.Serializable]
     public class DropEntry
@@ -33,10 +33,25 @@ public abstract class Enemy : MonoBehaviour
 
     private void Awake()
     {
-        rend = GetComponentInChildren<Renderer>();
+        enemyRenderers = GetComponentsInChildren<Renderer>(true);
+        enemyMaterials = new Material[enemyRenderers.Length][];
+        originalColors = new Color[enemyRenderers.Length][];
 
-        if (rend != null)
-            originalColor = rend.material.color;
+        for (int i = 0; i < enemyRenderers.Length; i++)
+        {
+            if (enemyRenderers[i] == null)
+                continue;
+
+            enemyMaterials[i] = enemyRenderers[i].materials;
+            originalColors[i] = new Color[enemyMaterials[i].Length];
+
+            for (int m = 0; m < enemyMaterials[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    originalColors[i][m] = mat.color;
+            }
+        }
             
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
@@ -70,13 +85,33 @@ public abstract class Enemy : MonoBehaviour
 
     IEnumerator FlashRoutine()
     {
-        if (rend != null)
-            rend.material.color = originalColor * damageColor;
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            if (enemyMaterials[i] == null || originalColors[i] == null)
+                continue;
+
+            for (int m = 0; m < enemyMaterials[i].Length && m < originalColors[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    mat.color = originalColors[i][m] * damageColor;
+            }
+        }
 
         yield return new WaitForSeconds(flashDuration);
 
-        if (rend != null)
-        rend.material.color = originalColor;
+        for (int i = 0; i < enemyMaterials.Length; i++)
+        {
+            if (enemyMaterials[i] == null || originalColors[i] == null)
+                continue;
+
+            for (int m = 0; m < enemyMaterials[i].Length && m < originalColors[i].Length; m++)
+            {
+                Material mat = enemyMaterials[i][m];
+                if (mat != null && mat.HasProperty("_Color"))
+                    mat.color = originalColors[i][m];
+            }
+        }
     }
 
     public void Damage(int d)
