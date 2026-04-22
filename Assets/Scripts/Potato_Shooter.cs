@@ -155,6 +155,7 @@ public class Potato_Shooter : MonoBehaviour
             if (currentAmmo <= 0)
             {
                 state = WeaponState.Empty;
+                TryReload();
             }
             else
             {
