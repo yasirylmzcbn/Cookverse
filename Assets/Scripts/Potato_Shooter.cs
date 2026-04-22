@@ -44,6 +44,8 @@ public class Potato_Shooter : MonoBehaviour
 
     private SwitchCamera _switchCamera;
     private AudioSource _audioSource;
+    private Quaternion _initialLocalRotation;
+    private Coroutine _recoilCoroutine;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
@@ -56,6 +58,8 @@ public class Potato_Shooter : MonoBehaviour
             _audioSource = gameObject.AddComponent<AudioSource>();
         }
         _audioSource.playOnAwake = false;
+        
+        _initialLocalRotation = transform.localRotation;
     }
 
     // Update is called once per frame
@@ -88,6 +92,11 @@ public class Potato_Shooter : MonoBehaviour
         if (fireSfx != null)
             AudioSource.PlayClipAtPoint(fireSfx, Shoot_Pos.position, fireSfxVolume);
         currentAmmo -= 1;
+        
+        if (_recoilCoroutine != null)
+            StopCoroutine(_recoilCoroutine);
+        _recoilCoroutine = StartCoroutine(RecoilRoutine());
+
         SetCooldown();
     }
 
@@ -163,6 +172,38 @@ public class Potato_Shooter : MonoBehaviour
             }
         }
         shootCooldownCoroutine = null;
+    }
+
+    private IEnumerator RecoilRoutine()
+    {
+        float elapsed = 0f;
+        // Make the recoil finish relatively quickly but safely inside the cooldown period 
+        float duration = Mathf.Min(0.15f, shootCooldownDuration > 0 ? shootCooldownDuration * 0.8f : 0.1f);
+        float halfDuration = duration / 2f;
+        
+        // Random pitch (up/down) between -1 and 1 degrees
+        float randomPitch = Random.Range(-1f, 1f);
+        Quaternion targetRecoil = _initialLocalRotation * Quaternion.Euler(randomPitch, 0f, 0f);
+
+        // Animate towards the recoil angle
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            transform.localRotation = Quaternion.Slerp(_initialLocalRotation, targetRecoil, elapsed / halfDuration);
+            yield return null;
+        }
+
+        // Animate back to original
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            transform.localRotation = Quaternion.Slerp(targetRecoil, _initialLocalRotation, elapsed / halfDuration);
+            yield return null;
+        }
+
+        transform.localRotation = _initialLocalRotation;
+        _recoilCoroutine = null;
     }
 
     private Transform GetAimTransform()
