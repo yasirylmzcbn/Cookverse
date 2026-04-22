@@ -865,7 +865,6 @@ GameObject:
   - component: {fileID: 237174316}
   - component: {fileID: 237174315}
   - component: {fileID: 237174319}
-  - component: {fileID: 237174320}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -982,18 +981,6 @@ MonoBehaviour:
   ammoText: {fileID: 1959504195}
   questText: {fileID: 70678404}
   dimmedAlpha: 0.3
---- !u!114 &237174320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 237174311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbe4f61e4ebf06149b7db8288c8e9cab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PauseScript
 --- !u!1001 &241049902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3083,6 +3070,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 0}
+  reloadSfxVolume: 1
 --- !u!65 &737363647
 BoxCollider:
   m_ObjectHideFlags: 0
