@@ -38,6 +38,10 @@ public class Potato_Shooter : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float fireSfxVolume = 1f;
 
+    [SerializeField] private AudioClip reloadSfx;
+    [Range(0f, 1f)]
+    [SerializeField] private float reloadSfxVolume = 1f;
+
     private SwitchCamera _switchCamera;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
@@ -90,6 +94,11 @@ public class Potato_Shooter : MonoBehaviour
         if (reloadCoroutine != null)
         {
             return;
+        }
+
+        if (reloadSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(reloadSfx, transform.position, reloadSfxVolume);
         }
 
         reloadCoroutine = StartCoroutine(ReloadRoutine());

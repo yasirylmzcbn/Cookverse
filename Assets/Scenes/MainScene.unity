@@ -2378,6 +2378,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 0}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 0}
+  reloadSfxVolume: 1
 --- !u!65 &179697323
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -19113,6 +19115,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 8300000, guid: 4c40f8b17f3c1cd4f846c8cf0dcf0b10, type: 3}
+  reloadSfxVolume: 1
 --- !u!65 &1733982125
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21561,6 +21565,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 0}
+  reloadSfxVolume: 1
 --- !u!65 &1983763466
 BoxCollider:
   m_ObjectHideFlags: 0
