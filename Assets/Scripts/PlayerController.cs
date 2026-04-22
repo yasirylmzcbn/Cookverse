@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour
     private Potato_Shooter _potatoShooter;
     private float _baseShootCooldownDuration;
     private bool _cachedShooterBase;
+    private bool _combatEnabled;
 
     private static readonly Dictionary<string, Vector3> _sceneReturnPositions = new Dictionary<string, Vector3>();
     private static readonly Dictionary<string, Quaternion> _sceneReturnRotations = new Dictionary<string, Quaternion>();
@@ -385,14 +386,29 @@ public class PlayerController : MonoBehaviour
     {
         moveAction?.Enable();
         jumpAction?.Enable();
-        shootAction?.Enable();
-        reloadAction?.Enable();
-        inventoryToggleAction?.Enable();
 
-        spell1Action?.Enable();
-        spell2Action?.Enable();
-        spell3Action?.Enable();
-        spell4Action?.Enable();
+        if (_combatEnabled)
+        {
+            shootAction?.Enable();
+            reloadAction?.Enable();
+            inventoryToggleAction?.Disable();
+
+            spell1Action?.Enable();
+            spell2Action?.Enable();
+            spell3Action?.Enable();
+            spell4Action?.Enable();
+        }
+        else
+        {
+            shootAction?.Disable();
+            reloadAction?.Disable();
+            inventoryToggleAction?.Enable();
+
+            spell1Action?.Disable();
+            spell2Action?.Disable();
+            spell3Action?.Disable();
+            spell4Action?.Disable();
+        }
     }
 
     private void OnDisable()
@@ -411,6 +427,7 @@ public class PlayerController : MonoBehaviour
 
     public void DisableCombat()
     {
+        _combatEnabled = false;
         shootAction?.Disable();
         reloadAction?.Disable();
         _potatoShooter?.gameObject.SetActive(false);
@@ -424,6 +441,7 @@ public class PlayerController : MonoBehaviour
 
     public void EnableCombat()
     {
+        _combatEnabled = true;
         shootAction?.Enable();
         reloadAction?.Enable();
         _potatoShooter?.gameObject.SetActive(true);
