@@ -194,6 +194,7 @@ MonoBehaviour:
   dropList:
   - itemData: {fileID: 11400000, guid: 628e7911d042445c29158c34fe5fd4d5, type: 2}
     weight: 1
+  attackSound: {fileID: 8300000, guid: 7551d875ec0bc9a43aeaf78ffb28781f, type: 3}
   damage: 5
   attackCooldown: 2
   enemyBulletPrefab: {fileID: 6888836019528570085, guid: 91305abee79d9d54d826bd15c5cb42dd, type: 3}

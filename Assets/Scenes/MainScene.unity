@@ -1772,7 +1772,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2378,6 +2378,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 0}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 0}
+  reloadSfxVolume: 1
 --- !u!65 &179697323
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6324,7 +6326,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
   musicSource: {fileID: 159306353}
-  musicVolume: 0.5
+  musicVolume: 0.2
   sceneTracks:
   - sceneName: EnemyScene
     clip: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
@@ -19103,7 +19105,7 @@ MonoBehaviour:
   Shoot_Pos: {fileID: 2030017362}
   maxAmmo: 100
   shootCooldownDuration: 0.1
-  reloadDuration: 2
+  reloadDuration: 3.5
   currentAmmo: 0
   aimReference: {fileID: 2030017362}
   useCameraRaycastAim: 1
@@ -19113,6 +19115,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 8300000, guid: 4c40f8b17f3c1cd4f846c8cf0dcf0b10, type: 3}
+  reloadSfxVolume: 1
 --- !u!65 &1733982125
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21561,6 +21565,8 @@ MonoBehaviour:
     m_Bits: 119
   fireSfx: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
   fireSfxVolume: 1
+  reloadSfx: {fileID: 0}
+  reloadSfxVolume: 1
 --- !u!65 &1983763466
 BoxCollider:
   m_ObjectHideFlags: 0
