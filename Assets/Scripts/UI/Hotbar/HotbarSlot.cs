@@ -20,8 +20,10 @@ public class HotbarSlot : MonoBehaviour,
     [Header("Display references")]
     [SerializeField] private Image slotIcon;
     [SerializeField] private TextMeshProUGUI slotAmountText;
-    [Tooltip("Optional visual shown when the slot is empty (e.g. a darkened background).")]
+    [Tooltip("Optional visual shown behind the slot content (e.g. your empty square background).")]
     [SerializeField] private GameObject emptyOverlay;
+    [Tooltip("If enabled, keeps the background overlay visible even when this slot has an item.")]
+    [SerializeField] private bool keepBackgroundVisible = true;
 
     [Header("World drop")]
     [Tooltip("Assign the HotbarWorldDrop component (on the Hotbar GO or this GO).")]
@@ -37,6 +39,7 @@ public class HotbarSlot : MonoBehaviour,
     private Canvas _rootCanvas;
     private bool _dragLeftUI;   // true once the ghost has left all UI elements
     private bool _worldDragHandedOff;
+    private Image _emptyOverlayImage;
 
     private GameManager gameManager;
 
@@ -54,6 +57,10 @@ public class HotbarSlot : MonoBehaviour,
     private void Start()
     {
         gameManager = GameManager.Instance;
+        if (emptyOverlay != null)
+            _emptyOverlayImage = emptyOverlay.GetComponent<Image>();
+
+        EnsureVisualOrder();
         Debug.Log("gamemanager: " + (gameManager != null ? "FOUND" : "NULL"));
         RefreshDisplay();
     }
@@ -282,12 +289,21 @@ public class HotbarSlot : MonoBehaviour,
     {
         bool hasItem = !IsEmpty;
 
+        EnsureVisualOrder();
+
         if (slotIcon != null)
         {
             slotIcon.sprite = hasItem ? HeldItem.icon : null;
             Color c = slotIcon.color;
             c.a = hasItem ? 1f : 0f;
             slotIcon.color = c;
+        }
+
+        if (_emptyOverlayImage != null)
+        {
+            Color bg = _emptyOverlayImage.color;
+            bg.a = 1f;
+            _emptyOverlayImage.color = bg;
         }
 
         if (slotAmountText != null)
@@ -297,6 +313,26 @@ public class HotbarSlot : MonoBehaviour,
         }
 
         if (emptyOverlay != null)
-            emptyOverlay.SetActive(!hasItem);
+            emptyOverlay.SetActive(keepBackgroundVisible || !hasItem);
+    }
+
+    /// <summary>
+    /// Keeps the background square behind the item icon so both stay visible.
+    /// </summary>
+    private void EnsureVisualOrder()
+    {
+        if (emptyOverlay == null || slotIcon == null)
+            return;
+
+        RectTransform bg = emptyOverlay.transform as RectTransform;
+        RectTransform icon = slotIcon.transform as RectTransform;
+        if (bg == null || icon == null)
+            return;
+
+        if (bg.parent != icon.parent)
+            return;
+
+        if (bg.GetSiblingIndex() >= icon.GetSiblingIndex())
+            bg.SetSiblingIndex(Mathf.Max(0, icon.GetSiblingIndex() - 1));
     }
 }
