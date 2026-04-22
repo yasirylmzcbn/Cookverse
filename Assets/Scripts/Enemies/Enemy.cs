@@ -1,6 +1,8 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public abstract class Enemy : MonoBehaviour
 
     [SerializeField] protected float attackRange = 2f;
     public float AttackRange => attackRange;
+    private bool isStunned = false;
 
     Renderer rend;
     MaterialPropertyBlock mpb;
@@ -57,6 +60,7 @@ public abstract class Enemy : MonoBehaviour
 
     private void Update()
     {
+        if (isStunned) return;
         CheckAttack();
     }
 
@@ -138,5 +142,22 @@ public abstract class Enemy : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    public void Stun(float duration)
+    {
+        StopCoroutine(nameof(StunRoutine)); //resets the duration if stunned while already stunned
+        StartCoroutine(StunRoutine(duration));
+    }
+
+    private IEnumerator StunRoutine(float duration)
+    {
+        isStunned = true;
+        EnemyMovementAI enemyMovement = GetComponent<EnemyMovementAI>();
+        enemyMovement.StunMovement();
+
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+        enemyMovement.RestoreMovement();
     }
 }

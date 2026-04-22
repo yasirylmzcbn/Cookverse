@@ -15,7 +15,8 @@ public enum Recipe
 {
     PepperSteak,
     DragulaCacciotare,
-    ManticoreRisotto
+    ManticoreRisotto,
+    Test
 }
 
 public static class Recipes
