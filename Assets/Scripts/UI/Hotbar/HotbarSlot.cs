@@ -40,6 +40,7 @@ public class HotbarSlot : MonoBehaviour,
     private bool _dragLeftUI;   // true once the ghost has left all UI elements
     private bool _worldDragHandedOff;
     private Image _emptyOverlayImage;
+    private bool _dragVisualHidden;
 
     private GameManager gameManager;
 
@@ -84,28 +85,32 @@ public class HotbarSlot : MonoBehaviour,
     // ── IDropHandler ─────────────────────────────────────────────────────────
     public void OnDrop(PointerEventData eventData)
     {
-        Debug.Log("[HotbarSlot] OnDrop on '" + gameObject.name + "' drag=" + (eventData.pointerDrag != null ? eventData.pointerDrag.name : "null"));
         if (eventData.pointerDrag == null) return;
 
         DragDropItem payload = eventData.pointerDrag.GetComponent<DragDropItem>();
-        Debug.Log("[HotbarSlot] payload=" + (payload != null ? payload.itemData?.itemName : "NOT FOUND"));
         if (payload == null) return;
 
         ItemData incomingItem = payload.itemData;
         int incomingAmount = payload.amount;
         HotbarSlot sourceSlot = payload.sourceSlot;
 
-        if (sourceSlot != null && sourceSlot != this)
+        if (sourceSlot != null && sourceSlot != this && incomingItem != null && incomingAmount > 0)
         {
-            // Swap between hotbar slots
             ItemData tempItem = HeldItem;
             int tempAmount = HeldAmount;
+
             SetItem(incomingItem, incomingAmount);
-            sourceSlot.SetItem(tempItem, tempAmount);
+
+            if (tempItem != null)
+                sourceSlot.SetItem(tempItem, tempAmount);
+            else
+                sourceSlot.ClearSlot();
+
+            sourceSlot.CompleteSuccessfulDrag();
         }
-        else if (sourceSlot == null)
+
+        if (sourceSlot == null && incomingItem != null && incomingAmount > 0)
         {
-            // From inventory — fill slot (inventory untouched, hotbar is a reference)
             SetItem(incomingItem, incomingAmount);
         }
     }
@@ -117,12 +122,14 @@ public class HotbarSlot : MonoBehaviour,
 
         _dragLeftUI = false;
         _worldDragHandedOff = false;
+        SetDragVisualHidden(true);
 
         // In kitchen interaction mode, skip UI ghost dragging and hand off
         // directly to world ingredient drag so one gesture handles everything.
         if (SwitchCamera.IsKitchenInteractionAllowed() && TryBeginWorldDragFromHotbar())
         {
             _worldDragHandedOff = true;
+            SetDragVisualHidden(false);
             return;
         }
 
@@ -170,6 +177,9 @@ public class HotbarSlot : MonoBehaviour,
 
         if (_worldDragHandedOff)
             return;
+
+        // Always restore visual — whether drop was accepted or not
+        SetDragVisualHidden(false);
 
         // Cursor released over the game world (not a UI drop target) → world drop.
         // If it ended on a UI slot, OnDrop() on that slot already handled it.
@@ -258,6 +268,11 @@ public class HotbarSlot : MonoBehaviour,
             gameManager.AddInventoryItem(item);
     }
 
+    public void CompleteSuccessfulDrag()
+    {
+        SetDragVisualHidden(false);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -288,6 +303,7 @@ public class HotbarSlot : MonoBehaviour,
     private void RefreshDisplay()
     {
         bool hasItem = !IsEmpty;
+        bool showContents = hasItem && !_dragVisualHidden;
 
         EnsureVisualOrder();
 
@@ -295,7 +311,7 @@ public class HotbarSlot : MonoBehaviour,
         {
             slotIcon.sprite = hasItem ? HeldItem.icon : null;
             Color c = slotIcon.color;
-            c.a = hasItem ? 1f : 0f;
+            c.a = showContents ? 1f : 0f;
             slotIcon.color = c;
         }
 
@@ -308,12 +324,18 @@ public class HotbarSlot : MonoBehaviour,
 
         if (slotAmountText != null)
         {
-            slotAmountText.gameObject.SetActive(hasItem && HeldAmount > 1);
+            slotAmountText.gameObject.SetActive(showContents && HeldAmount > 1);
             slotAmountText.text = hasItem ? "x" + HeldAmount : "";
         }
 
         if (emptyOverlay != null)
             emptyOverlay.SetActive(keepBackgroundVisible || !hasItem);
+    }
+
+    private void SetDragVisualHidden(bool hidden)
+    {
+        _dragVisualHidden = hidden;
+        RefreshDisplay();
     }
 
     /// <summary>

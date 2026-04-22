@@ -31,7 +31,9 @@ public class PlayerController : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
-    [Header("Movement Reference")]
+    [Header("Inventory")]
+    [SerializeField] private int inventoryCapacity = 12;
+    public int InventoryCapacity => inventoryCapacity;
     [Tooltip("If set, movement will be relative to this transform (usually the active camera). If left empty, uses the active SwitchCamera camera, else Camera.main.")]
     [SerializeField] private Transform movementReference;
 

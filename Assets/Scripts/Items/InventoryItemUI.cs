@@ -11,6 +11,10 @@ public class InventoryItemUI : MonoBehaviour,
     public Image icon;
     public TextMeshProUGUI itemName;
     public TextMeshProUGUI itemAmount;
+    [Tooltip("Optional background square behind the icon.")]
+    [SerializeField] private GameObject backgroundOverlay;
+    [Tooltip("Keep the background visible even when an item is present.")]
+    [SerializeField] private bool keepBackgroundVisible = true;
 
     // Set by InventoryUI.RefreshUI()
     [HideInInspector] public ItemData itemData;
@@ -20,6 +24,7 @@ public class InventoryItemUI : MonoBehaviour,
     private static GameObject _dragGhost;
     private Canvas _rootCanvas;
     private InventoryUI _inventoryUI;
+    private Image _backgroundImage;
 
     private Canvas RootCanvas
     {
@@ -34,6 +39,10 @@ public class InventoryItemUI : MonoBehaviour,
     // ── IBeginDragHandler ────────────────────────────────────────────────────
     public void OnBeginDrag(PointerEventData eventData)
     {
+        // If HotbarSlot is on this GameObject, it handles dragging (including inventory mode).
+        if (GetComponent<HotbarSlot>() != null)
+            return;
+
         Debug.Log($"[InventoryItemUI] OnBeginDrag — itemData={(itemData != null ? itemData.itemName : "NULL")}, amount={amount}");
 
         if (itemData == null)
@@ -57,13 +66,13 @@ public class InventoryItemUI : MonoBehaviour,
 
         Image ghostImg = _dragGhost.AddComponent<Image>();
         ghostImg.sprite = (icon != null) ? icon.sprite : null;
-        ghostImg.color = new Color(1f, 1f, 1f, 0.75f);
+        ghostImg.color = Color.white;
         ghostImg.raycastTarget = false;     // MUST be false — let events pass through to slots
 
         // If there's no sprite, make it a bright yellow square so you can see it
         if (ghostImg.sprite == null)
         {
-            ghostImg.color = new Color(1f, 1f, 0f, 0.75f);
+            ghostImg.color = Color.yellow;
             Debug.LogWarning("[InventoryItemUI] No sprite on icon — ghost will appear as a yellow square.");
         }
 
@@ -86,13 +95,17 @@ public class InventoryItemUI : MonoBehaviour,
 
     // ── IDragHandler ─────────────────────────────────────────────────────────
     public void OnDrag(PointerEventData eventData)
-    {
+    {        // If HotbarSlot is on this GameObject, it handles dragging (including inventory mode).
+        if (GetComponent<HotbarSlot>() != null)
+            return;
         MoveDragGhost(eventData);
     }
 
     // ── IEndDragHandler ──────────────────────────────────────────────────────
     public void OnEndDrag(PointerEventData eventData)
-    {
+    {        // If HotbarSlot is on this GameObject, it handles dragging (including inventory mode).
+        if (GetComponent<HotbarSlot>() != null)
+            return;
         Debug.Log($"[InventoryItemUI] OnEndDrag — pointerEnter={(eventData.pointerEnter != null ? eventData.pointerEnter.name : "null")}");
 
         if (_dragGhost != null)
@@ -115,6 +128,20 @@ public class InventoryItemUI : MonoBehaviour,
         _inventoryUI = inventoryUI;
     }
 
+    public void SetItem(ItemData item, int stackAmount)
+    {
+        itemData = item;
+        amount = stackAmount;
+        RefreshDisplay();
+    }
+
+    public void ClearItem()
+    {
+        itemData = null;
+        amount = 0;
+        RefreshDisplay();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
     private void MoveDragGhost(PointerEventData eventData)
     {
@@ -128,5 +155,45 @@ public class InventoryItemUI : MonoBehaviour,
 
         if (ok)
             _dragGhost.GetComponent<RectTransform>().localPosition = localPoint;
+    }
+
+    private void Start()
+    {
+        if (backgroundOverlay != null)
+            _backgroundImage = backgroundOverlay.GetComponent<Image>();
+
+        RefreshDisplay();
+    }
+
+    private void RefreshDisplay()
+    {
+        bool hasItem = itemData != null;
+
+        if (icon != null)
+        {
+            icon.sprite = hasItem ? itemData.icon : null;
+            Color iconColor = icon.color;
+            iconColor.a = hasItem ? 1f : 0f;
+            icon.color = iconColor;
+        }
+
+        if (_backgroundImage != null)
+        {
+            Color bgColor = _backgroundImage.color;
+            bgColor.a = 1f;
+            _backgroundImage.color = bgColor;
+        }
+
+        if (itemName != null)
+            itemName.gameObject.SetActive(false);
+
+        if (itemAmount != null)
+        {
+            itemAmount.gameObject.SetActive(hasItem && amount > 1);
+            itemAmount.text = hasItem ? "x" + amount : "";
+        }
+
+        if (backgroundOverlay != null)
+            backgroundOverlay.SetActive(keepBackgroundVisible || !hasItem);
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -8,13 +9,47 @@ public class InventoryUI : MonoBehaviour
     public GameObject itemPrefab;
     private bool isRefreshing = false;
     private Hotbar _hotbar;
+    private PlayerController _playerController;
+    private List<HotbarSlot> _inventorySlots = new List<HotbarSlot>();
     [SerializeField] private TextMeshProUGUI feedbackText;
 
     void Start()
     {
         isRefreshing = false;
+        _playerController = PlayerController.Instance;
         GameManager.Instance.OnInventoryChanged += RefreshUI;
+        InitializeInventorySlots();
         RefreshUI();
+    }
+
+    private void InitializeInventorySlots()
+    {
+        if (_playerController == null || content == null) return;
+
+        int capacity = _playerController.InventoryCapacity;
+
+        // Clear existing slots
+        foreach (Transform child in content)
+            Destroy(child.gameObject);
+
+        _inventorySlots.Clear();
+
+        // Create fixed number of slots
+        for (int i = 0; i < capacity; i++)
+        {
+            GameObject obj = Instantiate(itemPrefab, content);
+            HotbarSlot slot = obj.GetComponent<HotbarSlot>();
+            if (slot != null)
+            {
+                slot.ClearSlot();
+                _inventorySlots.Add(slot);
+            }
+        }
+
+        Canvas.ForceUpdateCanvases();
+        RectTransform rect = content.GetComponent<RectTransform>();
+        if (rect != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
     }
 
     public void RefreshUI()
@@ -25,44 +60,30 @@ public class InventoryUI : MonoBehaviour
         if (content == null)
             ResolveContent();
 
-        if (content == null)
-        {
-            isRefreshing = false;
-            return;
-        }
+        if (_playerController == null)
+            _playerController = PlayerController.Instance;
 
-        for (int i = content.childCount - 1; i >= 0; i--)
+        if (_inventorySlots.Count == 0)
+            InitializeInventorySlots();
+
+        // Clear all slots first
+        foreach (var slot in _inventorySlots)
+            slot?.ClearSlot();
+
+        // Fill slots from inventory
+        var items = GameManager.Instance?.GetItems();
+        if (items != null)
         {
-            if (content.GetChild(i).gameObject != null)
-                Destroy(content.GetChild(i).gameObject);
+            int slotIndex = 0;
+            foreach (var (item, amount) in items)
+            {
+                if (slotIndex >= _inventorySlots.Count) break;
+                _inventorySlots[slotIndex].SetItem(item, amount);
+                slotIndex++;
+            }
         }
 
         Debug.Log(GameManager.Instance?.GetInventoryItemsAsString());
-
-        foreach (var (item, amount) in GameManager.Instance?.GetItems())
-        {
-            GameObject obj = Instantiate(itemPrefab, content);
-            InventoryItemUI itemui = obj.GetComponent<InventoryItemUI>();
-
-            // ── Text display ──────────────────────────────────────────────────
-            itemui.itemName.text = item.itemName;
-            itemui.itemAmount.text = "x" + amount.ToString();
-
-            // ── Data needed for drag-and-drop ─────────────────────────────────
-            // These MUST be set so InventoryItemUI.OnBeginDrag can read them.
-            itemui.itemData = item;
-            itemui.amount = amount;
-            itemui.BindInventoryUI(this);
-
-            // ── Icon ──────────────────────────────────────────────────────────
-            if (itemui.icon != null && item.icon != null)
-                itemui.icon.sprite = item.icon;
-        }
-
-        Canvas.ForceUpdateCanvases();
-        RectTransform rect = content.GetComponent<RectTransform>();
-        if (rect != null)
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
         isRefreshing = false;
     }
 
