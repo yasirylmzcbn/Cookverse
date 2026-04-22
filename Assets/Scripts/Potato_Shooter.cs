@@ -93,6 +93,11 @@ public class Potato_Shooter : MonoBehaviour
 
     public void TryReload()
     {
+        if (currentAmmo >= maxAmmo)
+        {
+            return;
+        }
+
         if (state == WeaponState.Reloading)
         {
             return;
