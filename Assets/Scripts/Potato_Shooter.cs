@@ -43,12 +43,19 @@ public class Potato_Shooter : MonoBehaviour
     [SerializeField] private float reloadSfxVolume = 1f;
 
     private SwitchCamera _switchCamera;
+    private AudioSource _audioSource;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
         _switchCamera = FindFirstObjectByType<SwitchCamera>();
         currentAmmo = maxAmmo;
-
+        
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+        {
+            _audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        _audioSource.playOnAwake = false;
     }
 
     // Update is called once per frame
@@ -96,9 +103,9 @@ public class Potato_Shooter : MonoBehaviour
             return;
         }
 
-        if (reloadSfx != null)
+        if (reloadSfx != null && _audioSource != null)
         {
-            AudioSource.PlayClipAtPoint(reloadSfx, transform.position, reloadSfxVolume);
+            _audioSource.PlayOneShot(reloadSfx, reloadSfxVolume);
         }
 
         reloadCoroutine = StartCoroutine(ReloadRoutine());
