@@ -91,8 +91,7 @@ public class PauseScript : MonoBehaviour
             GUIStyle style = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 36,
-                fontStyle = FontStyle.Bold
+                fontSize = 36
             };
             GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 100f), "Press ESC to unpause", style);
 
@@ -100,8 +99,7 @@ public class PauseScript : MonoBehaviour
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fontSize = 24,
-                fontStyle = FontStyle.Bold
+                fontSize = 24
             };
             labelStyle.normal.textColor = Color.white;
 

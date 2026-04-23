@@ -52,11 +52,10 @@ public class DifficultySetter : MonoBehaviour, IInteractable
             GUIStyle style = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 36,
-                fontStyle = FontStyle.Bold
+                fontSize = 36
             };
 
-            GUI.Label(new Rect(0, Screen.height * 0.7f, Screen.width, 100f), "Press E to change the difficulty", style);
+            GUI.Label(new Rect(0, Screen.height * 0.7f, Screen.width, 100f), "Press E to adjust the difficulty", style);
             GUI.color = originalColor;
         }
     }
