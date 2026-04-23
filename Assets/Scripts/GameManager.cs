@@ -21,6 +21,74 @@ public class GameManager : MonoBehaviour
     public event Action OnInventoryChanged;
     private Difficulty lastCompletedDifficulty = Difficulty.None;
     private Difficulty currentDifficulty = Difficulty.None;
+
+    [Header("Save/Load")]
+    [Tooltip("Add all your ItemData assets here so they can be matched when loading.")]
+    [SerializeField] private List<ItemData> allItemsDatabase = new List<ItemData>();
+
+    public Difficulty GetLastCompletedDifficulty()
+    {
+        return lastCompletedDifficulty;
+    }
+
+    public void SaveGame()
+    {
+        PlayerPrefs.SetInt("Cookverse_Difficulty", (int)lastCompletedDifficulty);
+
+        List<string> itemNames = new List<string>();
+        List<int> itemAmounts = new List<int>();
+
+        foreach (var pair in items)
+        {
+            if (pair.Key != null)
+            {
+                itemNames.Add(pair.Key.name); // Using the asset name or itemName
+                itemAmounts.Add(pair.Value);
+            }
+        }
+
+        string saveJson = JsonUtility.ToJson(new InventorySaveData { names = itemNames, amounts = itemAmounts });
+        PlayerPrefs.SetString("Cookverse_Inventory", saveJson);
+        PlayerPrefs.Save();
+        Debug.Log("Game Saved!");
+    }
+
+    public void LoadGame()
+    {
+        if (PlayerPrefs.HasKey("Cookverse_Difficulty"))
+        {
+            lastCompletedDifficulty = (Difficulty)PlayerPrefs.GetInt("Cookverse_Difficulty");
+        }
+
+        if (PlayerPrefs.HasKey("Cookverse_Inventory"))
+        {
+            string saveJson = PlayerPrefs.GetString("Cookverse_Inventory");
+            InventorySaveData data = JsonUtility.FromJson<InventorySaveData>(saveJson);
+
+            items.Clear();
+            if (data != null && data.names != null && data.amounts != null)
+            {
+                for (int i = 0; i < data.names.Count; i++)
+                {
+                    ItemData item = allItemsDatabase.Find(x => x.name == data.names[i] || x.itemName == data.names[i]);
+                    if (item != null)
+                    {
+                        items[item] = data.amounts[i];
+                    }
+                }
+            }
+            OnInventoryChanged?.Invoke();
+        }
+        Debug.Log("Game Loaded!");
+    }
+
+    [Serializable]
+    private class InventorySaveData
+    {
+        public List<string> names;
+        public List<int> amounts;
+    }
+
     void Awake()
     {
         // If one already exists and it's not us then destroy the copy

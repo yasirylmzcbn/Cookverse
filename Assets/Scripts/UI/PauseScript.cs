@@ -93,7 +93,7 @@ public class PauseScript : MonoBehaviour
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 36
             };
-            GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 100f), "Press ESC to unpause", style);
+            GUI.Label(new Rect(0, Screen.height * 0.15f, Screen.width, 100f), "Press ESC to resume", style);
 
             // Volume Sliders
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
@@ -109,15 +109,27 @@ public class PauseScript : MonoBehaviour
             float centerY = Screen.height / 2f;
 
             // Music Volume
-            GUI.Label(new Rect(centerX, centerY, sliderWidth, 30f), "Music Volume", labelStyle);
+            GUI.Label(new Rect(centerX, centerY - 80f, sliderWidth, 30f), "Music Volume", labelStyle);
             if (MusicManager.Instance != null)
             {
-                MusicManager.Instance.MusicVolume = GUI.HorizontalSlider(new Rect(centerX, centerY + 35f, sliderWidth, sliderHeight), MusicManager.Instance.MusicVolume, 0f, 1f);
+                MusicManager.Instance.MusicVolume = GUI.HorizontalSlider(new Rect(centerX, centerY - 45f, sliderWidth, sliderHeight), MusicManager.Instance.MusicVolume, 0f, 1f);
             }
 
             // SFX Volume (Master Volume)
-            GUI.Label(new Rect(centerX, centerY + 80f, sliderWidth, 30f), "SFX Volume", labelStyle);
-            AudioListener.volume = GUI.HorizontalSlider(new Rect(centerX, centerY + 115f, sliderWidth, sliderHeight), AudioListener.volume, 0f, 1f);
+            GUI.Label(new Rect(centerX, centerY + 10f, sliderWidth, 30f), "SFX Volume", labelStyle);
+            AudioListener.volume = GUI.HorizontalSlider(new Rect(centerX, centerY + 45f, sliderWidth, sliderHeight), AudioListener.volume, 0f, 1f);
+
+            // Save / Load Buttons
+            float halfScreenWidth = Screen.width / 2f;
+            if (GUI.Button(new Rect(halfScreenWidth - 160f, centerY + 110f, 150f, 40f), "Save Game"))
+            {
+                if (GameManager.Instance != null) GameManager.Instance.SaveGame();
+            }
+
+            if (GUI.Button(new Rect(halfScreenWidth + 10f, centerY + 110f, 150f, 40f), "Load Game"))
+            {
+                if (GameManager.Instance != null) GameManager.Instance.LoadGame();
+            }
 
             GUI.color = originalColor;
         }

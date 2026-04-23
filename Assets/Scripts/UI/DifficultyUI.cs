@@ -61,6 +61,12 @@ public class DifficultyUI : MonoBehaviour
 
         if (visible)
         {
+            // Sync unlocks from GameManager
+            if (GameManager.Instance != null)
+            {
+                UnlockDifficulty(GameManager.Instance.GetLastCompletedDifficulty());
+            }
+
             // Disable player movement
             if (playerController != null)
                 playerController.enabled = false;
@@ -132,15 +138,15 @@ public class DifficultyUI : MonoBehaviour
     public void UnlockDifficulty(GameManager.Difficulty difficulty)
     {
         //Easy is unlocked on start
-        if (difficulty >= GameManager.Difficulty.Medium)
+        if (difficulty >= GameManager.Difficulty.Easy)
         {
             mediumButton.interactable = true;
         }
-        if (difficulty >= GameManager.Difficulty.Hard)
+        if (difficulty >= GameManager.Difficulty.Medium)
         {
             hardButton.interactable = true;
         }
-        if (difficulty >= GameManager.Difficulty.Boss)
+        if (difficulty >= GameManager.Difficulty.Hard)
         {
             bossButton.interactable = true;
         }
