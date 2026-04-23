@@ -7671,6 +7671,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
   placeIngredientSfx: {fileID: 0}
   placeIngredientSfxVolume: 1
+  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
+  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 906872736}
   snapRange: 0.4
@@ -11318,6 +11322,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
   placeIngredientSfx: {fileID: 0}
   placeIngredientSfxVolume: 1
+  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
+  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1878806117}
   snapRange: 0.4
@@ -19481,6 +19489,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OvenSlot
   placeIngredientSfx: {fileID: 0}
   placeIngredientSfxVolume: 1
+  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
+  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1264805466}
   snapRange: 0.8
@@ -20274,10 +20286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad62fb184027043b096ed3c68c0711a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlateController
-  placeOnPlateSfx: {fileID: 0}
+  placeOnPlateSfx: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
   placeOnPlateSfxVolume: 1
-  recipeNotUnlockedSfx: {fileID: 0}
-  recipeNotUnlockedSfxVolume: 1
   recipe: 0
   proteinAnchor: {fileID: 768850188}
   vegetableAnchor: {fileID: 83002422}
@@ -23873,6 +23883,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
   placeIngredientSfx: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
   placeIngredientSfxVolume: 1
+  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
+  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1153405405}
   snapRange: 0.8
@@ -23973,6 +23987,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
   placeIngredientSfx: {fileID: 8300000, guid: d450aa837070c764ea3dbea44d1ddd35, type: 3}
   placeIngredientSfxVolume: 1
+  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
+  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1421598550}
   snapRange: 0.4
