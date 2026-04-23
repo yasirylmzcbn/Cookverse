@@ -7669,6 +7669,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
+  placeIngredientSfx: {fileID: 0}
+  placeIngredientSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 906872736}
   snapRange: 0.4
@@ -11314,6 +11316,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
+  placeIngredientSfx: {fileID: 0}
+  placeIngredientSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1878806117}
   snapRange: 0.4
@@ -14415,6 +14419,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
+  turnOnSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  turnOffSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  knobSfxVolume: 1
 --- !u!1001 &1139304948
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19274,6 +19281,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
+  turnOnSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  turnOffSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  knobSfxVolume: 1
 --- !u!136 &1619708037
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -19469,6 +19479,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52597a41b29f2413984875c6c024e6da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OvenSlot
+  placeIngredientSfx: {fileID: 0}
+  placeIngredientSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1264805466}
   snapRange: 0.8
@@ -20262,6 +20274,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad62fb184027043b096ed3c68c0711a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlateController
+  placeOnPlateSfx: {fileID: 0}
+  placeOnPlateSfxVolume: 1
+  recipeNotUnlockedSfx: {fileID: 0}
+  recipeNotUnlockedSfxVolume: 1
   recipe: 0
   proteinAnchor: {fileID: 768850188}
   vegetableAnchor: {fileID: 83002422}
@@ -20384,6 +20400,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
+  turnOnSfx: {fileID: 0}
+  turnOffSfx: {fileID: 0}
+  knobSfxVolume: 1
 --- !u!1001 &1708951541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23852,6 +23871,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
+  placeIngredientSfx: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
+  placeIngredientSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1153405405}
   snapRange: 0.8
@@ -23950,6 +23971,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
+  placeIngredientSfx: {fileID: 8300000, guid: d450aa837070c764ea3dbea44d1ddd35, type: 3}
+  placeIngredientSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1421598550}
   snapRange: 0.4
@@ -24791,6 +24814,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
+  turnOnSfx: {fileID: 0}
+  turnOffSfx: {fileID: 0}
+  knobSfxVolume: 1
 --- !u!1 &2102608535
 GameObject:
   m_ObjectHideFlags: 0

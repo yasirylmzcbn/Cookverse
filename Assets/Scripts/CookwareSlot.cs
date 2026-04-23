@@ -15,6 +15,22 @@ public enum CookwareType
 
 public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip placeIngredientSfx;
+    [SerializeField, Range(0f, 1f)] private float placeIngredientSfxVolume = 1f;
+    [SerializeField] protected AudioClip cookingSizzleSfx;
+    [SerializeField] protected AudioClip cookingReadySfx;
+    [SerializeField] protected AudioClip cookingBurntSfx;
+    [SerializeField, Range(0f, 1f)] protected float cookingSfxVolume = 1f;
+    private AudioSource _audioSource;
+    private KitchenIngredientController _trackedCookingIngredient;
+    private bool _sizzlePlayedForCurrentIngredient;
+    private bool _readyPlayedForCurrentIngredient;
+    private bool _burntPlayedForCurrentIngredient;
+    private const string DefaultSizzlePath = "Assets/Audio/Sizzle.wav";
+    private const string DefaultReadyPath = "Assets/Audio/Ready.wav";
+    private const string DefaultBurntPath = "Assets/Audio/Burnt.wav";
+
     [Header("State")]
     [Tooltip("If true, ingredient cannot be removed.")]
     [SerializeField] private bool isOn = false;
@@ -67,10 +83,44 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
 
     private void Update()
     {
-        if (!isOn) return;
-        if (currentIngredient == null) return;
+        if (!isOn)
+        {
+            if (_trackedCookingIngredient != null)
+                _sizzlePlayedForCurrentIngredient = false;
+            return;
+        }
 
+        if (currentIngredient == null)
+        {
+            ResetCookingSfxState();
+            return;
+        }
+
+        TrackCookingSfxState(currentIngredient);
+        if (!_sizzlePlayedForCurrentIngredient)
+        {
+            PlayCookingSfx(cookingSizzleSfx);
+            _sizzlePlayedForCurrentIngredient = true;
+        }
+
+        float previousCookLevel = currentIngredient.cookLevel;
         currentIngredient.cookLevel = currentIngredient.cookLevel + cookRatePerSecond * Time.deltaTime;
+        if (!_readyPlayedForCurrentIngredient
+            && previousCookLevel < GV.REQUIRED_COOK_LEVEL
+            && currentIngredient.cookLevel >= GV.REQUIRED_COOK_LEVEL)
+        {
+            PlayCookingSfx(cookingReadySfx);
+            _readyPlayedForCurrentIngredient = true;
+        }
+
+        if (!_burntPlayedForCurrentIngredient
+            && previousCookLevel < GV.REQUIRED_BURN_LEVEL
+            && currentIngredient.cookLevel >= GV.REQUIRED_BURN_LEVEL)
+        {
+            PlayCookingSfx(cookingBurntSfx);
+            _burntPlayedForCurrentIngredient = true;
+        }
+
         if (currentIngredient.IsCooked())
         {
             currentIngredient.SetToCookedForm();
@@ -80,6 +130,35 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
             currentIngredient.SetToBurntForm();
         }
     }
+
+    private void Awake()
+    {
+        EnsureAudioSource();
+    }
+
+#if UNITY_EDITOR
+    private void Reset()
+    {
+        TryAssignDefaultCookingSfx();
+    }
+
+    private void OnValidate()
+    {
+        TryAssignDefaultCookingSfx();
+    }
+
+    private void TryAssignDefaultCookingSfx()
+    {
+        if (cookingSizzleSfx == null)
+            cookingSizzleSfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultSizzlePath);
+
+        if (cookingReadySfx == null)
+            cookingReadySfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultReadyPath);
+
+        if (cookingBurntSfx == null)
+            cookingBurntSfx = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultBurntPath);
+    }
+#endif
 
 
     public bool HasIngredient() => currentIngredient != null;
@@ -121,6 +200,7 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
         NotifyDragOutOfSnapRangeOrDropped();
 
         HidePreview();
+        PlayPlaceIngredientSfx();
         return true;
     }
 
@@ -130,6 +210,7 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
         if (currentIngredient != ingredient) return false;
 
         currentIngredient = null;
+        ResetCookingSfxState();
         ingredient.OnRemovedFromSlot();
         return true;
     }
@@ -190,5 +271,87 @@ public class CookwareSlot : IngredientSlotBehaviour, ISingleAnchorIngredientSlot
             lidAnimator.SetTrigger(lidCloseTrigger);
 
         _lidIsOpen = false;
+    }
+
+    protected void PlayPlaceIngredientSfx()
+    {
+        if (placeIngredientSfx == null)
+            return;
+
+        EnsureAudioSource();
+        if (_audioSource != null)
+            _audioSource.PlayOneShot(placeIngredientSfx, placeIngredientSfxVolume);
+    }
+
+    private void EnsureAudioSource()
+    {
+        if (_audioSource != null)
+            return;
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+            _audioSource = gameObject.AddComponent<AudioSource>();
+
+        _audioSource.playOnAwake = false;
+        _audioSource.spatialBlend = 0f;
+    }
+
+    protected void PlayCookingSfx(AudioClip clip)
+    {
+        if (clip == null)
+            return;
+
+        EnsureAudioSource();
+        if (_audioSource != null)
+            _audioSource.PlayOneShot(clip, cookingSfxVolume);
+    }
+
+    private void TrackCookingSfxState(KitchenIngredientController ingredient)
+    {
+        if (_trackedCookingIngredient == ingredient)
+            return;
+
+        _trackedCookingIngredient = ingredient;
+        _sizzlePlayedForCurrentIngredient = false;
+        _readyPlayedForCurrentIngredient = false;
+        _burntPlayedForCurrentIngredient = false;
+    }
+
+    protected void ResetCookingSfxState()
+    {
+        _trackedCookingIngredient = null;
+        _sizzlePlayedForCurrentIngredient = false;
+        _readyPlayedForCurrentIngredient = false;
+        _burntPlayedForCurrentIngredient = false;
+    }
+
+    protected void HandleCookingMilestoneSfx(KitchenIngredientController ingredient, float previousCookLevel)
+    {
+        if (ingredient == null)
+            return;
+
+        TrackCookingSfxState(ingredient);
+
+        if (!_sizzlePlayedForCurrentIngredient)
+        {
+            PlayCookingSfx(cookingSizzleSfx);
+            _sizzlePlayedForCurrentIngredient = true;
+        }
+
+        if (!_readyPlayedForCurrentIngredient
+            && previousCookLevel < GV.REQUIRED_COOK_LEVEL
+            && ingredient.cookLevel >= GV.REQUIRED_COOK_LEVEL)
+        {
+            PlayCookingSfx(cookingReadySfx);
+            _readyPlayedForCurrentIngredient = true;
+        }
+
+        if (!_burntPlayedForCurrentIngredient
+            && previousCookLevel < GV.REQUIRED_BURN_LEVEL
+            && ingredient.cookLevel >= GV.REQUIRED_BURN_LEVEL)
+        {
+            PlayCookingSfx(cookingBurntSfx);
+            _burntPlayedForCurrentIngredient = true;
+        }
     }
 }
