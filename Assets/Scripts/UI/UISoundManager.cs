@@ -18,13 +18,32 @@ public class UISoundManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
+            return;
+        }
+
+        // Extremely safe singleton pattern: If the user attached this to a very important scene object (like the Camera or Player),
+        // we DO NOT want to apply DontDestroyOnLoad to it, because it breaks scene reloading, audio listeners, and interactions.
+        // Instead, we spawn a completely invisible independent object, transfer our clips, and destroy this script from the host.
+        if (gameObject.name != "GlobalUISoundManager")
+        {
+            GameObject bgGo = new GameObject("GlobalUISoundManager");
+            DontDestroyOnLoad(bgGo);
+
+            UISoundManager newManager = bgGo.AddComponent<UISoundManager>();
+            newManager.hoverSound = this.hoverSound;
+            newManager.clickSound = this.clickSound;
+
+            Destroy(this);
             return;
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+            
         audioSource.ignoreListenerVolume = true;
         
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -42,7 +61,7 @@ public class UISoundManager : MonoBehaviour
 
     public void InjectSoundsIntoAllButtons()
     {
-        Selectable[] selectables = Resources.FindObjectsOfTypeAll<Selectable>();
+        Selectable[] selectables = FindObjectsByType<Selectable>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var sel in selectables)
         {
             // Only modify objects in the scene, not prefabs

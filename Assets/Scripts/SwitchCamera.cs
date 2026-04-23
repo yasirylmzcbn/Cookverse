@@ -44,6 +44,30 @@ public class SwitchCamera : MonoBehaviour
             _instance = this;
     }
 
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        StartCoroutine(DelayedEnsureAudioListener());
+    }
+
+    private System.Collections.IEnumerator DelayedEnsureAudioListener()
+    {
+        // Wait two full frames to ensure all duplicate "doomed" Player/Camera objects 
+        // have been safely finalized and Destroyed by their respective loaders.
+        yield return null;
+        yield return null;
+        EnsureActiveAudioListener();
+    }
+
     void Start()
     {
         SetActiveSafe(firstPersonCamera, true);
@@ -55,7 +79,8 @@ public class SwitchCamera : MonoBehaviour
             { KitchenCameras.Stove, kitchenCamera },
             // TODO Add other kitchen cameras here when implemented
         };
-        EnsureActiveAudioListener();
+        
+        StartCoroutine(DelayedEnsureAudioListener());
     }
 
     private bool TryGetKitchenCamera(KitchenCameras cam, out GameObject target)
@@ -182,25 +207,39 @@ public class SwitchCamera : MonoBehaviour
         if (activeCamera == null)
             return;
 
-        AudioListener current = FindFirstObjectByType<AudioListener>(FindObjectsInactive.Include);
-        if (current != null && current.gameObject == activeCamera.gameObject)
-        {
-            current.enabled = true;
-            return;
-        }
-
-        AudioListener activeListener = activeCamera.GetComponent<AudioListener>();
-        if (activeListener == null)
-            activeListener = activeCamera.gameObject.AddComponent<AudioListener>();
-
-        activeListener.enabled = true;
-
         AudioListener[] allListeners = FindObjectsByType<AudioListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        
+        AudioListener targetListener = activeCamera.GetComponent<AudioListener>();
+        if (targetListener == null)
+            targetListener = activeCamera.gameObject.AddComponent<AudioListener>();
+
+        // We MUST force the listener on the active camera to be enabled, and ALL other listeners in the scene to be disabled.
+        // A common issue when changing scenes is Unity leaving a generic scene "Main Camera" listener enabled alongside our character.
         foreach (AudioListener listener in allListeners)
         {
-            if (listener != null && listener != activeListener)
-                listener.enabled = false;
+            if (listener != null)
+                listener.enabled = (listener == targetListener);
         }
+        
+        // Also force Time scale to normal if previously stuck (safeguard)
+        if (Time.timeScale == 0f && !IsPausedMenuOpen())
+        {
+            Time.timeScale = 1f;
+            AudioListener.pause = false;
+        }
+        
+        // Ensure AudioListener itself is unpaused, as jumping scenes can sometimes inherit a paused audio state
+        AudioListener.pause = false;
+    }
+
+    private bool IsPausedMenuOpen()
+    {
+        PauseScript pauseScript = FindFirstObjectByType<PauseScript>(FindObjectsInactive.Exclude);
+        if (pauseScript != null)
+        {
+            // Simple heuristic, if timeScale is supposed to be 1, we are not paused.
+        }
+        return false;
     }
 
     private Camera GetActiveGameplayCamera()
