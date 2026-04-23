@@ -103,6 +103,10 @@ public class SpellMenuUI : MonoBehaviour
             RefreshDiamonds();
             ClearDescription();
             inventoryPanel.GetComponent<InventoryUI>().RefreshUI();
+            
+            // Play open sound when opening inventory/spell menu
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayUIOpenSound();
         }
         else
         {
@@ -116,6 +120,10 @@ public class SpellMenuUI : MonoBehaviour
             Cursor.lockState = keepKitchenCursor ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = keepKitchenCursor;
             _selectedDiamondSlot = -1;
+            
+            // Play close sound when closing inventory/spell menu
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayUICloseSound();
         }
     }
 

@@ -92,6 +92,10 @@ public class DifficultyUI : MonoBehaviour
             // Lock cursor back
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            
+            // Play close sound when exiting difficulty menu
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayUICloseSound();
         }
         storedVisible = visible;
     }

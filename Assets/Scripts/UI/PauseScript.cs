@@ -60,6 +60,10 @@ public class PauseScript : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        // Play open menu sound
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIOpenSound();
     }
 
     public void ResumeGame()
@@ -74,6 +78,10 @@ public class PauseScript : MonoBehaviour
 
         Cursor.lockState = previousLockState;
         Cursor.visible = previousCursorVisible;
+
+        // Play close menu sound
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUICloseSound();
     }
 
     private void OnGUI()

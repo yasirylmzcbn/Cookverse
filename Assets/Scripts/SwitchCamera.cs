@@ -153,6 +153,7 @@ public class SwitchCamera : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         EnsureActiveAudioListener();
+        
         return true;
     }
 

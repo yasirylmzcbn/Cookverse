@@ -113,12 +113,20 @@ public class HotbarSlot : MonoBehaviour,
         {
             SetItem(incomingItem, incomingAmount);
         }
+        
+        // Play drop sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIDropSound();
     }
 
     // ── IBeginDragHandler / IDragHandler / IEndDragHandler ───────────────────
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (IsEmpty) return;
+
+        // Play drag start sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIDragStartSound();
 
         _dragLeftUI = false;
         _worldDragHandedOff = false;

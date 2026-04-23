@@ -50,11 +50,20 @@ public class WaveManager : MonoBehaviour
             {
                 GameManager.Instance.WaveCompleted();
                 done = true;
+                
+                // Play final wave complete sound (portal appears)
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.PlayWaveFinalSound();
+                
                 yield break;
             }
 
             // Increase difficulty for the next wave
             GameManager.Instance.WaveCompleted();
+            
+            // Play wave end sound
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayWaveEndSound();
 
             // Countdown to next wave
             float countdown = timeBetweenWaves;
@@ -69,6 +78,11 @@ public class WaveManager : MonoBehaviour
                 {
                     winText.text = $"Next wave in {Mathf.CeilToInt(countdown)} seconds";
                 }
+                
+                // Play tick sound each second during countdown
+                if (SoundManager.Instance != null && countdown > 0)
+                    SoundManager.Instance.PlayWaveTickSound();
+                
                 yield return new WaitForSeconds(1f);
                 countdown -= 1f;
             }

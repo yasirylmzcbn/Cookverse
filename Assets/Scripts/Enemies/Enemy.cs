@@ -32,8 +32,6 @@ public abstract class Enemy : MonoBehaviour
     
     [Header("Audio")]
     [SerializeField] protected AudioClip attackSound;
-    [Tooltip("Sound played when the enemy takes damage")]
-    [SerializeField] protected AudioClip enemyHitSound;
     protected AudioSource audioSource;
 
     private void Awake()
@@ -64,7 +62,7 @@ public abstract class Enemy : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1f; // 3D sound
+        audioSource.spatialBlend = 0f; // 2D sound (global)
     }
 
     protected void PlayAttackSound()
@@ -124,11 +122,9 @@ public abstract class Enemy : MonoBehaviour
     {
         health -= d;
         
-        // Play hit sound
-        if (enemyHitSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(enemyHitSound);
-        }
+        // Play hit sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayEnemyHitSound();
         
         if (health <= 0)
         {
@@ -153,6 +149,11 @@ public abstract class Enemy : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        
+        // Play enemy defeated sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayEnemyDefeatedSound();
+        
         if (QuestManager.Instance != null)
             QuestManager.Instance.RegisterEnemyKilled();
 

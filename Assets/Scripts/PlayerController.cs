@@ -32,9 +32,10 @@ public class PlayerController : MonoBehaviour
     public int currentHealth;
 
     [Header("Audio")]
-    [Tooltip("Sound played when the player takes damage")]
-    [SerializeField] private AudioClip playerHitSound;
+    [Tooltip("Sound played when the player walks (assigned in SoundManager)")]
+    [SerializeField] private AudioClip footstepSound;
     private AudioSource playerAudioSource;
+    private float _footstepTimer = 0f;
 
     [Header("Inventory")]
     [SerializeField] private int inventoryCapacity = 12;
@@ -213,25 +214,26 @@ public class PlayerController : MonoBehaviour
 
         ResolveRecipeUnlocksIfNeeded();
 
-        // Initialize audio for hit sounds
+        // Initialize audio for footstep sounds
         playerAudioSource = GetComponent<AudioSource>();
         if (playerAudioSource == null)
         {
             playerAudioSource = gameObject.AddComponent<AudioSource>();
         }
         playerAudioSource.playOnAwake = false;
-        playerAudioSource.spatialBlend = 1f; // 3D sound
+        playerAudioSource.spatialBlend = 1f; // 3D sound for footsteps
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 
-        // Play hit sound
-        if (playerHitSound != null && playerAudioSource != null)
-        {
-            playerAudioSource.PlayOneShot(playerHitSound);
-        }
+        // Play hit sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayPlayerHitSound();
+
+        // Trigger screen flash overlay
+        DamageFlashOverlay.Flash();
 
         if (currentHealth <= 0 && !_isDead)
         {
@@ -617,10 +619,33 @@ public class PlayerController : MonoBehaviour
         if (jumpAction != null && jumpAction.WasPressedThisFrame() && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * 2f * -gravity);
+            
+            // Play jump sound via SoundManager
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayJumpSound();
         }
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // Play footstep sounds while walking (every 0.4 seconds)
+        if (isGrounded && playerAudioSource != null && footstepSound != null)
+        {
+            Vector2 inputMag = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+            if (inputMag.magnitude > 0.1f)
+            {
+                _footstepTimer += Time.deltaTime;
+                if (_footstepTimer >= 0.4f)
+                {
+                    _footstepTimer = 0f;
+                    playerAudioSource.PlayOneShot(footstepSound);
+                }
+            }
+            else
+            {
+                _footstepTimer = 0f;
+            }
+        }
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {

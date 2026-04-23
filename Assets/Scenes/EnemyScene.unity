@@ -2199,6 +2199,8 @@ MonoBehaviour:
   jumpHeight: 3
   maxHealth: 100
   currentHealth: 0
+  playerHitSound: {fileID: 0}
+  footstepSound: {fileID: 0}
   inventoryCapacity: 12
   movementReference: {fileID: 0}
   groundCheck: {fileID: 1481053390}
@@ -3566,7 +3568,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &770613843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3581,6 +3583,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UISoundManager
   hoverSound: {fileID: 8300000, guid: 242c71e425f5a644e97e346caf1a8b28, type: 3}
   clickSound: {fileID: 8300000, guid: 7855e39015a9237469ebe1a80281f45a, type: 3}
+  openSound: {fileID: 0}
+  closeSound: {fileID: 0}
+  dragStartSound: {fileID: 8300000, guid: f09bc1088ef633a44b0ba30be1fc8dd4, type: 3}
+  dropSound: {fileID: 8300000, guid: bb60f01b6b4f0324e98c203700603899, type: 3}
+  switchSound: {fileID: 0}
+  enemyDefeatedSound: {fileID: 0}
+  speedSpellSound: {fileID: 8300000, guid: 3d7e0eec9d1c58649a58441378afdbc6, type: 3}
+  waveEndSound: {fileID: 8300000, guid: 4a66f5ea5a0748545be4e7af30b1a5a1, type: 3}
+  finalWaveSound: {fileID: 8300000, guid: 360379bcc52d0544687a7a7588befce0, type: 3}
 --- !u!82 &770613844
 AudioSource:
   m_ObjectHideFlags: 0
