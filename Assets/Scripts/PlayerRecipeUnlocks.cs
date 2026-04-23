@@ -96,6 +96,11 @@ public class PlayerRecipeUnlocks : MonoBehaviour
 
     public bool IsUnlocked(Recipe recipe) => _unlocked.Contains(recipe);
 
+    public List<Recipe> GetUnlockedRecipes()
+    {
+        return new List<Recipe>(_unlocked);
+    }
+
     public bool Unlock(Recipe recipe)
     {
         Debug.Log("unlocked recipes before unlock: " + string.Join(", ", _unlocked));
@@ -114,6 +119,19 @@ public class PlayerRecipeUnlocks : MonoBehaviour
         _unlocked.Clear();
         if (persistToPlayerPrefs)
             PlayerPrefs.DeleteKey(playerPrefsKey);
+    }
+
+    public void SetUnlockedRecipes(IEnumerable<Recipe> recipes, bool saveToPrefs = true)
+    {
+        _unlocked.Clear();
+        if (recipes != null)
+        {
+            foreach (Recipe recipe in recipes)
+                _unlocked.Add(recipe);
+        }
+
+        if (persistToPlayerPrefs && saveToPrefs)
+            SaveToPrefs();
     }
 
     private void SaveToPrefs()

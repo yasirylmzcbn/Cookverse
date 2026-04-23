@@ -50,7 +50,20 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        string saveJson = JsonUtility.ToJson(new InventorySaveData { entries = entries });
+        List<int> unlockedRecipes = new List<int>();
+        if (PlayerRecipeUnlocks.Instance != null)
+        {
+            foreach (Recipe recipe in PlayerRecipeUnlocks.Instance.GetUnlockedRecipes())
+                unlockedRecipes.Add((int)recipe);
+        }
+
+        List<SpellSlotEntry> spellSlots = BuildSpellSlotEntries();
+        string saveJson = JsonUtility.ToJson(new InventorySaveData
+        {
+            entries = entries,
+            unlockedRecipes = unlockedRecipes,
+            spellSlots = spellSlots
+        });
         PlayerPrefs.SetString($"Cookverse_Inventory_{slot}", saveJson);
         PlayerPrefs.Save();
         Debug.Log($"Game Saved to Slot {slot}!");
@@ -108,6 +121,9 @@ public class GameManager : MonoBehaviour
                         }
                     }
                 }
+
+                RestoreRecipeUnlocks(data.unlockedRecipes);
+                RestoreSpellSlots(data.spellSlots);
             }
             OnInventoryChanged?.Invoke();
         }
@@ -120,6 +136,8 @@ public class GameManager : MonoBehaviour
         public List<InventoryEntry> entries;
         public List<string> names;
         public List<int> amounts;
+        public List<int> unlockedRecipes;
+        public List<SpellSlotEntry> spellSlots;
     }
 
     [Serializable]
@@ -128,6 +146,14 @@ public class GameManager : MonoBehaviour
         public string assetName;
         public string itemName;
         public int amount;
+    }
+
+    [Serializable]
+    private class SpellSlotEntry
+    {
+        public int slotIndex;
+        public string spellName;
+        public int recipe = -1;
     }
 
     void Awake()
@@ -338,5 +364,119 @@ public class GameManager : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(item.itemName) && !_itemLookup.ContainsKey(item.itemName))
             _itemLookup[item.itemName] = item;
+    }
+
+    private List<SpellSlotEntry> BuildSpellSlotEntries()
+    {
+        List<SpellSlotEntry> result = new List<SpellSlotEntry>();
+        PlayerController player = PlayerController.Instance;
+        if (player == null)
+            return result;
+
+        SpellDefinition[] loadout = player.GetLoadout();
+        if (loadout == null)
+            return result;
+
+        for (int i = 0; i < loadout.Length; i++)
+        {
+            SpellDefinition spell = loadout[i];
+            SpellSlotEntry entry = new SpellSlotEntry
+            {
+                slotIndex = i,
+                spellName = spell != null ? spell.name : string.Empty,
+                recipe = (spell != null && spell.requiresRecipeUnlock) ? (int)spell.requiredRecipe : -1
+            };
+            result.Add(entry);
+        }
+
+        return result;
+    }
+
+    private void RestoreRecipeUnlocks(List<int> unlockedRecipeValues)
+    {
+        if (PlayerRecipeUnlocks.Instance == null || unlockedRecipeValues == null)
+            return;
+
+        List<Recipe> recipes = new List<Recipe>();
+        foreach (int value in unlockedRecipeValues)
+        {
+            if (Enum.IsDefined(typeof(Recipe), value))
+                recipes.Add((Recipe)value);
+        }
+
+        PlayerRecipeUnlocks.Instance.SetUnlockedRecipes(recipes);
+    }
+
+    private void RestoreSpellSlots(List<SpellSlotEntry> spellSlots)
+    {
+        PlayerController player = PlayerController.Instance;
+        if (player == null || spellSlots == null)
+            return;
+
+        for (int i = 0; i < 4; i++)
+            player.UnequipSpell(i);
+
+        Dictionary<string, SpellDefinition> spellLookup = BuildSpellLookup();
+
+        foreach (SpellSlotEntry slot in spellSlots)
+        {
+            if (slot == null)
+                continue;
+            if (slot.slotIndex < 0 || slot.slotIndex >= 4)
+                continue;
+
+            SpellDefinition spell = null;
+            if (!string.IsNullOrWhiteSpace(slot.spellName))
+                spellLookup.TryGetValue(slot.spellName, out spell);
+
+            if (spell == null && slot.recipe >= 0 && Enum.IsDefined(typeof(Recipe), slot.recipe))
+            {
+                Recipe recipe = (Recipe)slot.recipe;
+                foreach (SpellDefinition candidate in spellLookup.Values)
+                {
+                    if (candidate != null
+                        && candidate.requiresRecipeUnlock
+                        && candidate.requiredRecipe == recipe)
+                    {
+                        spell = candidate;
+                        break;
+                    }
+                }
+            }
+
+            if (spell != null)
+                player.TryEquipSpell(spell, slot.slotIndex);
+        }
+    }
+
+    private Dictionary<string, SpellDefinition> BuildSpellLookup()
+    {
+        Dictionary<string, SpellDefinition> lookup = new Dictionary<string, SpellDefinition>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (SpellDefinition spell in Resources.FindObjectsOfTypeAll<SpellDefinition>())
+        {
+            if (spell == null)
+                continue;
+            if (!lookup.ContainsKey(spell.name))
+                lookup[spell.name] = spell;
+        }
+
+        PlayerController player = PlayerController.Instance;
+        if (player != null)
+        {
+            SpellDefinition[] loadout = player.GetLoadout();
+            if (loadout != null)
+            {
+                foreach (SpellDefinition spell in loadout)
+                {
+                    if (spell == null)
+                        continue;
+                    if (!lookup.ContainsKey(spell.name))
+                        lookup[spell.name] = spell;
+                }
+            }
+        }
+
+        return lookup;
     }
 }
