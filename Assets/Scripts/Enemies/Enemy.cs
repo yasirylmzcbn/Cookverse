@@ -32,6 +32,8 @@ public abstract class Enemy : MonoBehaviour
     
     [Header("Audio")]
     [SerializeField] protected AudioClip attackSound;
+    [Tooltip("Sound played when the enemy takes damage")]
+    [SerializeField] protected AudioClip enemyHitSound;
     protected AudioSource audioSource;
 
     private void Awake()
@@ -121,6 +123,13 @@ public abstract class Enemy : MonoBehaviour
     public void Damage(int d)
     {
         health -= d;
+        
+        // Play hit sound
+        if (enemyHitSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(enemyHitSound);
+        }
+        
         if (health <= 0)
         {
             Die();

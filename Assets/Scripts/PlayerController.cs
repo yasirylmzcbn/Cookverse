@@ -31,6 +31,11 @@ public class PlayerController : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
+    [Header("Audio")]
+    [Tooltip("Sound played when the player takes damage")]
+    [SerializeField] private AudioClip playerHitSound;
+    private AudioSource playerAudioSource;
+
     [Header("Inventory")]
     [SerializeField] private int inventoryCapacity = 12;
     public int InventoryCapacity => inventoryCapacity;
@@ -207,11 +212,26 @@ public class PlayerController : MonoBehaviour
         DisableCombat();
 
         ResolveRecipeUnlocksIfNeeded();
+
+        // Initialize audio for hit sounds
+        playerAudioSource = GetComponent<AudioSource>();
+        if (playerAudioSource == null)
+        {
+            playerAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        playerAudioSource.playOnAwake = false;
+        playerAudioSource.spatialBlend = 1f; // 3D sound
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+
+        // Play hit sound
+        if (playerHitSound != null && playerAudioSource != null)
+        {
+            playerAudioSource.PlayOneShot(playerHitSound);
+        }
 
         if (currentHealth <= 0 && !_isDead)
         {
