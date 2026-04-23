@@ -20,6 +20,8 @@ public class DifficultySetter : MonoBehaviour, IInteractable
 
     private void OnGUI()
     {
+        if (Time.timeScale == 0f) return;
+
         if (PlayerController.Instance == null || PlayerController.Instance.InteractorSource == null) return;
 
         if (difficultyUI != null && difficultyUI.IsVisible()) return;
