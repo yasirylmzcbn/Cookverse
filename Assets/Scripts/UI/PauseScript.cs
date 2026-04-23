@@ -3,9 +3,12 @@ using UnityEngine;
 public class PauseScript : MonoBehaviour
 {
     private bool isPaused = false;
+    private bool wasAnyUIOpenLastFrame = false;
 
     void Update()
     {
+        bool isAnyUIOpen = IsAnyOtherUIOpen();
+
         // Toggle pause state when Escape is pressed
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -15,9 +18,29 @@ public class PauseScript : MonoBehaviour
             }
             else
             {
+                // Prevent pausing if a UI is open, OR if it was open last frame 
+                // but another script already processed ESC and closed it this frame.
+                if (isAnyUIOpen || wasAnyUIOpenLastFrame)
+                    return;
+
                 PauseGame();
             }
         }
+
+        wasAnyUIOpenLastFrame = isAnyUIOpen;
+    }
+
+    private bool IsAnyOtherUIOpen()
+    {
+        SpellMenuUI spellMenu = FindFirstObjectByType<SpellMenuUI>();
+        if (spellMenu != null && spellMenu.menuOpen)
+            return true;
+
+        DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>();
+        if (difficultyUI != null && difficultyUI.IsVisible())
+            return true;
+
+        return false;
     }
 
     private CursorLockMode previousLockState;
