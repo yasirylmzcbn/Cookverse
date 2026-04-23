@@ -141,6 +141,10 @@ MonoBehaviour:
   sceneToLoad: 
   cookingSceneName: MainScene
   combatSceneName: EnemyScene
+  returnSpawnOffset: 2
+  returnOffsetDirection: 0
+  enterPortalSfx: {fileID: 8300000, guid: 2afe13dbf5c32ed40a7a3f196c19c40d, type: 3}
+  enterPortalSfxVolume: 1
 --- !u!65 &8028409439891726424
 BoxCollider:
   m_ObjectHideFlags: 0
