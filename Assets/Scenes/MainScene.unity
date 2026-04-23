@@ -16721,7 +16721,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1401387912}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.44367564
+  m_Size: 0.40833563
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -23415,6 +23415,8 @@ MonoBehaviour:
   unlockedOnStart: 
   persistToPlayerPrefs: 1
   playerPrefsKey: cookverse.unlockedRecipes
+  recipeUnlockedSfx: {fileID: 8300000, guid: 9078ecaea556a794f8ce2428130a56bc, type: 3}
+  recipeUnlockedSfxVolume: 1
   detachFromPlayerOnAwake: 0
   resetUnlocksOnSessionStart: 1
 --- !u!136 &2005958088
@@ -23459,6 +23461,7 @@ MonoBehaviour:
   jumpHeight: 3
   maxHealth: 100
   currentHealth: 0
+  inventoryCapacity: 12
   movementReference: {fileID: 0}
   groundCheck: {fileID: 937150395}
   groundDistance: 0.4
@@ -24817,6 +24820,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c45386c2b39fd44998b533491a6056c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  allItemsDatabase: []
 --- !u!4 &2102608537
 Transform:
   m_ObjectHideFlags: 0
