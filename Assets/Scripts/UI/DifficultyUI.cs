@@ -21,14 +21,41 @@ public class DifficultyUI : MonoBehaviour
     void Start()
     {
         easyButton.onClick.AddListener(OnEasyButtonClicked);
+        mediumButton.onClick.AddListener(OnMediumButtonClicked);
+        hardButton.onClick.AddListener(OnHardButtonClicked);
+        bossButton.onClick.AddListener(OnBossButtonClicked);
+
         SetMenuVisible(false);
         mediumButton.interactable = false;
         hardButton.interactable = false;
         bossButton.interactable = false;
     }
 
+    private void Update()
+    {
+        if (storedVisible && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)))
+        {
+            SetMenuVisible(false);
+            if (playerController != null)
+                playerController.EndInteraction();
+        }
+    }
+
     public void SetMenuVisible(bool visible)
     {
+        // Try to automatically find references if they are missing
+        if (playerController == null)
+            playerController = PlayerController.Instance != null ? PlayerController.Instance : FindFirstObjectByType<PlayerController>();
+
+        if (firstPersonCameraController == null)
+        {
+            if (playerController != null)
+                firstPersonCameraController = playerController.GetComponentInChildren<CameraController>(true);
+            
+            if (firstPersonCameraController == null)
+                firstPersonCameraController = FindFirstObjectByType<CameraController>(FindObjectsInactive.Include);
+        }
+
         if (difficultyPanel != null)
             difficultyPanel.SetActive(visible);
 
@@ -68,28 +95,32 @@ public class DifficultyUI : MonoBehaviour
         Debug.Log("Easy Clicked");
 
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetEasyDifficulty();
     }
 
     void OnMediumButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetMediumDifficulty();
     }
 
     void OnHardButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetHardDifficulty();
     }
 
     void OnBossButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetBossDifficulty();
     }
 
