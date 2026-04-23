@@ -43,6 +43,8 @@ public class PauseScript : MonoBehaviour
     private CursorLockMode previousLockState;
     private bool previousCursorVisible;
 
+    private int lastHoveredButtonId = -1;
+
     public void PauseGame()
     {
         isPaused = true;
@@ -146,6 +148,8 @@ public class PauseScript : MonoBehaviour
         bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
         bool saveLoadDisabled = combatActive || cookingActive;
 
+        int currentHoveredId = -1;
+
         for (int i = 1; i <= 3; i++)
         {
             float slotY = slotsStartY + (i - 1) * 55f;
@@ -153,14 +157,20 @@ public class PauseScript : MonoBehaviour
             GUI.Label(new Rect(halfScreenWidth - 250f, slotY, 80f, 40f), "Slot " + i, textStyle);
 
             GUI.enabled = !saveLoadDisabled;
-            if (GUI.Button(new Rect(halfScreenWidth - 160f, slotY, 100f, 35f), "Save"))
+            Rect saveRect = new Rect(halfScreenWidth - 160f, slotY, 100f, 35f);
+            if (!saveLoadDisabled && saveRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10;
+            if (GUI.Button(saveRect, "Save"))
             {
+                if (UISoundManager.Instance != null) UISoundManager.Instance.PlayClickSound();
                 if (GameManager.Instance != null)
                     GameManager.Instance.SaveGame(i);
             }
 
-            if (GUI.Button(new Rect(halfScreenWidth - 50f, slotY, 100f, 35f), "Load"))
+            Rect loadRect = new Rect(halfScreenWidth - 50f, slotY, 100f, 35f);
+            if (!saveLoadDisabled && loadRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10 + 1;
+            if (GUI.Button(loadRect, "Load"))
             {
+                if (UISoundManager.Instance != null) UISoundManager.Instance.PlayClickSound();
                 if (GameManager.Instance != null)
                     GameManager.Instance.LoadGame(i);
             }
@@ -202,6 +212,13 @@ public class PauseScript : MonoBehaviour
             }
 
             GUI.Label(new Rect(halfScreenWidth + 60f, slotY, 200f, 40f), infoText, infoStyle);
+        }
+
+        if (currentHoveredId != lastHoveredButtonId)
+        {
+            if (currentHoveredId != -1 && UISoundManager.Instance != null)
+                UISoundManager.Instance.PlayHoverSound();
+            lastHoveredButtonId = currentHoveredId;
         }
 
         if (saveLoadDisabled)
