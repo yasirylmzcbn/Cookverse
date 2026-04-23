@@ -23,6 +23,10 @@ public class Portal : MonoBehaviour
     [Tooltip("Which direction to offset relative to this portal's forward vector.")]
     [SerializeField] private ReturnOffsetDirection returnOffsetDirection = ReturnOffsetDirection.Forward;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip enterPortalSfx;
+    [SerializeField, Range(0f, 1f)] private float enterPortalSfxVolume = 1f;
+
     private Vector3 GetSafeReturnOffset()
     {
         Vector3 direction = returnOffsetDirection == ReturnOffsetDirection.Forward ? transform.forward : -transform.forward;
@@ -39,6 +43,7 @@ public class Portal : MonoBehaviour
         //Debug.Log("Portal triggered by: " + other.name);
         if (other.CompareTag("Player"))
         {
+            PlayPortalEnterSfxGlobal();
             Transform playerTransform = null;
 
             // Collider may be on a child of the player, so resolve from parent.
@@ -90,5 +95,23 @@ public class Portal : MonoBehaviour
             }
             SceneManager.LoadScene(sceneToLoad);
         }
+    }
+
+    private void PlayPortalEnterSfxGlobal()
+    {
+        if (enterPortalSfx == null)
+            return;
+
+        GameObject audioGo = new GameObject("PortalEnterSfx");
+        DontDestroyOnLoad(audioGo);
+
+        AudioSource audioSource = audioGo.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f;
+        audioSource.clip = enterPortalSfx;
+        audioSource.volume = enterPortalSfxVolume;
+        audioSource.Play();
+
+        Destroy(audioGo, enterPortalSfx.length + 0.1f);
     }
 }

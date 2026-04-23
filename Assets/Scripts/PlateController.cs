@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlot
 {
+    [Header("Audio")]
+    [SerializeField] private AudioClip placeOnPlateSfx;
+    [SerializeField, Range(0f, 1f)] private float placeOnPlateSfxVolume = 1f;
+    private AudioSource _audioSource;
+
     [Header("Recipe")]
     [SerializeField] public Recipe recipe;
     private List<Ingredient> requiredIngredients;
@@ -50,6 +55,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         RebindReferences();
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
+        EnsureAudioSource();
     }
 
     private void OnDestroy()
@@ -130,6 +136,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         {
             proteinIngredient = ingredient;
             ingredient.SnapInto(GetProteinAnchor());
+            PlayOneShot(placeOnPlateSfx, placeOnPlateSfxVolume);
             IsRecipeComplete();
             return true;
         }
@@ -137,6 +144,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         {
             vegetableIngredient = ingredient;
             ingredient.SnapInto(GetVegetableAnchor());
+            PlayOneShot(placeOnPlateSfx, placeOnPlateSfxVolume);
             IsRecipeComplete();
             return true;
         }
@@ -205,6 +213,29 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         yield return new WaitForSeconds(delay);
         if (completionText != null)
             completionText.text = "";
+    }
+
+    private void EnsureAudioSource()
+    {
+        if (_audioSource != null)
+            return;
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+            _audioSource = gameObject.AddComponent<AudioSource>();
+
+        _audioSource.playOnAwake = false;
+        _audioSource.spatialBlend = 1f;
+    }
+
+    private void PlayOneShot(AudioClip clip, float volume)
+    {
+        if (clip == null)
+            return;
+
+        EnsureAudioSource();
+        if (_audioSource != null)
+            _audioSource.PlayOneShot(clip, volume);
     }
 }
 

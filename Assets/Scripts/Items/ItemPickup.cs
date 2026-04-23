@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
-    //[Header("Aiming")]
     [Tooltip("Script should be placed on the item's Prefab.")]
     [SerializeField] public ItemData itemData;
+    [Header("Audio")]
+    [SerializeField] private AudioClip pickupSound;
+    [SerializeField, Range(0f, 1f)] private float pickupSoundVolume = 1f;
+    private const string DefaultPickupSoundPath = "Assets/Audio/PickUp.wav";
 
     private void Awake()
     {
@@ -15,11 +18,37 @@ public class ItemPickup : MonoBehaviour
         // GetComponent<Collider>().isTrigger = true;
     }
 
+#if UNITY_EDITOR
+    private void Reset()
+    {
+        TryAssignDefaultPickupSound();
+    }
+
+    private void OnValidate()
+    {
+        TryAssignDefaultPickupSound();
+    }
+
+    private void TryAssignDefaultPickupSound()
+    {
+        if (pickupSound != null)
+            return;
+
+        pickupSound = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultPickupSoundPath);
+    }
+#endif
+
     public void Pickup(GameManager gameManager)
     {
+        if (gameManager == null || itemData == null)
+            return;
+
         KitchenIngredientController ingredient = GetComponent<KitchenIngredientController>();
         if (ingredient != null && (ingredient.IsCooked() || ingredient.IsBurnt()))
             return;
+
+        if (pickupSound != null)
+            AudioSource.PlayClipAtPoint(pickupSound, transform.position, pickupSoundVolume);
 
         gameManager.AddInventoryItem(itemData);
         Destroy(gameObject);

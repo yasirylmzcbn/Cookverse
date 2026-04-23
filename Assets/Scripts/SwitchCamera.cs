@@ -55,6 +55,7 @@ public class SwitchCamera : MonoBehaviour
             { KitchenCameras.Stove, kitchenCamera },
             // TODO Add other kitchen cameras here when implemented
         };
+        EnsureActiveAudioListener();
     }
 
     private bool TryGetKitchenCamera(KitchenCameras cam, out GameObject target)
@@ -106,6 +107,8 @@ public class SwitchCamera : MonoBehaviour
                 SetActiveSafe(firstPersonCamera, true);
                 firstPerson = true;
             }
+
+            EnsureActiveAudioListener();
         }
     }
 
@@ -124,6 +127,7 @@ public class SwitchCamera : MonoBehaviour
         currentKitchenCamera = cam;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        EnsureActiveAudioListener();
         return true;
     }
 
@@ -132,12 +136,20 @@ public class SwitchCamera : MonoBehaviour
         Debug.Log("Exiting kitchen camera");
 
         if (PlayerController.Instance != null)
+        {
             PlayerController.Instance.SetBodyVisible(true);
+            PlayerController.Instance.EndInteraction();
+        }
 
         kitchenCam = false;
         SetActiveSafe(kitchenCamera, false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        SpellMenuUI spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
+        if (spellMenu != null && spellMenu.menuOpen)
+            spellMenu.SetMenuVisible(false);
+
         if (firstPerson)
         {
             SetActiveSafe(firstPersonCamera, true);
@@ -153,5 +165,66 @@ public class SwitchCamera : MonoBehaviour
         {
             SetActiveSafe(thirdPersonCamera, true);
         }
+
+        CameraMove tpController = thirdPersonCamera != null
+            ? thirdPersonCamera.GetComponentInChildren<CameraMove>(true)
+            : null;
+
+        if (tpController != null)
+            tpController.enabled = !firstPerson;
+
+        EnsureActiveAudioListener();
+    }
+
+    private void EnsureActiveAudioListener()
+    {
+        Camera activeCamera = GetActiveGameplayCamera();
+        if (activeCamera == null)
+            return;
+
+        AudioListener current = FindFirstObjectByType<AudioListener>(FindObjectsInactive.Include);
+        if (current != null && current.gameObject == activeCamera.gameObject)
+        {
+            current.enabled = true;
+            return;
+        }
+
+        AudioListener activeListener = activeCamera.GetComponent<AudioListener>();
+        if (activeListener == null)
+            activeListener = activeCamera.gameObject.AddComponent<AudioListener>();
+
+        activeListener.enabled = true;
+
+        AudioListener[] allListeners = FindObjectsByType<AudioListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (AudioListener listener in allListeners)
+        {
+            if (listener != null && listener != activeListener)
+                listener.enabled = false;
+        }
+    }
+
+    private Camera GetActiveGameplayCamera()
+    {
+        if (kitchenCam)
+        {
+            Camera kitchenCamComponent = kitchenCamera != null ? kitchenCamera.GetComponentInChildren<Camera>(true) : null;
+            if (kitchenCamComponent != null)
+                return kitchenCamComponent;
+        }
+
+        if (firstPerson)
+        {
+            Camera fpCamera = firstPersonCamera != null ? firstPersonCamera.GetComponentInChildren<Camera>(true) : null;
+            if (fpCamera != null)
+                return fpCamera;
+        }
+        else
+        {
+            Camera tpCamera = thirdPersonCamera != null ? thirdPersonCamera.GetComponentInChildren<Camera>(true) : null;
+            if (tpCamera != null)
+                return tpCamera;
+        }
+
+        return Camera.main;
     }
 }

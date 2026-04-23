@@ -9,9 +9,19 @@ public class Win : MonoBehaviour
     private bool hasWon = false;
     public WaveManager waveManager;
 
+    [SerializeField] private TMP_Text waveNumberText;
+
     [SerializeField] private GameObject portal;
     private Transform playerTransform;
     [SerializeField] private float portalDistanceFromPlayer = 2f;
+
+    public void UpdateWaveText(int currentWave, int maxWave)
+    {
+        if (waveNumberText != null)
+        {
+            waveNumberText.text = $"Wave: {currentWave} / {maxWave}";
+        }
+    }
 
     void Start()
     {
@@ -52,5 +62,6 @@ public class Win : MonoBehaviour
     {
         hasWon = true;
         winText.enabled = true;
+        winText.text = "You Win!";
     }
 }
