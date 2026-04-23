@@ -19,6 +19,17 @@ public class MusicManager : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float musicVolume = 1f;
 
+    public float MusicVolume
+    {
+        get => musicVolume;
+        set
+        {
+            musicVolume = Mathf.Clamp01(value);
+            if (musicSource != null)
+                musicSource.volume = musicVolume;
+        }
+    }
+
     [Header("Scene Music")]
     [SerializeField] private List<SceneTrack> sceneTracks = new List<SceneTrack>();
 
@@ -46,6 +57,7 @@ public class MusicManager : MonoBehaviour
             return;
         }
 
+        musicSource.ignoreListenerVolume = true;
         musicSource.loop = true;
         musicSource.volume = musicVolume;
         RebuildTrackLookup();

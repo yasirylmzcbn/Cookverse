@@ -20,6 +20,9 @@ public class PauseScript : MonoBehaviour
         }
     }
 
+    private CursorLockMode previousLockState;
+    private bool previousCursorVisible;
+
     public void PauseGame()
     {
         isPaused = true;
@@ -29,6 +32,12 @@ public class PauseScript : MonoBehaviour
         {
             PlayerController.Instance.enabled = false;
         }
+
+        previousLockState = Cursor.lockState;
+        previousCursorVisible = Cursor.visible;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void ResumeGame()
@@ -40,6 +49,9 @@ public class PauseScript : MonoBehaviour
         {
             PlayerController.Instance.enabled = true;
         }
+
+        Cursor.lockState = previousLockState;
+        Cursor.visible = previousCursorVisible;
     }
 
     private void OnGUI()
@@ -59,7 +71,32 @@ public class PauseScript : MonoBehaviour
                 fontSize = 36,
                 fontStyle = FontStyle.Bold
             };
-            GUI.Label(new Rect(0, 0, Screen.width, Screen.height), "Press ESC to unpause", style);
+            GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 100f), "Press ESC to unpause", style);
+
+            // Volume Sliders
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                fontSize = 24,
+                fontStyle = FontStyle.Bold
+            };
+            labelStyle.normal.textColor = Color.white;
+
+            float sliderWidth = 300f;
+            float sliderHeight = 30f;
+            float centerX = (Screen.width - sliderWidth) / 2f;
+            float centerY = Screen.height / 2f;
+
+            // Music Volume
+            GUI.Label(new Rect(centerX, centerY, sliderWidth, 30f), "Music Volume", labelStyle);
+            if (MusicManager.Instance != null)
+            {
+                MusicManager.Instance.MusicVolume = GUI.HorizontalSlider(new Rect(centerX, centerY + 35f, sliderWidth, sliderHeight), MusicManager.Instance.MusicVolume, 0f, 1f);
+            }
+
+            // SFX Volume (Master Volume)
+            GUI.Label(new Rect(centerX, centerY + 80f, sliderWidth, 30f), "SFX Volume", labelStyle);
+            AudioListener.volume = GUI.HorizontalSlider(new Rect(centerX, centerY + 115f, sliderWidth, sliderHeight), AudioListener.volume, 0f, 1f);
 
             GUI.color = originalColor;
         }
