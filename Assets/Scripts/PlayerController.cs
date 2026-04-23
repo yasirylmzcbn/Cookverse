@@ -492,7 +492,7 @@ public class PlayerController : MonoBehaviour
         }
         if (reloadAction == null || reloadAction.bindings.Count == 0)
         {
-            reloadAction = new InputAction("Shoot", InputActionType.Button);
+            reloadAction = new InputAction("Reload", InputActionType.Button);
             reloadAction.AddBinding("<Keyboard>/r");
             reloadAction.AddBinding("<Gamepad>/buttonWest");
         }
@@ -644,7 +644,7 @@ public class PlayerController : MonoBehaviour
             if (potatoShooter != null) potatoShooter.Shoot();
         }
 
-        if (reloadAction != null && reloadAction.IsPressed())
+        if (reloadAction != null && reloadAction.WasPressedThisFrame())
         {
             Debug.Log("reload pressed");
             var potatoShooter = GetPotatoShooter();
