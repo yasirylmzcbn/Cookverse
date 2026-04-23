@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     float waveMultiplierIncrement = 1.1f;
     private int currentWave = 1;
     private int lastWave = 2;
+    private int firstWave = 1;
     [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>();
     public event Action OnInventoryChanged;
     private Difficulty lastCompletedDifficulty = Difficulty.None;
@@ -278,8 +279,20 @@ public class GameManager : MonoBehaviour
         return lastWave;
     }
 
+    public int DisplayWaveCurrent()
+    {
+        int total = DisplayWaveMax();
+        return Mathf.Clamp((currentWave - firstWave) + 1, 1, total);
+    }
+
+    public int DisplayWaveMax()
+    {
+        return Mathf.Max(1, (lastWave - firstWave) + 1);
+    }
+
     public void SetEasyDifficulty()
     {
+        firstWave = 1;
         currentWave = 1;
         lastWave = 5;
         currentDifficulty = Difficulty.Easy;
@@ -287,22 +300,25 @@ public class GameManager : MonoBehaviour
 
     public void SetMediumDifficulty()
     {
+        firstWave = 10;
         currentWave = 10;
-        lastWave = 20;
+        lastWave = 19;
         currentDifficulty = Difficulty.Medium;
     }
 
     public void SetHardDifficulty()
     {
+        firstWave = 20;
         currentWave = 20;
-        lastWave = 30;
+        lastWave = 29;
         currentDifficulty = Difficulty.Hard;
     }
 
     public void SetBossDifficulty()
     {
+        firstWave = 30;
         currentWave = 30;
-        lastWave = 40;
+        lastWave = 39;
         currentDifficulty = Difficulty.Boss;
     }
 

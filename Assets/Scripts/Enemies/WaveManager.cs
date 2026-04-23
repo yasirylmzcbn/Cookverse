@@ -20,19 +20,19 @@ public class WaveManager : MonoBehaviour
 
         if (winScript != null && GameManager.Instance != null)
         {
-            int maxWave = Mathf.Max(1, GameManager.Instance.LastWave());
-            int displayWave = Mathf.Clamp(GameManager.Instance.CurrentWave(), 1, maxWave);
+            int maxWave = GameManager.Instance.DisplayWaveMax();
+            int displayWave = GameManager.Instance.DisplayWaveCurrent();
             winScript.UpdateWaveText(displayWave, maxWave);
         }
 
         while (true)
         {
-            int maxWave = Mathf.Max(1, GameManager.Instance.LastWave());
-            int currentWave = Mathf.Clamp(GameManager.Instance.CurrentWave(), 1, maxWave);
+            int absoluteMaxWave = Mathf.Max(1, GameManager.Instance.LastWave());
+            int currentWave = Mathf.Clamp(GameManager.Instance.CurrentWave(), 1, absoluteMaxWave);
 
             if (winScript != null)
             {
-                winScript.UpdateWaveText(currentWave, maxWave);
+                winScript.UpdateWaveText(GameManager.Instance.DisplayWaveCurrent(), GameManager.Instance.DisplayWaveMax());
             }
 
             foreach (var spawner in spawners)
@@ -46,7 +46,7 @@ public class WaveManager : MonoBehaviour
                 yield return new WaitForSeconds(0.5f);
             }
 
-            if (currentWave >= maxWave)
+            if (currentWave >= absoluteMaxWave)
             {
                 GameManager.Instance.WaveCompleted();
                 done = true;
