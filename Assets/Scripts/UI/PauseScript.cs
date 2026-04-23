@@ -141,6 +141,7 @@ public class PauseScript : MonoBehaviour
         };
 
         float slotsStartY = Screen.height * 0.65f;
+        bool combatActive = PlayerController.Instance != null && PlayerController.Instance.IsCombatEnabled;
 
         for (int i = 1; i <= 3; i++)
         {
@@ -148,6 +149,7 @@ public class PauseScript : MonoBehaviour
 
             GUI.Label(new Rect(halfScreenWidth - 250f, slotY, 80f, 40f), "Slot " + i, textStyle);
 
+            GUI.enabled = !combatActive;
             if (GUI.Button(new Rect(halfScreenWidth - 160f, slotY, 100f, 35f), "Save"))
             {
                 if (GameManager.Instance != null)
@@ -159,6 +161,7 @@ public class PauseScript : MonoBehaviour
                 if (GameManager.Instance != null)
                     GameManager.Instance.LoadGame(i);
             }
+            GUI.enabled = true;
 
             string infoText = "Empty";
 
@@ -196,6 +199,22 @@ public class PauseScript : MonoBehaviour
             }
 
             GUI.Label(new Rect(halfScreenWidth + 60f, slotY, 200f, 40f), infoText, infoStyle);
+        }
+
+        if (combatActive)
+        {
+            GUIStyle combatInfoStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 16,
+                normal = { textColor = new Color(1f, 0.8f, 0.4f) }
+            };
+
+            GUI.Label(
+                new Rect(halfScreenWidth - 250f, slotsStartY - 35f, 500f, 25f),
+                "Save/Load disabled during combat",
+                combatInfoStyle
+            );
         }
 
         GUI.color = originalColor;

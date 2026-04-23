@@ -99,6 +99,7 @@ public class PlayerController : MonoBehaviour
     private float _baseShootCooldownDuration;
     private bool _cachedShooterBase;
     private bool _combatEnabled;
+    public bool IsCombatEnabled => _combatEnabled;
 
     private static readonly Dictionary<string, Vector3> _sceneReturnPositions = new Dictionary<string, Vector3>();
     private static readonly Dictionary<string, Quaternion> _sceneReturnRotations = new Dictionary<string, Quaternion>();
