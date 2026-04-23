@@ -20,29 +20,24 @@ public class WaveManager : MonoBehaviour
 
         if (winScript != null && GameManager.Instance != null)
         {
-            winScript.UpdateWaveText(Mathf.Max(1, GameManager.Instance.CurrentWave() - 1), GameManager.Instance.LastWave());
+            int maxWave = Mathf.Max(1, GameManager.Instance.LastWave());
+            int displayWave = Mathf.Clamp(GameManager.Instance.CurrentWave(), 1, maxWave);
+            winScript.UpdateWaveText(displayWave, maxWave);
         }
 
         while (true)
         {
+            int maxWave = Mathf.Max(1, GameManager.Instance.LastWave());
+            int currentWave = Mathf.Clamp(GameManager.Instance.CurrentWave(), 1, maxWave);
+
+            if (winScript != null)
+            {
+                winScript.UpdateWaveText(currentWave, maxWave);
+            }
+
             foreach (var spawner in spawners)
             {
                 spawner.SpawnEnemy(GameManager.Instance.GetWaveMultiplier());
-            }
-
-            // Increase difficulty
-            GameManager.Instance.WaveCompleted();
-
-            if (winScript != null && GameManager.Instance != null)
-            {
-                winScript.UpdateWaveText(GameManager.Instance.CurrentWave() - 1, GameManager.Instance.LastWave());
-            }
-
-            // Small delay before next wave
-            if (GameManager.Instance.CurrentWave() == GameManager.Instance.LastWave())
-            {
-                done = true;
-                yield break;
             }
 
             // Wait for all enemies to be defeated
@@ -50,6 +45,16 @@ public class WaveManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(0.5f);
             }
+
+            if (currentWave >= maxWave)
+            {
+                GameManager.Instance.WaveCompleted();
+                done = true;
+                yield break;
+            }
+
+            // Increase difficulty for the next wave
+            GameManager.Instance.WaveCompleted();
 
             // Countdown to next wave
             float countdown = timeBetweenWaves;
