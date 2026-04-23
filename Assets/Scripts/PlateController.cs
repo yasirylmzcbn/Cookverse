@@ -9,8 +9,6 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     [Header("Audio")]
     [SerializeField] private AudioClip placeOnPlateSfx;
     [SerializeField, Range(0f, 1f)] private float placeOnPlateSfxVolume = 1f;
-    [SerializeField] private AudioClip recipeNotUnlockedSfx;
-    [SerializeField, Range(0f, 1f)] private float recipeNotUnlockedSfxVolume = 1f;
     private AudioSource _audioSource;
 
     [Header("Recipe")]
@@ -206,10 +204,6 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
                 StartCoroutine(HideTextCoroutine(5f));
 
             }
-        }
-        else if (!complete && proteinIngredient != null && vegetableIngredient != null)
-        {
-            PlayOneShot(recipeNotUnlockedSfx, recipeNotUnlockedSfxVolume);
         }
         return complete;
     }
