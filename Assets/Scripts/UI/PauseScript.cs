@@ -142,6 +142,9 @@ public class PauseScript : MonoBehaviour
 
         float slotsStartY = Screen.height * 0.65f;
         bool combatActive = PlayerController.Instance != null && PlayerController.Instance.IsCombatEnabled;
+        SwitchCamera switchCamera = FindFirstObjectByType<SwitchCamera>();
+        bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
+        bool saveLoadDisabled = combatActive || cookingActive;
 
         for (int i = 1; i <= 3; i++)
         {
@@ -149,7 +152,7 @@ public class PauseScript : MonoBehaviour
 
             GUI.Label(new Rect(halfScreenWidth - 250f, slotY, 80f, 40f), "Slot " + i, textStyle);
 
-            GUI.enabled = !combatActive;
+            GUI.enabled = !saveLoadDisabled;
             if (GUI.Button(new Rect(halfScreenWidth - 160f, slotY, 100f, 35f), "Save"))
             {
                 if (GameManager.Instance != null)
@@ -201,7 +204,7 @@ public class PauseScript : MonoBehaviour
             GUI.Label(new Rect(halfScreenWidth + 60f, slotY, 200f, 40f), infoText, infoStyle);
         }
 
-        if (combatActive)
+        if (saveLoadDisabled)
         {
             GUIStyle combatInfoStyle = new GUIStyle(GUI.skin.label)
             {
@@ -210,9 +213,15 @@ public class PauseScript : MonoBehaviour
                 normal = { textColor = new Color(1f, 0.8f, 0.4f) }
             };
 
+            string reasonText = combatActive && cookingActive
+                ? "Save/Load disabled during combat and cooking"
+                : combatActive
+                    ? "Save/Load disabled during combat"
+                    : "Save/Load disabled while cooking";
+
             GUI.Label(
                 new Rect(halfScreenWidth - 250f, slotsStartY - 35f, 500f, 25f),
-                "Save/Load disabled during combat",
+                reasonText,
                 combatInfoStyle
             );
         }
