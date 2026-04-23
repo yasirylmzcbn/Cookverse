@@ -12,12 +12,11 @@ public class GameManager : MonoBehaviour
         Hard,
         Boss
     }
-    // Difficulty, Inventory, and Saving will be here
     public static GameManager Instance;
     float waveMultiplierIncrement = 1.1f;
     private int currentWave = 1;
     private int lastWave = 2;
-    [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>(); //For debug purposes, hide later
+    [SerializeField] private Dictionary<ItemData, int> items = new Dictionary<ItemData, int>();
     public event Action OnInventoryChanged;
     private Difficulty lastCompletedDifficulty = Difficulty.None;
     private Difficulty currentDifficulty = Difficulty.None;
@@ -25,73 +24,114 @@ public class GameManager : MonoBehaviour
     [Header("Save/Load")]
     [Tooltip("Add all your ItemData assets here so they can be matched when loading.")]
     [SerializeField] private List<ItemData> allItemsDatabase = new List<ItemData>();
+    private readonly Dictionary<string, ItemData> _itemLookup = new Dictionary<string, ItemData>(StringComparer.OrdinalIgnoreCase);
 
     public Difficulty GetLastCompletedDifficulty()
     {
         return lastCompletedDifficulty;
     }
 
-    public void SaveGame()
+    public void SaveGame(int slot)
     {
-        PlayerPrefs.SetInt("Cookverse_Difficulty", (int)lastCompletedDifficulty);
+        PlayerPrefs.SetInt($"Cookverse_Difficulty_{slot}", (int)lastCompletedDifficulty);
 
-        List<string> itemNames = new List<string>();
-        List<int> itemAmounts = new List<int>();
+        List<InventoryEntry> entries = new List<InventoryEntry>();
 
         foreach (var pair in items)
         {
             if (pair.Key != null)
             {
-                itemNames.Add(pair.Key.name); // Using the asset name or itemName
-                itemAmounts.Add(pair.Value);
+                entries.Add(new InventoryEntry
+                {
+                    assetName = pair.Key.name,
+                    itemName = pair.Key.itemName,
+                    amount = pair.Value
+                });
             }
         }
 
-        string saveJson = JsonUtility.ToJson(new InventorySaveData { names = itemNames, amounts = itemAmounts });
-        PlayerPrefs.SetString("Cookverse_Inventory", saveJson);
+        string saveJson = JsonUtility.ToJson(new InventorySaveData { entries = entries });
+        PlayerPrefs.SetString($"Cookverse_Inventory_{slot}", saveJson);
         PlayerPrefs.Save();
-        Debug.Log("Game Saved!");
+        Debug.Log($"Game Saved to Slot {slot}!");
     }
 
-    public void LoadGame()
+    public void LoadGame(int slot)
     {
-        if (PlayerPrefs.HasKey("Cookverse_Difficulty"))
+        if (PlayerPrefs.HasKey($"Cookverse_Difficulty_{slot}"))
         {
-            lastCompletedDifficulty = (Difficulty)PlayerPrefs.GetInt("Cookverse_Difficulty");
+            lastCompletedDifficulty = (Difficulty)PlayerPrefs.GetInt($"Cookverse_Difficulty_{slot}");
         }
 
-        if (PlayerPrefs.HasKey("Cookverse_Inventory"))
+        if (PlayerPrefs.HasKey($"Cookverse_Inventory_{slot}"))
         {
-            string saveJson = PlayerPrefs.GetString("Cookverse_Inventory");
+            string saveJson = PlayerPrefs.GetString($"Cookverse_Inventory_{slot}");
             InventorySaveData data = JsonUtility.FromJson<InventorySaveData>(saveJson);
 
             items.Clear();
-            if (data != null && data.names != null && data.amounts != null)
+            if (data != null)
             {
-                for (int i = 0; i < data.names.Count; i++)
+                RebuildItemLookup();
+                List<InventoryEntry> entriesToLoad = data.entries;
+
+                if ((entriesToLoad == null || entriesToLoad.Count == 0)
+                    && data.names != null && data.amounts != null)
                 {
-                    ItemData item = allItemsDatabase.Find(x => x.name == data.names[i] || x.itemName == data.names[i]);
-                    if (item != null)
+                    entriesToLoad = new List<InventoryEntry>();
+                    int legacyCount = Mathf.Min(data.names.Count, data.amounts.Count);
+                    for (int i = 0; i < legacyCount; i++)
                     {
-                        items[item] = data.amounts[i];
+                        entriesToLoad.Add(new InventoryEntry
+                        {
+                            assetName = data.names[i],
+                            itemName = data.names[i],
+                            amount = data.amounts[i]
+                        });
+                    }
+                }
+
+                if (entriesToLoad != null)
+                {
+                    foreach (InventoryEntry entry in entriesToLoad)
+                    {
+                        ItemData item = ResolveItem(entry.assetName, entry.itemName);
+                        if (item != null)
+                        {
+                            if (items.ContainsKey(item))
+                                items[item] += entry.amount;
+                            else
+                                items[item] = entry.amount;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[GameManager] Could not resolve saved item '{entry.assetName}' / '{entry.itemName}'.");
+                        }
                     }
                 }
             }
             OnInventoryChanged?.Invoke();
         }
-        Debug.Log("Game Loaded!");
+        Debug.Log($"Game Loaded from Slot {slot}!");
     }
 
     [Serializable]
     private class InventorySaveData
     {
+        public List<InventoryEntry> entries;
         public List<string> names;
         public List<int> amounts;
     }
 
+    [Serializable]
+    private class InventoryEntry
+    {
+        public string assetName;
+        public string itemName;
+        public int amount;
+    }
+
     void Awake()
     {
-        // If one already exists and it's not us then destroy the copy
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -100,6 +140,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        RebuildItemLookup();
         SetEasyDifficulty();
     }
 
@@ -139,7 +180,6 @@ public class GameManager : MonoBehaviour
         return items.TryGetValue(item, out int amount) ? amount : 0;
     }
 
-    //Debugging
     public string GetInventoryItemsAsString()
     {
         if (items.Count == 0)
@@ -235,9 +275,68 @@ public class GameManager : MonoBehaviour
 
     public void SetBossDifficulty()
     {
-        //add a boss bool to spawn in one wave and then turn it off
         currentWave = 30;
         lastWave = 40;
         currentDifficulty = Difficulty.Boss;
+    }
+
+    private void RebuildItemLookup()
+    {
+        _itemLookup.Clear();
+
+        foreach (ItemData item in allItemsDatabase)
+        {
+            RegisterItem(item);
+        }
+
+        foreach (ItemData item in Resources.LoadAll<ItemData>(""))
+        {
+            RegisterItem(item);
+        }
+
+        foreach (ItemData item in Resources.FindObjectsOfTypeAll<ItemData>())
+        {
+            RegisterItem(item);
+        }
+
+        foreach (ItemPickup pickup in FindObjectsByType<ItemPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (pickup != null)
+                RegisterItem(pickup.itemData);
+        }
+
+        foreach (ItemData item in items.Keys)
+        {
+            RegisterItem(item);
+        }
+    }
+
+    private ItemData ResolveItem(string assetName, string displayName)
+    {
+        if (!string.IsNullOrWhiteSpace(assetName)
+            && _itemLookup.TryGetValue(assetName, out ItemData byAssetName))
+        {
+            return byAssetName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(displayName)
+            && _itemLookup.TryGetValue(displayName, out ItemData byDisplayName))
+        {
+            return byDisplayName;
+        }
+
+        return null;
+    }
+
+    private void RegisterItem(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(item.name) && !_itemLookup.ContainsKey(item.name))
+            _itemLookup[item.name] = item;
+
+        if (!string.IsNullOrWhiteSpace(item.itemName) && !_itemLookup.ContainsKey(item.itemName))
+            _itemLookup[item.itemName] = item;
     }
 }

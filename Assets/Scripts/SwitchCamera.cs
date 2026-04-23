@@ -132,12 +132,20 @@ public class SwitchCamera : MonoBehaviour
         Debug.Log("Exiting kitchen camera");
 
         if (PlayerController.Instance != null)
+        {
             PlayerController.Instance.SetBodyVisible(true);
+            PlayerController.Instance.EndInteraction();
+        }
 
         kitchenCam = false;
         SetActiveSafe(kitchenCamera, false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        SpellMenuUI spellMenu = FindFirstObjectByType<SpellMenuUI>(FindObjectsInactive.Include);
+        if (spellMenu != null && spellMenu.menuOpen)
+            spellMenu.SetMenuVisible(false);
+
         if (firstPerson)
         {
             SetActiveSafe(firstPersonCamera, true);
@@ -153,5 +161,12 @@ public class SwitchCamera : MonoBehaviour
         {
             SetActiveSafe(thirdPersonCamera, true);
         }
+
+        CameraMove tpController = thirdPersonCamera != null
+            ? thirdPersonCamera.GetComponentInChildren<CameraMove>(true)
+            : null;
+
+        if (tpController != null)
+            tpController.enabled = !firstPerson;
     }
 }
