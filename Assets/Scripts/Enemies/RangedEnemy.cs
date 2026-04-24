@@ -25,6 +25,8 @@ public class RangedEnemy : Enemy
     protected override void CheckAttack()
     {
         if (!canAttack) return;
+        if (player == null || playerTransform == null) return;
+        if (player.IsDeadOrDown) return;
 
         float sqrDistance = (playerTransform.position - transform.position).sqrMagnitude;
 
@@ -38,9 +40,12 @@ public class RangedEnemy : Enemy
     {
         canAttack = false;
 
-        Attack();
-        PlayAttackSound();
-        GetComponent<EnemyMovementAI>().AttackAnimation();
+        if (player != null && !player.IsDeadOrDown)
+        {
+            Attack();
+            PlayAttackSound();
+            GetComponent<EnemyMovementAI>().AttackAnimation();
+        }
 
         yield return new WaitForSeconds(attackCooldown);
 
@@ -71,6 +76,8 @@ public class RangedEnemy : Enemy
     void Attack()
     {
         if (enemyBulletPrefab == null || firePoint == null) return;
+        if (player == null || playerTransform == null) return;
+        if (player.IsDeadOrDown) return;
 
         //Vector3 targetPos = playerTransform.position;
         Vector3 targetPos = playerTransform.position - Vector3.up * 1.3f;

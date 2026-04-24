@@ -15,6 +15,8 @@ public class SoundManager : MonoBehaviour
     [Tooltip("Sound played when the player takes damage")]
     [FormerlySerializedAs("playerHitSound")]
     [SerializeField] private AudioClip playerDamagedSound;
+    [Tooltip("Sound played when the player reaches 0 health")]
+    [SerializeField] private AudioClip playerDefeatedSound;
     [Tooltip("Sound played when the player walks")]
     [SerializeField] private AudioClip footstepSound;
     [Tooltip("Sound played when the player jumps")]
@@ -123,6 +125,7 @@ public class SoundManager : MonoBehaviour
 
     #region Player Sounds
     public void PlayPlayerDamagedSound() => PlayOneShot(playerDamagedSound);
+    public void PlayPlayerDefeatedSound() => PlayOneShot(playerDefeatedSound);
     public void PlayFootstepSound() => PlayOneShot(footstepSound);
     public void PlayJumpSound() => PlayOneShot(jumpSound);
     #endregion

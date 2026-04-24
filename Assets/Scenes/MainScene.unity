@@ -21541,17 +21541,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   playerDamagedSound: {fileID: 8300000, guid: 9cd4a5c71c9613c45be0aa7e54ffed9e, type: 3}
+  playerDefeatedSound: {fileID: 8300000, guid: 51640251a8df9d74ebe023a2b5f62d88, type: 3}
   footstepSound: {fileID: 8300000, guid: 63530760b6195b8409c860a9dcbe1967, type: 3}
   jumpSound: {fileID: 8300000, guid: c1804bc6d7bdd95479f20f42a9778f4f, type: 3}
   enemyAttackSound: {fileID: 8300000, guid: 117c2f2c806c62d4c92de76a03a4aa90, type: 3}
   enemyDamagedSound: {fileID: 8300000, guid: e8366197da6c6184eb072b9ed018f0a8, type: 3}
-  enemyDefeatedSound: {fileID: 8300000, guid: bb60f01b6b4f0324e98c203700603899, type: 3}
+  enemyDefeatedSound: {fileID: 8300000, guid: 46b9da2c99e0c5a48a85a6e6a8f6b39d, type: 3}
   uiHoverSound: {fileID: 8300000, guid: 242c71e425f5a644e97e346caf1a8b28, type: 3}
   uiClickSound: {fileID: 8300000, guid: 7855e39015a9237469ebe1a80281f45a, type: 3}
   uiOpenSound: {fileID: 8300000, guid: d5e3c54ed83c3e44fb5646f9ad680094, type: 3}
   uiCloseSound: {fileID: 8300000, guid: f3752851eef07e743a2778f040d158f1, type: 3}
   uiDragStartSound: {fileID: 8300000, guid: f09bc1088ef633a44b0ba30be1fc8dd4, type: 3}
-  uiDropSound: {fileID: 8300000, guid: bb60f01b6b4f0324e98c203700603899, type: 3}
+  uiDropSound: {fileID: 8300000, guid: 46b9da2c99e0c5a48a85a6e6a8f6b39d, type: 3}
   uiSwitchSound: {fileID: 8300000, guid: d5e3c54ed83c3e44fb5646f9ad680094, type: 3}
   waveStartSound: {fileID: 8300000, guid: 0736aae902be21e4099363348f55b2e0, type: 3}
   waveTickSound: {fileID: 8300000, guid: f3752851eef07e743a2778f040d158f1, type: 3}

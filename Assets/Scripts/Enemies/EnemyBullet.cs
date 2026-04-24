@@ -25,6 +25,12 @@ public class EnemyBullet : MonoBehaviour
         if (player == null)
             return;
 
+        if (player.IsDeadOrDown)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         player.TakeDamage(damage);
         Destroy(gameObject);
     }

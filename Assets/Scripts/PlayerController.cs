@@ -77,6 +77,7 @@ public class PlayerController : MonoBehaviour
     public float respawnDelay = 5f;
     private bool _isDead = false;
     private Coroutine _respawnCoroutine;
+    public bool IsDeadOrDown => _isDead || currentHealth <= 0;
 
     private readonly float[] _nextSpellTimes = new float[4];
 
@@ -215,14 +216,24 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (amount <= 0)
+            return;
+
+        if (IsDeadOrDown)
+            return;
+
+        int previousHealth = currentHealth;
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 
         // Play damaged sound via SoundManager
-        if (SoundManager.Instance != null)
+        if (SoundManager.Instance != null && currentHealth < previousHealth)
             SoundManager.Instance.PlayPlayerDamagedSound();
 
-        if (currentHealth <= 0 && !_isDead)
+        if (previousHealth > 0 && currentHealth <= 0 && !_isDead)
         {
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayPlayerDefeatedSound();
+
             _isDead = true;
             _respawnCoroutine = StartCoroutine(RespawnRoutine());
         }
