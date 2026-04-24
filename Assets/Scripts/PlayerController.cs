@@ -221,9 +221,6 @@ public class PlayerController : MonoBehaviour
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlayPlayerDamagedSound();
 
-        // Trigger screen flash overlay
-        DamageFlashOverlay.Flash();
-
         if (currentHealth <= 0 && !_isDead)
         {
             _isDead = true;
