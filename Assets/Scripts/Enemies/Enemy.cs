@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -31,10 +30,6 @@ public abstract class Enemy : MonoBehaviour
     [Tooltip("This drop list is weight-based.")]
     [SerializeField] private List<DropEntry> dropList;
     
-    [Header("Audio")]
-    [SerializeField] protected AudioClip attackSound;
-    protected AudioSource audioSource;
-
     private void Awake()
     {
         enemyRenderers = GetComponentsInChildren<Renderer>(true);
@@ -56,28 +51,12 @@ public abstract class Enemy : MonoBehaviour
                     originalColors[i][m] = mat.color;
             }
         }
-            
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
-        audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 0f; // 2D sound (global)
     }
 
     protected void PlayAttackSound()
     {
         if (SoundManager.Instance != null)
-        {
             SoundManager.Instance.PlayEnemyAttackSound();
-            return;
-        }
-
-        if (attackSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(attackSound);
-        }
     }
 
     private void Update()
