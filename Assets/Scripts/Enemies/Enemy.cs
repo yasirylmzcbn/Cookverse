@@ -67,6 +67,12 @@ public abstract class Enemy : MonoBehaviour
 
     protected void PlayAttackSound()
     {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayEnemyAttackSound();
+            return;
+        }
+
         if (attackSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(attackSound);

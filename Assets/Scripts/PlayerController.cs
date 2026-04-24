@@ -32,9 +32,6 @@ public class PlayerController : MonoBehaviour
     public int currentHealth;
 
     [Header("Audio")]
-    [Tooltip("Sound played when the player walks (assigned in SoundManager)")]
-    [SerializeField] private AudioClip footstepSound;
-    private AudioSource playerAudioSource;
     private float _footstepTimer = 0f;
 
     [Header("Inventory")]
@@ -214,14 +211,6 @@ public class PlayerController : MonoBehaviour
 
         ResolveRecipeUnlocksIfNeeded();
 
-        // Initialize audio for footstep sounds
-        playerAudioSource = GetComponent<AudioSource>();
-        if (playerAudioSource == null)
-        {
-            playerAudioSource = gameObject.AddComponent<AudioSource>();
-        }
-        playerAudioSource.playOnAwake = false;
-        playerAudioSource.spatialBlend = 1f; // 3D sound for footsteps
     }
 
     public void TakeDamage(int amount)
@@ -629,7 +618,7 @@ public class PlayerController : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
 
         // Play footstep sounds while walking (every 0.4 seconds)
-        if (isGrounded && playerAudioSource != null && footstepSound != null)
+        if (isGrounded)
         {
             Vector2 inputMag = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
             if (inputMag.magnitude > 0.1f)
@@ -638,7 +627,8 @@ public class PlayerController : MonoBehaviour
                 if (_footstepTimer >= 0.4f)
                 {
                     _footstepTimer = 0f;
-                    playerAudioSource.PlayOneShot(footstepSound);
+                    if (SoundManager.Instance != null)
+                        SoundManager.Instance.PlayFootstepSound();
                 }
             }
             else

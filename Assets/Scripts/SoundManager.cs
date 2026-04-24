@@ -19,6 +19,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip jumpSound;
 
     [Header("Enemy Sounds")]
+    [Tooltip("Sound played when an enemy attacks")]
+    [SerializeField] private AudioClip enemyAttackSound;
     [Tooltip("Sound played when an enemy takes damage")]
     [SerializeField] private AudioClip enemyHitSound;
     [Tooltip("Sound played when an enemy is defeated")]
@@ -111,6 +113,7 @@ public class SoundManager : MonoBehaviour
     #endregion
 
     #region Enemy Sounds
+    public void PlayEnemyAttackSound() => PlayOneShot(enemyAttackSound);
     public void PlayEnemyHitSound() => PlayOneShot(enemyHitSound);
     public void PlayEnemyDefeatedSound() => PlayOneShot(enemyDefeatedSound);
     #endregion
