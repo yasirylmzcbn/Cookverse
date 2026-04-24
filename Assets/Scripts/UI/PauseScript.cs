@@ -45,16 +45,29 @@ public class PauseScript : MonoBehaviour
 
     private int lastHoveredButtonId = -1;
 
-    private void PlayPauseHoverSound()
+    private void PlayPauseSound(bool hover)
     {
+        if (hover)
+        {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayUIHoverSound();
+                return;
+            }
+
+            if (UISoundManager.Instance != null)
+                UISoundManager.Instance.PlayHoverSound();
+            return;
+        }
+
         if (SoundManager.Instance != null)
         {
-            SoundManager.Instance.PlayUIHoverSound();
+            SoundManager.Instance.PlayUIClickSound();
             return;
         }
 
         if (UISoundManager.Instance != null)
-            UISoundManager.Instance.PlayHoverSound();
+            UISoundManager.Instance.PlayClickSound();
     }
 
     public void PauseGame()
@@ -180,7 +193,7 @@ public class PauseScript : MonoBehaviour
             if (!saveLoadDisabled && saveRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10;
             if (GUI.Button(saveRect, "Save"))
             {
-                if (UISoundManager.Instance != null) UISoundManager.Instance.PlayClickSound();
+                PlayPauseSound(hover: false);
                 if (GameManager.Instance != null)
                     GameManager.Instance.SaveGame(i);
             }
@@ -189,7 +202,7 @@ public class PauseScript : MonoBehaviour
             if (!saveLoadDisabled && loadRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10 + 1;
             if (GUI.Button(loadRect, "Load"))
             {
-                if (UISoundManager.Instance != null) UISoundManager.Instance.PlayClickSound();
+                PlayPauseSound(hover: false);
                 if (GameManager.Instance != null)
                     GameManager.Instance.LoadGame(i);
             }
@@ -233,13 +246,6 @@ public class PauseScript : MonoBehaviour
             GUI.Label(new Rect(halfScreenWidth + 60f, slotY, 200f, 40f), infoText, infoStyle);
         }
 
-        if (currentHoveredId != lastHoveredButtonId)
-        {
-            if (currentHoveredId != -1)
-                PlayPauseHoverSound();
-            lastHoveredButtonId = currentHoveredId;
-        }
-
         if (saveLoadDisabled)
         {
             GUIStyle combatInfoStyle = new GUIStyle(GUI.skin.label)
@@ -267,6 +273,13 @@ public class PauseScript : MonoBehaviour
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         DrawUnlockAllTestingButton(ref currentHoveredId);
 #endif
+
+        if (currentHoveredId != lastHoveredButtonId)
+        {
+            if (currentHoveredId != -1)
+                PlayPauseSound(hover: true);
+            lastHoveredButtonId = currentHoveredId;
+        }
     }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -282,6 +295,8 @@ public class PauseScript : MonoBehaviour
 
         if (GUI.Button(unlockAllRect, "Unlock All"))
         {
+            PlayPauseSound(hover: false);
+
             if (PlayerRecipeUnlocks.Instance != null)
                 PlayerRecipeUnlocks.Instance.UnlockAllRecipesForTesting();
 
