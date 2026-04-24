@@ -43,6 +43,8 @@ public class DifficultyUI : MonoBehaviour
 
     public void SetMenuVisible(bool visible)
     {
+        bool wasVisible = storedVisible;
+
         // Try to automatically find references if they are missing
         if (playerController == null)
             playerController = PlayerController.Instance != null ? PlayerController.Instance : FindFirstObjectByType<PlayerController>();
@@ -93,8 +95,8 @@ public class DifficultyUI : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             
-            // Play close sound when exiting difficulty menu
-            if (SoundManager.Instance != null)
+            // Play close sound only on a real open -> closed transition.
+            if (wasVisible && SoundManager.Instance != null)
                 SoundManager.Instance.PlayUICloseSound();
         }
         storedVisible = visible;

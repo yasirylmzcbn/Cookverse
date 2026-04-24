@@ -86,6 +86,7 @@ public class SpellMenuUI : MonoBehaviour
     public void SetMenuVisible(bool visible)
     {
         RebindReferences();
+        bool wasOpen = menuOpen;
         menuOpen = visible;
         if (spellMenuRoot != null)
             spellMenuRoot.SetActive(visible);
@@ -104,8 +105,8 @@ public class SpellMenuUI : MonoBehaviour
             ClearDescription();
             inventoryPanel.GetComponent<InventoryUI>().RefreshUI();
             
-            // Play open sound when opening inventory/spell menu
-            if (SoundManager.Instance != null)
+            // Play open sound only on a real closed -> open transition.
+            if (!wasOpen && SoundManager.Instance != null)
                 SoundManager.Instance.PlayUIOpenSound();
         }
         else
@@ -121,8 +122,8 @@ public class SpellMenuUI : MonoBehaviour
             Cursor.visible = keepKitchenCursor;
             _selectedDiamondSlot = -1;
             
-            // Play close sound when closing inventory/spell menu
-            if (SoundManager.Instance != null)
+            // Play close sound only on a real open -> closed transition.
+            if (wasOpen && SoundManager.Instance != null)
                 SoundManager.Instance.PlayUICloseSound();
         }
     }
