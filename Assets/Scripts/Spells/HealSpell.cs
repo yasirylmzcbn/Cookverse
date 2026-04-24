@@ -13,5 +13,8 @@ public class HealSpell : SpellDefinition
     {
         if (context.player == null) return;
         context.player.Heal(healAmount);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellHealSound();
     }
 }

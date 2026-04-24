@@ -60,6 +60,12 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip spellSpeedSound;
     [Tooltip("Sound played when the speed spell boost ends")]
     [SerializeField] private AudioClip spellSpeedEndSound;
+    [Tooltip("Sound played when the heal spell is cast")]
+    [SerializeField] private AudioClip spellHealSound;
+    [Tooltip("Sound played when the projectile spell is cast")]
+    [SerializeField] private AudioClip spellProjectileSound;
+    [Tooltip("Sound played when a projectile hits something and disappears")]
+    [SerializeField] private AudioClip spellProjectileImpactSound;
 
     [Header("Cooking Sounds")]
     [Tooltip("Sound played when an ingredient is placed into cookware")]
@@ -147,6 +153,9 @@ public class SoundManager : MonoBehaviour
     #region Spell Sounds
     public void PlaySpellSpeedSound() => PlayOneShot(spellSpeedSound);
     public void PlaySpellSpeedEndSound() => PlayOneShot(spellSpeedEndSound);
+    public void PlaySpellHealSound() => PlayOneShot(spellHealSound);
+    public void PlaySpellProjectileSound() => PlayOneShot(spellProjectileSound);
+    public void PlaySpellProjectileImpactSound() => PlayOneShot(spellProjectileImpactSound);
     #endregion
 
     #region Cooking Sounds
