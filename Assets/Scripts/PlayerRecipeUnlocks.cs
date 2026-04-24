@@ -142,6 +142,18 @@ public class PlayerRecipeUnlocks : MonoBehaviour
             SaveToPrefs();
     }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    public void UnlockAllRecipesForTesting(bool saveToPrefs = true)
+    {
+        List<Recipe> allRecipes = new List<Recipe>();
+
+        foreach (Recipe recipe in Recipes.RecipeIngredients.Keys)
+            allRecipes.Add(recipe);
+
+        SetUnlockedRecipes(allRecipes, saveToPrefs);
+    }
+#endif
+
     private void SaveToPrefs()
     {
         // Store as comma-separated ints.

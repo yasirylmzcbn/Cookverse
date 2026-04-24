@@ -252,7 +252,34 @@ public class PauseScript : MonoBehaviour
         }
 
         GUI.color = originalColor;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        DrawUnlockAllTestingButton();
+#endif
     }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private void DrawUnlockAllTestingButton()
+    {
+        const float buttonWidth = 150f;
+        const float buttonHeight = 40f;
+        const float margin = 20f;
+
+        Rect unlockAllRect = new Rect(margin, Screen.height - buttonHeight - margin, buttonWidth, buttonHeight);
+        if (GUI.Button(unlockAllRect, "Unlock All"))
+        {
+            if (PlayerRecipeUnlocks.Instance != null)
+                PlayerRecipeUnlocks.Instance.UnlockAllRecipesForTesting();
+
+            if (GameManager.Instance != null)
+                GameManager.Instance.UnlockAllDifficultiesForTesting();
+
+            DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>(FindObjectsInactive.Include);
+            if (difficultyUI != null)
+                difficultyUI.UnlockDifficulty(GameManager.Difficulty.Boss);
+        }
+    }
+#endif
 
     [System.Serializable]
     private class InventorySaveData
