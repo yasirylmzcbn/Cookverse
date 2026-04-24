@@ -45,6 +45,18 @@ public class PauseScript : MonoBehaviour
 
     private int lastHoveredButtonId = -1;
 
+    private void PlayPauseHoverSound()
+    {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayUIHoverSound();
+            return;
+        }
+
+        if (UISoundManager.Instance != null)
+            UISoundManager.Instance.PlayHoverSound();
+    }
+
     public void PauseGame()
     {
         isPaused = true;
@@ -155,7 +167,6 @@ public class PauseScript : MonoBehaviour
         SwitchCamera switchCamera = FindFirstObjectByType<SwitchCamera>();
         bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
         bool saveLoadDisabled = combatActive || cookingActive;
-
         int currentHoveredId = -1;
 
         for (int i = 1; i <= 3; i++)
@@ -224,8 +235,8 @@ public class PauseScript : MonoBehaviour
 
         if (currentHoveredId != lastHoveredButtonId)
         {
-            if (currentHoveredId != -1 && UISoundManager.Instance != null)
-                UISoundManager.Instance.PlayHoverSound();
+            if (currentHoveredId != -1)
+                PlayPauseHoverSound();
             lastHoveredButtonId = currentHoveredId;
         }
 
@@ -254,18 +265,21 @@ public class PauseScript : MonoBehaviour
         GUI.color = originalColor;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        DrawUnlockAllTestingButton();
+        DrawUnlockAllTestingButton(ref currentHoveredId);
 #endif
     }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-    private void DrawUnlockAllTestingButton()
+    private void DrawUnlockAllTestingButton(ref int currentHoveredId)
     {
         const float buttonWidth = 150f;
         const float buttonHeight = 40f;
         const float margin = 20f;
 
         Rect unlockAllRect = new Rect(margin, Screen.height - buttonHeight - margin, buttonWidth, buttonHeight);
+        if (unlockAllRect.Contains(Event.current.mousePosition))
+            currentHoveredId = 999;
+
         if (GUI.Button(unlockAllRect, "Unlock All"))
         {
             if (PlayerRecipeUnlocks.Instance != null)

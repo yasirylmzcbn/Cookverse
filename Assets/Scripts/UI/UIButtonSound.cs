@@ -14,7 +14,16 @@ public class UIButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerDownHa
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (UISoundManager.Instance != null && selectable != null && selectable.interactable)
+        if (selectable == null || !selectable.interactable)
+            return;
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayUIHoverSound();
+            return;
+        }
+
+        if (UISoundManager.Instance != null)
         {
             UISoundManager.Instance.PlayHoverSound();
         }
@@ -22,7 +31,16 @@ public class UIButtonSound : MonoBehaviour, IPointerEnterHandler, IPointerDownHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (UISoundManager.Instance != null && selectable != null && selectable.interactable)
+        if (selectable == null || !selectable.interactable)
+            return;
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayUIClickSound();
+            return;
+        }
+
+        if (UISoundManager.Instance != null)
         {
             UISoundManager.Instance.PlayClickSound();
         }

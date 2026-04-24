@@ -21410,7 +21410,7 @@ GameObject:
   - component: {fileID: 1785286495}
   - component: {fileID: 1785286496}
   m_Layer: 0
-  m_Name: UISoundManager
+  m_Name: SoundManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

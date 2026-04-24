@@ -113,15 +113,15 @@ public class UISoundManager : MonoBehaviour
 
     public void PlayHoverSound()
     {
-        if (SoundManager.Instance != null)
-        {
-            SoundManager.Instance.PlayUIHoverSound();
-            return;
-        }
-
         if (hoverSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(hoverSound);
+            return;
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayUIHoverSound();
         }
     }
 

@@ -5,7 +5,7 @@ using TMPro;
 
 public class InventoryItemUI : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler,
-    IPointerClickHandler
+    IPointerClickHandler, IPointerEnterHandler
 {
     [Header("Display")]
     public Image icon;
@@ -121,6 +121,14 @@ public class InventoryItemUI : MonoBehaviour,
         if (itemData == null) return;
 
         _inventoryUI?.TryQuickEquipToHotbar(itemData, amount);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIHoverSound();
+        else if (UISoundManager.Instance != null)
+            UISoundManager.Instance.PlayHoverSound();
     }
 
     public void BindInventoryUI(InventoryUI inventoryUI)

@@ -49,6 +49,11 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData e)
     {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIHoverSound();
+        else if (UISoundManager.Instance != null)
+            UISoundManager.Instance.PlayHoverSound();
+
         _menu.OnSpellHovered(Spell);
         if (backgroundImage != null) backgroundImage.color = hoveredColor;
     }

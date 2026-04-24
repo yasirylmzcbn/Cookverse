@@ -155,6 +155,9 @@ public class SpellMenuUI : MonoBehaviour
             ui.SetEquippedVisual(IsEquipped(entry.spell));
             _spellSlotUIs.Add(ui);
         }
+
+        if (UISoundManager.Instance != null)
+            UISoundManager.Instance.InjectSoundsIntoAllButtons();
     }
 
     // ── Diamond Slots ─────────────────────────────────────────
