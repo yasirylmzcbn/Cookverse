@@ -217,9 +217,9 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 
-        // Play hit sound via SoundManager
+        // Play damaged sound via SoundManager
         if (SoundManager.Instance != null)
-            SoundManager.Instance.PlayPlayerHitSound();
+            SoundManager.Instance.PlayPlayerDamagedSound();
 
         // Trigger screen flash overlay
         DamageFlashOverlay.Flash();
@@ -778,10 +778,10 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(durationSeconds);
 
-        ClearActiveBuff(stopCoroutine: false);
+        ClearActiveBuff(stopCoroutine: false, playEndSound: true);
     }
 
-    private void ClearActiveBuff(bool stopCoroutine)
+    private void ClearActiveBuff(bool stopCoroutine, bool playEndSound = false)
     {
         if (stopCoroutine && _buffCoroutine != null)
         {
@@ -799,6 +799,9 @@ public class PlayerController : MonoBehaviour
             if (shooter != null)
                 shooter.shootCooldownDuration = _buffPrevShootCooldownDuration;
         }
+
+        if (playEndSound && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellSpeedEndSound();
 
         _buffActive = false;
         _buffHadShooter = false;

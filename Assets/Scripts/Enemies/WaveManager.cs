@@ -35,6 +35,10 @@ public class WaveManager : MonoBehaviour
                 winScript.UpdateWaveText(GameManager.Instance.DisplayWaveCurrent(), GameManager.Instance.DisplayWaveMax());
             }
 
+            // Play wave start sound once when this wave begins.
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayWaveStartSound();
+
             foreach (var spawner in spawners)
             {
                 spawner.SpawnEnemy(GameManager.Instance.GetWaveMultiplier());

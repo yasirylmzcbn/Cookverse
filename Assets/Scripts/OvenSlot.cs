@@ -186,7 +186,7 @@ public class OvenSlot : CookwareSlot
             // Ingredient has been placed - treat as "dropped outside range"
             // so the door-close counter is decremented correctly.
             HidePreview();
-            PlayPlaceIngredientSfx();
+            PlayKitchenPlaceSfx();
             return true;
         }
     }
@@ -407,7 +407,7 @@ public class OvenSlot : CookwareSlot
         if (playedFlag)
             return;
 
-        PlayCookingSfx(cookingSizzleSfx);
+        PlayCookingSizzleSfx();
         playedFlag = true;
     }
 
@@ -416,7 +416,7 @@ public class OvenSlot : CookwareSlot
         if (playedFlag)
             return;
 
-        PlayCookingSfx(cookingReadySfx);
+        PlayCookingReadySfx();
         playedFlag = true;
     }
 
@@ -425,7 +425,7 @@ public class OvenSlot : CookwareSlot
         if (playedFlag)
             return;
 
-        PlayCookingSfx(cookingBurntSfx);
+        PlayCookingBurntSfx();
         playedFlag = true;
     }
 }

@@ -133,9 +133,9 @@ public abstract class Enemy : MonoBehaviour
     {
         health -= d;
         
-        // Play hit sound via SoundManager
+        // Play damaged sound via SoundManager
         if (SoundManager.Instance != null)
-            SoundManager.Instance.PlayEnemyHitSound();
+            SoundManager.Instance.PlayEnemyDamagedSound();
         
         if (health <= 0)
         {

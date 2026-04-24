@@ -7669,12 +7669,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
-  placeIngredientSfx: {fileID: 0}
-  placeIngredientSfxVolume: 1
-  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
-  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
-  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
-  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 906872736}
   snapRange: 0.4
@@ -11320,12 +11314,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookwareSlot
-  placeIngredientSfx: {fileID: 0}
-  placeIngredientSfxVolume: 1
-  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
-  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
-  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
-  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1878806117}
   snapRange: 0.4
@@ -19487,12 +19475,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52597a41b29f2413984875c6c024e6da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OvenSlot
-  placeIngredientSfx: {fileID: 0}
-  placeIngredientSfxVolume: 1
-  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
-  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
-  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
-  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1264805466}
   snapRange: 0.8
@@ -21558,11 +21540,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b6e5e75f5fe5c640896b43081579655, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
-  playerHitSound: {fileID: 8300000, guid: 9cd4a5c71c9613c45be0aa7e54ffed9e, type: 3}
+  playerDamagedSound: {fileID: 8300000, guid: 9cd4a5c71c9613c45be0aa7e54ffed9e, type: 3}
   footstepSound: {fileID: 8300000, guid: 63530760b6195b8409c860a9dcbe1967, type: 3}
-  jumpSound: {fileID: 8300000, guid: 7f713d4f242d8ac4d925939b3387983f, type: 3}
+  jumpSound: {fileID: 8300000, guid: c1804bc6d7bdd95479f20f42a9778f4f, type: 3}
   enemyAttackSound: {fileID: 8300000, guid: 117c2f2c806c62d4c92de76a03a4aa90, type: 3}
-  enemyHitSound: {fileID: 8300000, guid: e8366197da6c6184eb072b9ed018f0a8, type: 3}
+  enemyDamagedSound: {fileID: 8300000, guid: e8366197da6c6184eb072b9ed018f0a8, type: 3}
   enemyDefeatedSound: {fileID: 8300000, guid: bb60f01b6b4f0324e98c203700603899, type: 3}
   uiHoverSound: {fileID: 8300000, guid: 242c71e425f5a644e97e346caf1a8b28, type: 3}
   uiClickSound: {fileID: 8300000, guid: 7855e39015a9237469ebe1a80281f45a, type: 3}
@@ -21571,10 +21553,13 @@ MonoBehaviour:
   uiDragStartSound: {fileID: 8300000, guid: f09bc1088ef633a44b0ba30be1fc8dd4, type: 3}
   uiDropSound: {fileID: 8300000, guid: bb60f01b6b4f0324e98c203700603899, type: 3}
   uiSwitchSound: {fileID: 8300000, guid: d5e3c54ed83c3e44fb5646f9ad680094, type: 3}
+  waveStartSound: {fileID: 8300000, guid: 0736aae902be21e4099363348f55b2e0, type: 3}
   waveTickSound: {fileID: 8300000, guid: f3752851eef07e743a2778f040d158f1, type: 3}
   waveEndSound: {fileID: 8300000, guid: 4a66f5ea5a0748545be4e7af30b1a5a1, type: 3}
   waveFinalSound: {fileID: 8300000, guid: 360379bcc52d0544687a7a7588befce0, type: 3}
   spellSpeedSound: {fileID: 8300000, guid: 3d7e0eec9d1c58649a58441378afdbc6, type: 3}
+  spellSpeedEndSound: {fileID: 8300000, guid: 6ceb8aea856906e4eadb1c0cda76a4f8, type: 3}
+  kitchenPlaceSound: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
   cookingSizzleSound: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
   cookingReadySound: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
   cookingBurntSound: {fileID: 8300000, guid: 6ceb8aea856906e4eadb1c0cda76a4f8, type: 3}
@@ -24047,12 +24032,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
-  placeIngredientSfx: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
-  placeIngredientSfxVolume: 1
-  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
-  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
-  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
-  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1153405405}
   snapRange: 0.8
@@ -24151,12 +24130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3919af26c7884b02b45b951720a394b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenItemSlot
-  placeIngredientSfx: {fileID: 8300000, guid: d450aa837070c764ea3dbea44d1ddd35, type: 3}
-  placeIngredientSfxVolume: 1
-  cookingSizzleSfx: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
-  cookingReadySfx: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
-  cookingBurntSfx: {fileID: 8300000, guid: 57ac635208e598c459ca933d7715dcf0, type: 3}
-  cookingSfxVolume: 1
   isOn: 0
   ingredientAnchor: {fileID: 1421598550}
   snapRange: 0.4

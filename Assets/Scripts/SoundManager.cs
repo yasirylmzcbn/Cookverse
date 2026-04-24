@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Centralized sound manager for all game audio.
@@ -12,7 +13,8 @@ public class SoundManager : MonoBehaviour
 
     [Header("Player Sounds")]
     [Tooltip("Sound played when the player takes damage")]
-    [SerializeField] private AudioClip playerHitSound;
+    [FormerlySerializedAs("playerHitSound")]
+    [SerializeField] private AudioClip playerDamagedSound;
     [Tooltip("Sound played when the player walks")]
     [SerializeField] private AudioClip footstepSound;
     [Tooltip("Sound played when the player jumps")]
@@ -22,7 +24,8 @@ public class SoundManager : MonoBehaviour
     [Tooltip("Sound played when an enemy attacks")]
     [SerializeField] private AudioClip enemyAttackSound;
     [Tooltip("Sound played when an enemy takes damage")]
-    [SerializeField] private AudioClip enemyHitSound;
+    [FormerlySerializedAs("enemyHitSound")]
+    [SerializeField] private AudioClip enemyDamagedSound;
     [Tooltip("Sound played when an enemy is defeated")]
     [SerializeField] private AudioClip enemyDefeatedSound;
 
@@ -43,6 +46,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip uiSwitchSound;
 
     [Header("Wave Sounds")]
+    [Tooltip("Sound played when a new wave starts")]
+    [SerializeField] private AudioClip waveStartSound;
     [Tooltip("Sound played during wave countdown (ticking)")]
     [SerializeField] private AudioClip waveTickSound;
     [Tooltip("Sound played when a wave ends")]
@@ -53,8 +58,12 @@ public class SoundManager : MonoBehaviour
     [Header("Spell Sounds")]
     [Tooltip("Sound played when speed spell is cast")]
     [SerializeField] private AudioClip spellSpeedSound;
+    [Tooltip("Sound played when the speed spell boost ends")]
+    [SerializeField] private AudioClip spellSpeedEndSound;
 
     [Header("Cooking Sounds")]
+    [Tooltip("Sound played when an ingredient is placed into cookware")]
+    [SerializeField] private AudioClip kitchenPlaceSound;
     [Tooltip("Sound played when food is sizzling")]
     [SerializeField] private AudioClip cookingSizzleSound;
     [Tooltip("Sound played when food is ready")]
@@ -107,14 +116,14 @@ public class SoundManager : MonoBehaviour
     }
 
     #region Player Sounds
-    public void PlayPlayerHitSound() => PlayOneShot(playerHitSound);
+    public void PlayPlayerDamagedSound() => PlayOneShot(playerDamagedSound);
     public void PlayFootstepSound() => PlayOneShot(footstepSound);
     public void PlayJumpSound() => PlayOneShot(jumpSound);
     #endregion
 
     #region Enemy Sounds
     public void PlayEnemyAttackSound() => PlayOneShot(enemyAttackSound);
-    public void PlayEnemyHitSound() => PlayOneShot(enemyHitSound);
+    public void PlayEnemyDamagedSound() => PlayOneShot(enemyDamagedSound);
     public void PlayEnemyDefeatedSound() => PlayOneShot(enemyDefeatedSound);
     #endregion
 
@@ -129,6 +138,7 @@ public class SoundManager : MonoBehaviour
     #endregion
 
     #region Wave Sounds
+    public void PlayWaveStartSound() => PlayOneShot(waveStartSound);
     public void PlayWaveTickSound() => PlayOneShot(waveTickSound);
     public void PlayWaveEndSound() => PlayOneShot(waveEndSound);
     public void PlayWaveFinalSound() => PlayOneShot(waveFinalSound);
@@ -136,9 +146,11 @@ public class SoundManager : MonoBehaviour
 
     #region Spell Sounds
     public void PlaySpellSpeedSound() => PlayOneShot(spellSpeedSound);
+    public void PlaySpellSpeedEndSound() => PlayOneShot(spellSpeedEndSound);
     #endregion
 
     #region Cooking Sounds
+    public void PlayKitchenPlaceSound() => PlayOneShot(kitchenPlaceSound);
     public void PlayCookingSizzleSound() => PlayOneShot(cookingSizzleSound);
     public void PlayCookingReadySound() => PlayOneShot(cookingReadySound);
     public void PlayCookingBurntSound() => PlayOneShot(cookingBurntSound);

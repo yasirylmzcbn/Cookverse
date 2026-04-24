@@ -83,6 +83,11 @@ public class UISoundManager : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    private void Start()
+    {
+        InjectSoundsIntoAllButtons();
+    }
+
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -108,6 +113,12 @@ public class UISoundManager : MonoBehaviour
 
     public void PlayHoverSound()
     {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayUIHoverSound();
+            return;
+        }
+
         if (hoverSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(hoverSound);
