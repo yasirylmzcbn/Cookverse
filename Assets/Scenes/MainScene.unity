@@ -21558,7 +21558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b6e5e75f5fe5c640896b43081579655, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
-  playerHitSound: {fileID: 8300000, guid: 682473ddcc32f5b41a9bf113c455194b, type: 3}
+  playerHitSound: {fileID: 8300000, guid: 9cd4a5c71c9613c45be0aa7e54ffed9e, type: 3}
   footstepSound: {fileID: 8300000, guid: 63530760b6195b8409c860a9dcbe1967, type: 3}
   jumpSound: {fileID: 8300000, guid: 7f713d4f242d8ac4d925939b3387983f, type: 3}
   enemyAttackSound: {fileID: 8300000, guid: 117c2f2c806c62d4c92de76a03a4aa90, type: 3}

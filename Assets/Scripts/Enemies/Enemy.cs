@@ -19,6 +19,7 @@ public abstract class Enemy : MonoBehaviour
     private Renderer[] enemyRenderers;
     private Material[][] enemyMaterials;
     private Color[][] originalColors;
+    private Coroutine flashRoutineCoroutine;
 
     [System.Serializable]
     public class DropEntry
@@ -89,8 +90,10 @@ public abstract class Enemy : MonoBehaviour
 
     void FlashDamage()
     {
-        StopAllCoroutines();
-        StartCoroutine(FlashRoutine());
+        if (flashRoutineCoroutine != null)
+            StopCoroutine(flashRoutineCoroutine);
+
+        flashRoutineCoroutine = StartCoroutine(FlashRoutine());
     }
 
     IEnumerator FlashRoutine()
@@ -122,6 +125,8 @@ public abstract class Enemy : MonoBehaviour
                     mat.color = originalColors[i][m];
             }
         }
+
+        flashRoutineCoroutine = null;
     }
 
     public void Damage(int d)
