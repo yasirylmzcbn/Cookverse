@@ -23808,9 +23808,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PauseScript
   mainMenuSceneName: Main Menu
   tutorialSlides:
-  - {fileID: 2800000, guid: e3d69e16bab259047b9ef773bef45ae5, type: 3}
-  - {fileID: 2800000, guid: fca92da192ad70045a18b59be16e9f03, type: 3}
-  - {fileID: 2800000, guid: 400e964c25df7c446a3c669adeca7643, type: 3}
+  - {fileID: 2800000, guid: b6218178f89b861489cb61279eb45687, type: 3}
+  - {fileID: 2800000, guid: 31b9b36f1c4887243af32ee2090772b2, type: 3}
+  - {fileID: 2800000, guid: 0f28fddc242f23e41871ab8eec3202a8, type: 3}
+  - {fileID: 2800000, guid: 9157ae320d01d7344945a5ababcadfc6, type: 3}
+  - {fileID: 2800000, guid: 45deb027d5c18d04e9b8094a401b8b44, type: 3}
+  - {fileID: 2800000, guid: 5901dbedf2634ca4c96770107815ce8f, type: 3}
+  - {fileID: 2800000, guid: eaa73789cef5ae64b88e508dc7f7c761, type: 3}
+  - {fileID: 2800000, guid: 5d76d1e715f4a8143ad2f70b013e3a57, type: 3}
+  - {fileID: 2800000, guid: 5fafaad4dde342e4ea2f9fb2a6a8bcb3, type: 3}
+  - {fileID: 2800000, guid: 1537e5a1786f5fa4c8b6a00fe119e3bc, type: 3}
+  - {fileID: 2800000, guid: 1d74849d2da092c4c8746facbc516f17, type: 3}
+  - {fileID: 2800000, guid: 7a34b4fe51ceea24797b8637222d24fc, type: 3}
   tutorialButtonLabel: Tutorial
 --- !u!1001 &2006495666
 PrefabInstance:

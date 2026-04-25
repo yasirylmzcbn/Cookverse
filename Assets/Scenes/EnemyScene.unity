@@ -1113,6 +1113,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6dfe328605bef4ea3c6a8d24965f93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  preferredHudToggleKey: 9
+  fallbackHudToggleKey: 0
+  hudRoots:
+  - {fileID: 237174311}
   playerController: {fileID: 0}
   questManager: {fileID: 0}
   resolveRetryIntervalSeconds: 0.25
