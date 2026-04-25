@@ -1113,6 +1113,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6dfe328605bef4ea3c6a8d24965f93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  preferredHudToggleKey: 9
+  fallbackHudToggleKey: 0
+  hudRoots:
+  - {fileID: 237174311}
   playerController: {fileID: 0}
   questManager: {fileID: 0}
   resolveRetryIntervalSeconds: 0.25
@@ -2156,6 +2160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c45386c2b39fd44998b533491a6056c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  allItemsDatabase: []
 --- !u!136 &454283861
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9523,6 +9528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c45386c2b39fd44998b533491a6056c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  allItemsDatabase: []
 --- !u!1001 &2021097715
 PrefabInstance:
   m_ObjectHideFlags: 0

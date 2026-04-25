@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class EquippedDiamondUI : MonoBehaviour, IPointerClickHandler
+public class EquippedDiamondUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     , IDropHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Tooltip("0=Up, 1=Right, 2=Down, 3=Left")]
@@ -54,6 +54,14 @@ public class EquippedDiamondUI : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log($"Diamond slot {slotIndex} clicked");
         _menu.OnDiamondClicked(slotIndex);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayUIHoverSound();
+        else if (UISoundManager.Instance != null)
+            UISoundManager.Instance.PlayHoverSound();
     }
 
     public void OnDrop(PointerEventData eventData)

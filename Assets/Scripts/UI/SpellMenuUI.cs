@@ -86,6 +86,7 @@ public class SpellMenuUI : MonoBehaviour
     public void SetMenuVisible(bool visible)
     {
         RebindReferences();
+        bool wasOpen = menuOpen;
         menuOpen = visible;
         if (spellMenuRoot != null)
             spellMenuRoot.SetActive(visible);
@@ -103,6 +104,10 @@ public class SpellMenuUI : MonoBehaviour
             RefreshDiamonds();
             ClearDescription();
             inventoryPanel.GetComponent<InventoryUI>().RefreshUI();
+            
+            // Play open sound only on a real closed -> open transition.
+            if (!wasOpen && SoundManager.Instance != null)
+                SoundManager.Instance.PlayUIOpenSound();
         }
         else
         {
@@ -116,6 +121,10 @@ public class SpellMenuUI : MonoBehaviour
             Cursor.lockState = keepKitchenCursor ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = keepKitchenCursor;
             _selectedDiamondSlot = -1;
+            
+            // Play close sound only on a real open -> closed transition.
+            if (wasOpen && SoundManager.Instance != null)
+                SoundManager.Instance.PlayUICloseSound();
         }
     }
 
@@ -146,6 +155,9 @@ public class SpellMenuUI : MonoBehaviour
             ui.SetEquippedVisual(IsEquipped(entry.spell));
             _spellSlotUIs.Add(ui);
         }
+
+        if (UISoundManager.Instance != null)
+            UISoundManager.Instance.InjectSoundsIntoAllButtons();
     }
 
     // ── Diamond Slots ─────────────────────────────────────────

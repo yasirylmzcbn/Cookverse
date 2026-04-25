@@ -188,8 +188,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             _unlockedFired = true;
             Debug.Log("Recipe complete: " + recipe);
 
+            bool unlockedNow = false;
+
             if (playerRecipeUnlocks != null)
-                playerRecipeUnlocks.Unlock(recipe);
+                unlockedNow = playerRecipeUnlocks.Unlock(recipe);
             else
                 Debug.LogWarning($"No PlayerRecipeUnlocks found. Recipe '{recipe}' won't be saved as unlocked.");
 
@@ -198,11 +200,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
                 var spell = recipeSpellDatabase.GetSpellOrNull(recipe);
             }
 
-            if (completionText != null)
+            if (completionText != null && unlockedNow)
             {
                 completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
                 StartCoroutine(HideTextCoroutine(5f));
-
             }
         }
         return complete;

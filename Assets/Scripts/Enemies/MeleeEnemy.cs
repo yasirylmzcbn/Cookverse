@@ -20,6 +20,8 @@ public class MeleeEnemy : Enemy
     protected override void CheckAttack()
     {
         if (!canAttack) return;
+        if (player == null || playerTransform == null) return;
+        if (player.IsDeadOrDown) return;
 
         float sqrDistance = (playerTransform.position - transform.position).sqrMagnitude;
 
@@ -33,9 +35,12 @@ public class MeleeEnemy : Enemy
     {
         canAttack = false;
 
-        Attack();
-        PlayAttackSound();
-        GetComponent<EnemyMovementAI>().AttackAnimation();
+        if (player != null && !player.IsDeadOrDown)
+        {
+            Attack();
+            PlayAttackSound();
+            GetComponent<EnemyMovementAI>().AttackAnimation();
+        }
 
         yield return new WaitForSeconds(attackCooldown);
 
@@ -45,6 +50,10 @@ public class MeleeEnemy : Enemy
     void Attack() {
         if (player == null)
             return;
+
+        if (player.IsDeadOrDown)
+            return;
+
         player.TakeDamage(damage);
 
     }

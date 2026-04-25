@@ -32,6 +32,13 @@ public class GameManager : MonoBehaviour
         return lastCompletedDifficulty;
     }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    public void UnlockAllDifficultiesForTesting()
+    {
+        lastCompletedDifficulty = Difficulty.Boss;
+    }
+#endif
+
     public void SaveGame(int slot)
     {
         PlayerPrefs.SetInt($"Cookverse_Difficulty_{slot}", (int)lastCompletedDifficulty);
