@@ -208,28 +208,7 @@ public class PauseScript : MonoBehaviour
         GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
 
-        float slideWidth = currentSlide.width;
-        float slideHeight = currentSlide.height;
-        float maxWidth = Screen.width - 120f;
-        float maxHeight = Screen.height - 180f;
-        float scale = Mathf.Min(maxWidth / slideWidth, maxHeight / slideHeight);
-        scale = Mathf.Max(0.01f, scale);
-
-        float drawWidth = slideWidth * scale;
-        float drawHeight = slideHeight * scale;
-        Rect drawRect = new Rect((Screen.width - drawWidth) * 0.5f, (Screen.height - drawHeight) * 0.5f - 20f, drawWidth, drawHeight);
-
-        GUI.DrawTexture(drawRect, currentSlide, ScaleMode.ScaleToFit, true);
-
-        GUIStyle captionStyle = new GUIStyle(GUI.skin.label)
-        {
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 20,
-            normal = { textColor = Color.white }
-        };
-
-        string caption = $"Slide {tutorialSlideIndex + 1} / {tutorialSlides.Count} - Click, Space, or Enter to continue (Esc to close)";
-        GUI.Label(new Rect(0f, Screen.height - 70f, Screen.width, 40f), caption, captionStyle);
+        GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), currentSlide, ScaleMode.ScaleAndCrop, true);
     }
 
     private void OnGUI()
@@ -272,6 +251,9 @@ public class PauseScript : MonoBehaviour
             fontSize = 24,
             normal = { textColor = Color.white }
         };
+        labelStyle.hover.textColor = labelStyle.normal.textColor;
+        labelStyle.active.textColor = labelStyle.normal.textColor;
+        labelStyle.focused.textColor = labelStyle.normal.textColor;
 
         GUI.Label(new Rect(centerX, sliderBlockY - 40f, sliderWidth, 30f), "Music Volume", labelStyle);
 
