@@ -17,23 +17,65 @@ public class DifficultyUI : MonoBehaviour
     [SerializeField] private Button bossButton;
 
     private bool storedVisible;
+    private bool isPausedByGame;
+    private CanvasGroup difficultyCanvasGroup;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         easyButton.onClick.AddListener(OnEasyButtonClicked);
+        mediumButton.onClick.AddListener(OnMediumButtonClicked);
+        hardButton.onClick.AddListener(OnHardButtonClicked);
+        bossButton.onClick.AddListener(OnBossButtonClicked);
+
         SetMenuVisible(false);
         mediumButton.interactable = false;
         hardButton.interactable = false;
         bossButton.interactable = false;
     }
 
+    private void Update()
+    {
+        if (Time.timeScale == 0f)
+            return;
+
+        if (storedVisible && Input.GetKeyDown(KeyCode.E))
+        {
+            SetMenuVisible(false);
+            if (playerController != null)
+                playerController.EndInteraction();
+        }
+    }
+
     public void SetMenuVisible(bool visible)
     {
+        bool wasVisible = storedVisible;
+
+        // Try to automatically find references if they are missing
+        if (playerController == null)
+            playerController = PlayerController.Instance != null ? PlayerController.Instance : FindFirstObjectByType<PlayerController>();
+
+        if (firstPersonCameraController == null)
+        {
+            if (playerController != null)
+                firstPersonCameraController = playerController.GetComponentInChildren<CameraController>(true);
+            
+            if (firstPersonCameraController == null)
+                firstPersonCameraController = FindFirstObjectByType<CameraController>(FindObjectsInactive.Include);
+        }
+
         if (difficultyPanel != null)
             difficultyPanel.SetActive(visible);
 
+        RefreshCanvasGroup();
+
         if (visible)
         {
+            // Sync unlocks from GameManager
+            if (GameManager.Instance != null)
+            {
+                UnlockDifficulty(GameManager.Instance.GetLastCompletedDifficulty());
+            }
+
             // Disable player movement
             if (playerController != null)
                 playerController.enabled = false;
@@ -59,8 +101,13 @@ public class DifficultyUI : MonoBehaviour
             // Lock cursor back
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            
+            // Play close sound only on a real open -> closed transition.
+            if (wasVisible && SoundManager.Instance != null)
+                SoundManager.Instance.PlayUICloseSound();
         }
         storedVisible = visible;
+        ApplyPauseState();
     }
 
     void OnEasyButtonClicked()
@@ -68,28 +115,32 @@ public class DifficultyUI : MonoBehaviour
         Debug.Log("Easy Clicked");
 
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetEasyDifficulty();
     }
 
     void OnMediumButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetMediumDifficulty();
     }
 
     void OnHardButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetHardDifficulty();
     }
 
     void OnBossButtonClicked()
     {
         SetMenuVisible(false);
-        playerController.EndInteraction();
+        if (playerController != null)
+            playerController.EndInteraction();
         GameManager.Instance.SetBossDifficulty();
     }
 
@@ -98,18 +149,59 @@ public class DifficultyUI : MonoBehaviour
         return storedVisible;
     }
 
+    public void SetPausedState(bool paused)
+    {
+        isPausedByGame = paused;
+        ApplyPauseState();
+    }
+
+    public void ForceCloseForPause()
+    {
+        if (!storedVisible)
+            return;
+
+        storedVisible = false;
+
+        if (difficultyPanel != null)
+            difficultyPanel.SetActive(false);
+    }
+
+    private void RefreshCanvasGroup()
+    {
+        if (difficultyPanel == null)
+            return;
+
+        if (difficultyCanvasGroup == null)
+            difficultyCanvasGroup = difficultyPanel.GetComponent<CanvasGroup>();
+
+        if (difficultyCanvasGroup == null)
+            difficultyCanvasGroup = difficultyPanel.AddComponent<CanvasGroup>();
+    }
+
+    private void ApplyPauseState()
+    {
+        RefreshCanvasGroup();
+
+        if (difficultyCanvasGroup == null)
+            return;
+
+        bool allowInteraction = storedVisible && !isPausedByGame;
+        difficultyCanvasGroup.interactable = allowInteraction;
+        difficultyCanvasGroup.blocksRaycasts = allowInteraction;
+    }
+
     public void UnlockDifficulty(GameManager.Difficulty difficulty)
     {
         //Easy is unlocked on start
-        if (difficulty >= GameManager.Difficulty.Medium)
+        if (difficulty >= GameManager.Difficulty.Easy)
         {
             mediumButton.interactable = true;
         }
-        if (difficulty >= GameManager.Difficulty.Hard)
+        if (difficulty >= GameManager.Difficulty.Medium)
         {
             hardButton.interactable = true;
         }
-        if (difficulty >= GameManager.Difficulty.Boss)
+        if (difficulty >= GameManager.Difficulty.Hard)
         {
             bossButton.interactable = true;
         }

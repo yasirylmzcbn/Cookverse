@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
+    [Header("Audio")]
+    private float _footstepTimer = 0f;
+
     [Header("Inventory")]
     [SerializeField] private int inventoryCapacity = 12;
     public int InventoryCapacity => inventoryCapacity;
@@ -74,6 +77,7 @@ public class PlayerController : MonoBehaviour
     public float respawnDelay = 5f;
     private bool _isDead = false;
     private Coroutine _respawnCoroutine;
+    public bool IsDeadOrDown => _isDead || currentHealth <= 0;
 
     private readonly float[] _nextSpellTimes = new float[4];
 
@@ -99,6 +103,7 @@ public class PlayerController : MonoBehaviour
     private float _baseShootCooldownDuration;
     private bool _cachedShooterBase;
     private bool _combatEnabled;
+    public bool IsCombatEnabled => _combatEnabled;
 
     private static readonly Dictionary<string, Vector3> _sceneReturnPositions = new Dictionary<string, Vector3>();
     private static readonly Dictionary<string, Quaternion> _sceneReturnRotations = new Dictionary<string, Quaternion>();
@@ -206,14 +211,29 @@ public class PlayerController : MonoBehaviour
         DisableCombat();
 
         ResolveRecipeUnlocksIfNeeded();
+
     }
 
     public void TakeDamage(int amount)
     {
+        if (amount <= 0)
+            return;
+
+        if (IsDeadOrDown)
+            return;
+
+        int previousHealth = currentHealth;
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
 
-        if (currentHealth <= 0 && !_isDead)
+        // Play damaged sound via SoundManager
+        if (SoundManager.Instance != null && currentHealth < previousHealth)
+            SoundManager.Instance.PlayPlayerDamagedSound();
+
+        if (previousHealth > 0 && currentHealth <= 0 && !_isDead)
         {
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayPlayerDefeatedSound();
+
             _isDead = true;
             _respawnCoroutine = StartCoroutine(RespawnRoutine());
         }
@@ -362,6 +382,12 @@ public class PlayerController : MonoBehaviour
         _sceneReturnRotations[sceneName] = rotation;
     }
 
+    public static void ClearRememberedScenePositions()
+    {
+        _sceneReturnPositions.Clear();
+        _sceneReturnRotations.Clear();
+    }
+
     private void RestorePositionForScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -492,7 +518,7 @@ public class PlayerController : MonoBehaviour
         }
         if (reloadAction == null || reloadAction.bindings.Count == 0)
         {
-            reloadAction = new InputAction("Shoot", InputActionType.Button);
+            reloadAction = new InputAction("Reload", InputActionType.Button);
             reloadAction.AddBinding("<Keyboard>/r");
             reloadAction.AddBinding("<Gamepad>/buttonWest");
         }
@@ -559,7 +585,7 @@ public class PlayerController : MonoBehaviour
         }
         if (currentlyInteracting)
         {
-            if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {
                 currentlyInteracting = false;
                 Debug.Log("Stopped interacting via input.");
@@ -596,10 +622,34 @@ public class PlayerController : MonoBehaviour
         if (jumpAction != null && jumpAction.WasPressedThisFrame() && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * 2f * -gravity);
+            
+            // Play jump sound via SoundManager
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayJumpSound();
         }
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        // Play footstep sounds while walking (every 0.4 seconds)
+        if (isGrounded)
+        {
+            Vector2 inputMag = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+            if (inputMag.magnitude > 0.1f)
+            {
+                _footstepTimer += Time.deltaTime;
+                if (_footstepTimer >= 0.4f)
+                {
+                    _footstepTimer = 0f;
+                    if (SoundManager.Instance != null)
+                        SoundManager.Instance.PlayFootstepSound();
+                }
+            }
+            else
+            {
+                _footstepTimer = 0f;
+            }
+        }
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -644,7 +694,7 @@ public class PlayerController : MonoBehaviour
             if (potatoShooter != null) potatoShooter.Shoot();
         }
 
-        if (reloadAction != null && reloadAction.IsPressed())
+        if (reloadAction != null && reloadAction.WasPressedThisFrame())
         {
             Debug.Log("reload pressed");
             var potatoShooter = GetPotatoShooter();
@@ -742,10 +792,10 @@ public class PlayerController : MonoBehaviour
 
         yield return new WaitForSeconds(durationSeconds);
 
-        ClearActiveBuff(stopCoroutine: false);
+        ClearActiveBuff(stopCoroutine: false, playEndSound: true);
     }
 
-    private void ClearActiveBuff(bool stopCoroutine)
+    private void ClearActiveBuff(bool stopCoroutine, bool playEndSound = false)
     {
         if (stopCoroutine && _buffCoroutine != null)
         {
@@ -763,6 +813,9 @@ public class PlayerController : MonoBehaviour
             if (shooter != null)
                 shooter.shootCooldownDuration = _buffPrevShootCooldownDuration;
         }
+
+        if (playEndSound && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellSpeedEndSound();
 
         _buffActive = false;
         _buffHadShooter = false;

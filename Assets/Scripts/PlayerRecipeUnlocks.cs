@@ -19,6 +19,10 @@ public class PlayerRecipeUnlocks : MonoBehaviour
     [SerializeField] private bool persistToPlayerPrefs = true;
     [SerializeField] private string playerPrefsKey = "cookverse.unlockedRecipes";
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip recipeUnlockedSfx;
+    [SerializeField, Range(0f, 1f)] private float recipeUnlockedSfxVolume = 1f;
+
     [Header("Player Attachment")]
     [Tooltip("If enabled and this component is attached to the Player, it will move unlock state to a dedicated persistent object and remove itself from the Player.\n\nDisable this if you want the entire Player to persist between scenes.")]
     [SerializeField] private bool detachFromPlayerOnAwake = false;
@@ -27,6 +31,7 @@ public class PlayerRecipeUnlocks : MonoBehaviour
     [SerializeField] private bool resetUnlocksOnSessionStart = false;
 
     private readonly HashSet<Recipe> _unlocked = new HashSet<Recipe>();
+    private AudioSource _audioSource;
 
     public event Action<Recipe> RecipeUnlocked;
 
@@ -75,6 +80,7 @@ public class PlayerRecipeUnlocks : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        EnsureAudioSource();
 
         _unlocked.Clear();
 
@@ -96,6 +102,11 @@ public class PlayerRecipeUnlocks : MonoBehaviour
 
     public bool IsUnlocked(Recipe recipe) => _unlocked.Contains(recipe);
 
+    public List<Recipe> GetUnlockedRecipes()
+    {
+        return new List<Recipe>(_unlocked);
+    }
+
     public bool Unlock(Recipe recipe)
     {
         Debug.Log("unlocked recipes before unlock: " + string.Join(", ", _unlocked));
@@ -104,6 +115,8 @@ public class PlayerRecipeUnlocks : MonoBehaviour
         Debug.Log("unlocked recipes after unlock: " + string.Join(", ", _unlocked));
         if (persistToPlayerPrefs)
             SaveToPrefs();
+
+        PlayRecipeUnlockedSfx();
 
         RecipeUnlocked?.Invoke(recipe);
         return true;
@@ -115,6 +128,31 @@ public class PlayerRecipeUnlocks : MonoBehaviour
         if (persistToPlayerPrefs)
             PlayerPrefs.DeleteKey(playerPrefsKey);
     }
+
+    public void SetUnlockedRecipes(IEnumerable<Recipe> recipes, bool saveToPrefs = true)
+    {
+        _unlocked.Clear();
+        if (recipes != null)
+        {
+            foreach (Recipe recipe in recipes)
+                _unlocked.Add(recipe);
+        }
+
+        if (persistToPlayerPrefs && saveToPrefs)
+            SaveToPrefs();
+    }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    public void UnlockAllRecipesForTesting(bool saveToPrefs = true)
+    {
+        List<Recipe> allRecipes = new List<Recipe>();
+
+        foreach (Recipe recipe in Recipes.RecipeIngredients.Keys)
+            allRecipes.Add(recipe);
+
+        SetUnlockedRecipes(allRecipes, saveToPrefs);
+    }
+#endif
 
     private void SaveToPrefs()
     {
@@ -148,5 +186,26 @@ public class PlayerRecipeUnlocks : MonoBehaviour
 
             _unlocked.Add((Recipe)value);
         }
+    }
+
+    private void EnsureAudioSource()
+    {
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+            _audioSource = gameObject.AddComponent<AudioSource>();
+
+        _audioSource.playOnAwake = false;
+        _audioSource.spatialBlend = 0f;
+    }
+
+    private void PlayRecipeUnlockedSfx()
+    {
+        if (recipeUnlockedSfx == null)
+            return;
+
+        if (_audioSource == null)
+            EnsureAudioSource();
+
+        _audioSource.PlayOneShot(recipeUnlockedSfx, recipeUnlockedSfxVolume);
     }
 }

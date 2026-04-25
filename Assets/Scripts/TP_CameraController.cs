@@ -53,7 +53,8 @@ public class CameraMove : MonoBehaviour
 
     private void OnDisable()
     {
-        lookAction?.Disable();
+        // DO NOT disable lookAction here - Unity Input System bug with Mouse Delta freezing permanently
+        // lookAction?.Disable();
     }
 
     private void EnsureActionsConfigured()

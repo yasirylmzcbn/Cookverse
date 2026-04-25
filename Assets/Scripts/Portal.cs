@@ -23,6 +23,20 @@ public class Portal : MonoBehaviour
     [Tooltip("Which direction to offset relative to this portal's forward vector.")]
     [SerializeField] private ReturnOffsetDirection returnOffsetDirection = ReturnOffsetDirection.Forward;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip enterPortalSfx;
+    [SerializeField, Range(0f, 1f)] private float enterPortalSfxVolume = 1f;
+
+    private void Start()
+    {
+        // If the portal has a looping ambient audio source attached to it, make sure it is global (2D) as requested.
+        AudioSource ambientSource = GetComponent<AudioSource>();
+        if (ambientSource != null)
+        {
+            ambientSource.spatialBlend = 0f; // 0 is fully 2D (Global)
+        }
+    }
+
     private Vector3 GetSafeReturnOffset()
     {
         Vector3 direction = returnOffsetDirection == ReturnOffsetDirection.Forward ? transform.forward : -transform.forward;
@@ -39,6 +53,7 @@ public class Portal : MonoBehaviour
         //Debug.Log("Portal triggered by: " + other.name);
         if (other.CompareTag("Player"))
         {
+            PlayPortalEnterSfxGlobal();
             Transform playerTransform = null;
 
             // Collider may be on a child of the player, so resolve from parent.
@@ -48,7 +63,9 @@ public class Portal : MonoBehaviour
                 if (sceneToLoad == cookingSceneName)
                     playerController.DisableCombat();
                 else if (sceneToLoad == combatSceneName)
+                {
                     playerController.EnableCombat();
+                }
 
                 playerController.ResetCombatState();
             }
@@ -88,7 +105,31 @@ public class Portal : MonoBehaviour
                 else if (!string.IsNullOrEmpty(sceneToLoad) && sceneToLoad == combatSceneName)
                     shooter.gameObject.SetActive(true);
             }
+
             SceneManager.LoadScene(sceneToLoad);
         }
+    }
+
+    private void PlayPortalEnterSfxGlobal()
+    {
+        if (enterPortalSfx == null)
+            return;
+
+        GameObject audioGo = new GameObject("PortalEnterSfx");
+        DontDestroyOnLoad(audioGo);
+
+        AudioSource audioSource = audioGo.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f; // Global 2D pan
+        audioSource.ignoreListenerVolume = true; // Ignore global volume muffling during transitions
+        audioSource.clip = enterPortalSfx;
+
+        float sfxVolume = SoundManager.Instance != null
+            ? SoundManager.Instance.SfxVolume
+            : PlayerPrefs.GetFloat(SoundManager.SFX_VOLUME_PREF_KEY, 1f);
+        audioSource.volume = enterPortalSfxVolume * Mathf.Clamp01(sfxVolume);
+        audioSource.Play();
+
+        Destroy(audioGo, enterPortalSfx.length + 0.1f);
     }
 }

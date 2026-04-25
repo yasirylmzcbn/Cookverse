@@ -95,6 +95,9 @@ public class SpellProjectile : MonoBehaviour
         if (_exploded) return;
         _exploded = true;
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellProjectileImpactSound();
+
         int count = Physics.OverlapSphereNonAlloc(position, areaRadius, _overlapBuffer, ~0, explosionQueryTriggers);
 
         // Prevent damaging the same enemy multiple times due to multiple colliders.

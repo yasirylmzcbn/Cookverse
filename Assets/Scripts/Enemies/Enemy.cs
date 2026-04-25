@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -19,6 +18,7 @@ public abstract class Enemy : MonoBehaviour
     private Renderer[] enemyRenderers;
     private Material[][] enemyMaterials;
     private Color[][] originalColors;
+    private Coroutine flashRoutineCoroutine;
 
     [System.Serializable]
     public class DropEntry
@@ -30,10 +30,6 @@ public abstract class Enemy : MonoBehaviour
     [Tooltip("This drop list is weight-based.")]
     [SerializeField] private List<DropEntry> dropList;
     
-    [Header("Audio")]
-    [SerializeField] protected AudioClip attackSound;
-    protected AudioSource audioSource;
-
     private void Awake()
     {
         enemyRenderers = GetComponentsInChildren<Renderer>(true);
@@ -55,22 +51,12 @@ public abstract class Enemy : MonoBehaviour
                     originalColors[i][m] = mat.color;
             }
         }
-            
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
-        audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1f; // 3D sound
     }
 
     protected void PlayAttackSound()
     {
-        if (attackSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(attackSound);
-        }
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayEnemyAttackSound();
     }
 
     private void Update()
@@ -83,8 +69,10 @@ public abstract class Enemy : MonoBehaviour
 
     void FlashDamage()
     {
-        StopAllCoroutines();
-        StartCoroutine(FlashRoutine());
+        if (flashRoutineCoroutine != null)
+            StopCoroutine(flashRoutineCoroutine);
+
+        flashRoutineCoroutine = StartCoroutine(FlashRoutine());
     }
 
     IEnumerator FlashRoutine()
@@ -116,11 +104,18 @@ public abstract class Enemy : MonoBehaviour
                     mat.color = originalColors[i][m];
             }
         }
+
+        flashRoutineCoroutine = null;
     }
 
     public void Damage(int d)
     {
         health -= d;
+        
+        // Play damaged sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayEnemyDamagedSound();
+        
         if (health <= 0)
         {
             Die();
@@ -144,6 +139,11 @@ public abstract class Enemy : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        
+        // Play enemy defeated sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayEnemyDefeatedSound();
+        
         if (QuestManager.Instance != null)
             QuestManager.Instance.RegisterEnemyKilled();
 

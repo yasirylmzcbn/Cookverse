@@ -37,11 +37,16 @@ public class CameraController : MonoBehaviour
     {
         lookAction?.Enable();
         escapeAction?.Enable();
+
+        // Reset smoothing states to prevent NaN delta corruption on re-enable
+        smoothedInput = Vector2.zero;
+        inputVelocity = Vector2.zero;
     }
 
     private void OnDisable()
     {
-        lookAction?.Disable();
+        // DO NOT disable lookAction here - Unity Input System bug with Mouse Delta freezing permanently
+        // lookAction?.Disable();
         escapeAction?.Disable();
     }
 
@@ -78,12 +83,6 @@ public class CameraController : MonoBehaviour
         if (playerBody == null) return;
 
         bool menuOpen = spellMenu != null && spellMenu.menuOpen;
-
-        if (menuOpen && escapeAction != null && escapeAction.WasPressedThisFrame())
-        {
-            spellMenu.SetMenuVisible(false);
-            return;
-        }
 
         if (menuOpen) return;
 

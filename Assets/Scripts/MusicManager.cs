@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,23 +6,32 @@ public class MusicManager : MonoBehaviour
 {
     public static MusicManager Instance;
 
-    [Serializable]
-    private struct SceneTrack
-    {
-        public string sceneName;
-        public AudioClip clip;
-    }
-
     [Header("References")]
     [SerializeField] private AudioSource musicSource;
     [Range(0f, 1f)]
     [SerializeField] private float musicVolume = 1f;
 
-    [Header("Scene Music")]
-    [SerializeField] private List<SceneTrack> sceneTracks = new List<SceneTrack>();
+    public float MusicVolume
+    {
+        get => musicVolume;
+        set
+        {
+            musicVolume = Mathf.Clamp01(value);
+            if (musicSource != null)
+                musicSource.volume = musicVolume;
+        }
+    }
 
-    private readonly Dictionary<string, AudioClip> trackByScene = new Dictionary<string, AudioClip>();
-    private string currentSceneName = string.Empty;
+    [Header("Scene Settings")]
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
+
+    [Header("Tracks")]
+    [SerializeField] private AudioClip mainMenuMusic;
+    [SerializeField] private AudioClip kitchenMusic;
+    [SerializeField] private AudioClip combatEasyMusic;
+    [SerializeField] private AudioClip combatMediumMusic;
+    [SerializeField] private AudioClip combatHardMusic;
+    [SerializeField] private AudioClip combatBossMusic;
 
     private void Awake()
     {
@@ -46,9 +54,9 @@ public class MusicManager : MonoBehaviour
             return;
         }
 
+        musicSource.ignoreListenerVolume = true;
         musicSource.loop = true;
         musicSource.volume = musicVolume;
-        RebuildTrackLookup();
     }
 
     private void OnEnable()
@@ -63,7 +71,13 @@ public class MusicManager : MonoBehaviour
 
     private void Start()
     {
-        PlayForScene(SceneManager.GetActiveScene().name);
+        ApplyTargetTrack();
+    }
+
+    private void Update()
+    {
+        // Combat mode and difficulty can change without scene transitions.
+        ApplyTargetTrack();
     }
 
     private void OnValidate()
@@ -74,48 +88,76 @@ public class MusicManager : MonoBehaviour
         if (!Application.isPlaying)
             return;
 
-        RebuildTrackLookup();
+        ApplyTargetTrack();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        PlayForScene(scene.name);
+        ApplyTargetTrack(forceRestart: true);
     }
 
-    private void RebuildTrackLookup()
+    private void ApplyTargetTrack(bool forceRestart = false)
     {
-        trackByScene.Clear();
-
-        for (int i = 0; i < sceneTracks.Count; i++)
-        {
-            SceneTrack track = sceneTracks[i];
-
-            if (string.IsNullOrWhiteSpace(track.sceneName) || track.clip == null)
-                continue;
-
-            trackByScene[track.sceneName] = track.clip;
-        }
-    }
-
-    private void PlayForScene(string sceneName)
-    {
-        if (string.Equals(currentSceneName, sceneName, StringComparison.Ordinal))
+        if (musicSource == null)
             return;
 
-        if (!trackByScene.TryGetValue(sceneName, out AudioClip clip) || clip == null)
+        AudioClip targetClip = ResolveTargetTrack();
+        if (targetClip == null)
         {
-            currentSceneName = sceneName;
+            if (musicSource.isPlaying)
+                musicSource.Stop();
+            musicSource.clip = null;
             return;
         }
 
-        if (musicSource.clip == clip && musicSource.isPlaying)
-        {
-            currentSceneName = sceneName;
+        if (!forceRestart && musicSource.clip == targetClip && musicSource.isPlaying)
             return;
-        }
 
-        musicSource.clip = clip;
+        if (musicSource.isPlaying)
+            musicSource.Stop();
+
+        musicSource.clip = targetClip;
         musicSource.Play();
-        currentSceneName = sceneName;
+    }
+
+    private AudioClip ResolveTargetTrack()
+    {
+        string activeSceneName = SceneManager.GetActiveScene().name;
+        if (string.Equals(activeSceneName, mainMenuSceneName, StringComparison.OrdinalIgnoreCase))
+            return mainMenuMusic;
+
+        bool isCombatEnabled = PlayerController.Instance != null && PlayerController.Instance.IsCombatEnabled;
+        if (!isCombatEnabled)
+            return kitchenMusic;
+
+        switch (ResolveCombatDifficulty())
+        {
+            case GameManager.Difficulty.Medium:
+                return combatMediumMusic;
+            case GameManager.Difficulty.Hard:
+                return combatHardMusic;
+            case GameManager.Difficulty.Boss:
+                return combatBossMusic;
+            case GameManager.Difficulty.None:
+            case GameManager.Difficulty.Easy:
+            default:
+                return combatEasyMusic;
+        }
+    }
+
+    private GameManager.Difficulty ResolveCombatDifficulty()
+    {
+        if (GameManager.Instance == null)
+            return GameManager.Difficulty.Easy;
+
+        int wave = GameManager.Instance.CurrentWave();
+        if (wave >= 30)
+            return GameManager.Difficulty.Boss;
+        if (wave >= 20)
+            return GameManager.Difficulty.Hard;
+        if (wave >= 10)
+            return GameManager.Difficulty.Medium;
+
+        return GameManager.Difficulty.Easy;
     }
 }

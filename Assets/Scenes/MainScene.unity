@@ -6968,11 +6968,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
   musicSource: {fileID: 159306353}
   musicVolume: 0.2
-  sceneTracks:
-  - sceneName: EnemyScene
-    clip: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
-  - sceneName: 
-    clip: {fileID: 0}
+  mainMenuSceneName: MainMenu
+  mainMenuMusic: {fileID: 0}
+  kitchenMusic: {fileID: 8300000, guid: 2628a006e27ad5d4db94e9578b405d22, type: 3}
+  combatEasyMusic: {fileID: 8300000, guid: a32c7492a73146c45b89e918ad214b50, type: 3}
+  combatMediumMusic: {fileID: 8300000, guid: a32c7492a73146c45b89e918ad214b50, type: 3}
+  combatHardMusic: {fileID: 8300000, guid: de6e520d7fdc44c4a8128df09204560f, type: 3}
+  combatBossMusic: {fileID: 8300000, guid: 19462cdbc8144994db5fe9ce54e11019, type: 3}
 --- !u!4 &535633528
 Transform:
   m_ObjectHideFlags: 0
@@ -14415,6 +14417,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
+  turnOnSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  turnOffSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  knobSfxVolume: 1
 --- !u!1001 &1139304948
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19274,6 +19279,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
+  turnOnSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  turnOffSfx: {fileID: 8300000, guid: 8bfa1df7f021f1a4a870c552a57a1a65, type: 3}
+  knobSfxVolume: 1
 --- !u!136 &1619708037
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -20262,6 +20270,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad62fb184027043b096ed3c68c0711a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlateController
+  placeOnPlateSfx: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
+  placeOnPlateSfxVolume: 1
   recipe: 0
   proteinAnchor: {fileID: 768850188}
   vegetableAnchor: {fileID: 83002422}
@@ -20384,6 +20394,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 0
+  turnOnSfx: {fileID: 0}
+  turnOffSfx: {fileID: 0}
+  knobSfxVolume: 1
 --- !u!1001 &1708951541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21387,6 +21400,180 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3469878753922927357, guid: 8241ffa2db322f148a140189e8ca4afd, type: 3}
   m_PrefabInstance: {fileID: 161837694}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1785286492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1785286493}
+  - component: {fileID: 1785286495}
+  - component: {fileID: 1785286496}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1785286493
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1785286492}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -16.543995, y: 11.21, z: -12.540002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1785286495
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1785286492}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1785286496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1785286492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b6e5e75f5fe5c640896b43081579655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
+  playerDamagedSound: {fileID: 8300000, guid: 9cd4a5c71c9613c45be0aa7e54ffed9e, type: 3}
+  playerDefeatedSound: {fileID: 8300000, guid: f85984ec5b9e5084da8bfe1e390c4bee, type: 3}
+  footstepSound: {fileID: 8300000, guid: 63530760b6195b8409c860a9dcbe1967, type: 3}
+  jumpSound: {fileID: 8300000, guid: c1804bc6d7bdd95479f20f42a9778f4f, type: 3}
+  enemyAttackSound: {fileID: 8300000, guid: 117c2f2c806c62d4c92de76a03a4aa90, type: 3}
+  enemyDamagedSound: {fileID: 8300000, guid: e8366197da6c6184eb072b9ed018f0a8, type: 3}
+  enemyDefeatedSound: {fileID: 8300000, guid: 46b9da2c99e0c5a48a85a6e6a8f6b39d, type: 3}
+  uiHoverSound: {fileID: 8300000, guid: 242c71e425f5a644e97e346caf1a8b28, type: 3}
+  uiClickSound: {fileID: 8300000, guid: 7855e39015a9237469ebe1a80281f45a, type: 3}
+  uiOpenSound: {fileID: 8300000, guid: d5e3c54ed83c3e44fb5646f9ad680094, type: 3}
+  uiCloseSound: {fileID: 8300000, guid: f3752851eef07e743a2778f040d158f1, type: 3}
+  uiDragStartSound: {fileID: 8300000, guid: f09bc1088ef633a44b0ba30be1fc8dd4, type: 3}
+  uiDropSound: {fileID: 8300000, guid: 46b9da2c99e0c5a48a85a6e6a8f6b39d, type: 3}
+  uiSwitchSound: {fileID: 8300000, guid: d5e3c54ed83c3e44fb5646f9ad680094, type: 3}
+  waveStartSound: {fileID: 8300000, guid: 0736aae902be21e4099363348f55b2e0, type: 3}
+  waveTickSound: {fileID: 8300000, guid: f3752851eef07e743a2778f040d158f1, type: 3}
+  waveEndSound: {fileID: 8300000, guid: 4a66f5ea5a0748545be4e7af30b1a5a1, type: 3}
+  waveFinalSound: {fileID: 8300000, guid: 360379bcc52d0544687a7a7588befce0, type: 3}
+  spellSpeedSound: {fileID: 8300000, guid: 3d7e0eec9d1c58649a58441378afdbc6, type: 3}
+  spellSpeedEndSound: {fileID: 8300000, guid: 6ceb8aea856906e4eadb1c0cda76a4f8, type: 3}
+  spellHealSound: {fileID: 8300000, guid: 348ef75489ac2a84cb195d7f87e7bbb4, type: 3}
+  spellProjectileSound: {fileID: 8300000, guid: 65a28ef022a08154785ed12880ec7c8a, type: 3}
+  spellProjectileImpactSound: {fileID: 8300000, guid: 5e42afc6fae79594784e54ea5fadc83a, type: 3}
+  kitchenPlaceSound: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
+  cookingSizzleSound: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
+  cookingReadySound: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
+  cookingBurntSound: {fileID: 8300000, guid: 6ceb8aea856906e4eadb1c0cda76a4f8, type: 3}
+  portalEnterSound: {fileID: 8300000, guid: 2afe13dbf5c32ed40a7a3f196c19c40d, type: 3}
+  pickupSound: {fileID: 8300000, guid: 86b2295f9548a2b4b9b73fef31bb3ec2, type: 3}
+  reloadSound: {fileID: 8300000, guid: 4c40f8b17f3c1cd4f846c8cf0dcf0b10, type: 3}
+  shootSound: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
+  sfxVolume: 1
 --- !u!1 &1785517865
 GameObject:
   m_ObjectHideFlags: 0
@@ -23415,6 +23602,8 @@ MonoBehaviour:
   unlockedOnStart: 
   persistToPlayerPrefs: 1
   playerPrefsKey: cookverse.unlockedRecipes
+  recipeUnlockedSfx: {fileID: 8300000, guid: 9078ecaea556a794f8ce2428130a56bc, type: 3}
+  recipeUnlockedSfxVolume: 1
   detachFromPlayerOnAwake: 0
   resetUnlocksOnSessionStart: 1
 --- !u!136 &2005958088
@@ -23459,6 +23648,7 @@ MonoBehaviour:
   jumpHeight: 3
   maxHealth: 100
   currentHealth: 0
+  inventoryCapacity: 12
   inventoryCapacity: 12
   movementReference: {fileID: 0}
   groundCheck: {fileID: 937150395}
@@ -23617,6 +23807,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe4f61e4ebf06149b7db8288c8e9cab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseScript
+  mainMenuSceneName: Main Menu
+  tutorialSlides:
+  - {fileID: 2800000, guid: b6218178f89b861489cb61279eb45687, type: 3}
+  - {fileID: 2800000, guid: 31b9b36f1c4887243af32ee2090772b2, type: 3}
+  - {fileID: 2800000, guid: 0f28fddc242f23e41871ab8eec3202a8, type: 3}
+  - {fileID: 2800000, guid: 9157ae320d01d7344945a5ababcadfc6, type: 3}
+  - {fileID: 2800000, guid: 45deb027d5c18d04e9b8094a401b8b44, type: 3}
+  - {fileID: 2800000, guid: 5901dbedf2634ca4c96770107815ce8f, type: 3}
+  - {fileID: 2800000, guid: eaa73789cef5ae64b88e508dc7f7c761, type: 3}
+  - {fileID: 2800000, guid: 5d76d1e715f4a8143ad2f70b013e3a57, type: 3}
+  - {fileID: 2800000, guid: 5fafaad4dde342e4ea2f9fb2a6a8bcb3, type: 3}
+  - {fileID: 2800000, guid: 1537e5a1786f5fa4c8b6a00fe119e3bc, type: 3}
+  - {fileID: 2800000, guid: 1d74849d2da092c4c8746facbc516f17, type: 3}
+  - {fileID: 2800000, guid: 7a34b4fe51ceea24797b8637222d24fc, type: 3}
+  - {fileID: 2800000, guid: 13b75f9b8aad44640b77546483891da1, type: 3}
+  tutorialButtonLabel: Tutorial
 --- !u!1001 &2006495666
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24789,6 +24995,9 @@ MonoBehaviour:
   snapAutoAxisToWorldCardinal: 1
   mountReference: {fileID: 0}
   side: 1
+  turnOnSfx: {fileID: 0}
+  turnOffSfx: {fileID: 0}
+  knobSfxVolume: 1
 --- !u!1 &2102608535
 GameObject:
   m_ObjectHideFlags: 0
@@ -24818,6 +25027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c45386c2b39fd44998b533491a6056c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  allItemsDatabase: []
 --- !u!4 &2102608537
 Transform:
   m_ObjectHideFlags: 0
@@ -25789,7 +25999,8 @@ SceneRoots:
   - {fileID: 237661785}
   - {fileID: 2102608537}
   - {fileID: 2005958091}
-  - {fileID: 535633528}
   - {fileID: 1113400004}
   - {fileID: 1761259163}
   - {fileID: 1509088539}
+  - {fileID: 1785286493}
+  - {fileID: 535633528}

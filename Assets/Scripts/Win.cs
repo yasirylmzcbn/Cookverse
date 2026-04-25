@@ -9,9 +9,19 @@ public class Win : MonoBehaviour
     private bool hasWon = false;
     public WaveManager waveManager;
 
+    [SerializeField] private TMP_Text waveNumberText;
+
     [SerializeField] private GameObject portal;
     private Transform playerTransform;
     [SerializeField] private float portalDistanceFromPlayer = 2f;
+
+    public void UpdateWaveText(int currentWave, int maxWave)
+    {
+        if (waveNumberText != null)
+        {
+            waveNumberText.text = $"Wave: {currentWave} / {maxWave}";
+        }
+    }
 
     void Start()
     {
@@ -21,7 +31,7 @@ public class Win : MonoBehaviour
         {
             winText.enabled = false;
         }
-        waveManager = FindObjectsByType<WaveManager>(FindObjectsSortMode.None)?[0];
+        waveManager = FindFirstObjectByType<WaveManager>();
 
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (playerTransform == null)
@@ -35,22 +45,30 @@ public class Win : MonoBehaviour
         //Debug.Log(!hasWon);
         //Debug.Log(spawner.IsDoneSpawning());
         //Debug.Log(spawner.EnemyCount());
-        if (!hasWon && waveManager.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
+        if (!hasWon && waveManager != null && waveManager.IsDoneSpawning() && FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length == 0)
         {
             ShowWin();
-            Vector3 forward = playerTransform.forward;
-            forward.y = 0f;
-            forward.Normalize();
-            Vector3 portalPosition = playerTransform.position + forward * portalDistanceFromPlayer;
-            portalPosition.y = 3.34f;
-            portal.transform.position = portalPosition;
-            portal.SetActive(true);
+            if (portal != null && playerTransform != null)
+            {
+                Vector3 forward = playerTransform.forward;
+                forward.y = 0f;
+                forward.Normalize();
+                Vector3 portalPosition = playerTransform.position + forward * portalDistanceFromPlayer;
+                portalPosition.y = 3.34f;
+                portal.transform.position = portalPosition;
+                portal.SetActive(true);
+            }
         }
     }
 
     void ShowWin()
     {
         hasWon = true;
-        winText.enabled = true;
+
+        if (winText != null)
+        {
+            winText.enabled = true;
+            winText.text = "You Win!";
+        }
     }
 }

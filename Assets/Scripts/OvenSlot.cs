@@ -54,6 +54,14 @@ public class OvenSlot : CookwareSlot
     // Using a counter (not a bool) lets two simultaneous drags both work correctly.
     private int _dragsInRange;
     private bool _doorIsOpen;
+    private KitchenIngredientController _trackedIngredient1;
+    private bool _sizzlePlayedForIngredient1;
+    private bool _readyPlayedForIngredient1;
+    private bool _burntPlayedForIngredient1;
+    private KitchenIngredientController _trackedIngredient2;
+    private bool _sizzlePlayedForIngredient2;
+    private bool _readyPlayedForIngredient2;
+    private bool _burntPlayedForIngredient2;
 
     // ── Lights ───────────────────────────────────────────────────────────────
 
@@ -178,6 +186,7 @@ public class OvenSlot : CookwareSlot
             // Ingredient has been placed - treat as "dropped outside range"
             // so the door-close counter is decremented correctly.
             HidePreview();
+            PlayKitchenPlaceSfx();
             return true;
         }
     }
@@ -193,6 +202,7 @@ public class OvenSlot : CookwareSlot
         if (_ingredient2 == ingredient)
         {
             _ingredient2 = null;
+            ResetCookingSfxStateForSecondAnchor();
             ingredient.OnRemovedFromSlot();
             return true;
         }
@@ -218,14 +228,45 @@ public class OvenSlot : CookwareSlot
     // Replicates the cooking logic from CookwareSlot.Update for slot 1
     private void CookSlot1()
     {
-        if (!IsOn) return;
+        if (!IsOn)
+        {
+            if (_trackedIngredient1 != null)
+                _sizzlePlayedForIngredient1 = false;
+            return;
+        }
         var ing = CurrentIngredient;
-        if (ing == null || ing.IsCooked()) return;
+        if (ing == null)
+        {
+            ResetCookingSfxStateForFirstAnchor();
+            return;
+        }
 
-        ing.cookLevel = Mathf.Clamp01(ing.cookLevel + ovenCookRatePerSecond * Time.deltaTime);
-        if (ing.cookLevel >= 1f)
+        TrackFirstAnchorIngredient(ing);
+        if (!_sizzlePlayedForIngredient1)
+        {
+            PlayCookingSfxForAnchor(ref _sizzlePlayedForIngredient1);
+        }
+
+        float previousCookLevel = ing.cookLevel;
+        ing.cookLevel = ing.cookLevel + ovenCookRatePerSecond * Time.deltaTime;
+
+        if (!_readyPlayedForIngredient1
+            && previousCookLevel < GV.REQUIRED_COOK_LEVEL
+            && ing.cookLevel >= GV.REQUIRED_COOK_LEVEL)
+        {
+            PlayReadySfxForAnchor(ref _readyPlayedForIngredient1);
+        }
+
+        if (!_burntPlayedForIngredient1
+            && previousCookLevel < GV.REQUIRED_BURN_LEVEL
+            && ing.cookLevel >= GV.REQUIRED_BURN_LEVEL)
+        {
+            PlayBurntSfxForAnchor(ref _burntPlayedForIngredient1);
+        }
+
+        if (ing.IsCooked())
             ing.SetToCookedForm();
-        if (ing.cookLevel >= 1.75f)
+        if (ing.IsBurnt())
         {
             ing.SetToBurntForm();
         }
@@ -233,14 +274,46 @@ public class OvenSlot : CookwareSlot
 
     private void CookSlot2()
     {
-        if (!IsOn) return;
-        if (_ingredient2 == null || _ingredient2.IsCooked()) return;
+        if (!IsOn)
+        {
+            if (_trackedIngredient2 != null)
+                _sizzlePlayedForIngredient2 = false;
+            return;
+        }
+        if (_ingredient2 == null)
+        {
+            ResetCookingSfxStateForSecondAnchor();
+            return;
+        }
 
-        _ingredient2.cookLevel = Mathf.Clamp01(
-            _ingredient2.cookLevel + ovenCookRatePerSecond * Time.deltaTime);
+        TrackSecondAnchorIngredient(_ingredient2);
+        if (!_sizzlePlayedForIngredient2)
+        {
+            PlayCookingSfxForAnchor(ref _sizzlePlayedForIngredient2);
+        }
 
-        if (_ingredient2.cookLevel >= 1f)
+        float previousCookLevel = _ingredient2.cookLevel;
+        _ingredient2.cookLevel = _ingredient2.cookLevel + ovenCookRatePerSecond * Time.deltaTime;
+
+        if (!_readyPlayedForIngredient2
+            && previousCookLevel < GV.REQUIRED_COOK_LEVEL
+            && _ingredient2.cookLevel >= GV.REQUIRED_COOK_LEVEL)
+        {
+            PlayReadySfxForAnchor(ref _readyPlayedForIngredient2);
+        }
+
+        if (!_burntPlayedForIngredient2
+            && previousCookLevel < GV.REQUIRED_BURN_LEVEL
+            && _ingredient2.cookLevel >= GV.REQUIRED_BURN_LEVEL)
+        {
+            PlayBurntSfxForAnchor(ref _burntPlayedForIngredient2);
+        }
+
+        if (_ingredient2.IsCooked())
             _ingredient2.SetToCookedForm();
+
+        if (_ingredient2.IsBurnt())
+            _ingredient2.SetToBurntForm();
     }
 
     public new void NotifyDragInSnapRange()
@@ -286,6 +359,73 @@ public class OvenSlot : CookwareSlot
     {
         base.OnDisable(); // clears base preview + triggers base close-notification
         _dragsInRange = 0;
+        ResetCookingSfxStateForFirstAnchor();
+        ResetCookingSfxStateForSecondAnchor();
         CloseDoor();
+    }
+
+    private void TrackFirstAnchorIngredient(KitchenIngredientController ingredient)
+    {
+        if (_trackedIngredient1 == ingredient)
+            return;
+
+        _trackedIngredient1 = ingredient;
+        _sizzlePlayedForIngredient1 = false;
+        _readyPlayedForIngredient1 = false;
+        _burntPlayedForIngredient1 = false;
+    }
+
+    private void TrackSecondAnchorIngredient(KitchenIngredientController ingredient)
+    {
+        if (_trackedIngredient2 == ingredient)
+            return;
+
+        _trackedIngredient2 = ingredient;
+        _sizzlePlayedForIngredient2 = false;
+        _readyPlayedForIngredient2 = false;
+        _burntPlayedForIngredient2 = false;
+    }
+
+    private void ResetCookingSfxStateForFirstAnchor()
+    {
+        _trackedIngredient1 = null;
+        _sizzlePlayedForIngredient1 = false;
+        _readyPlayedForIngredient1 = false;
+        _burntPlayedForIngredient1 = false;
+    }
+
+    private void ResetCookingSfxStateForSecondAnchor()
+    {
+        _trackedIngredient2 = null;
+        _sizzlePlayedForIngredient2 = false;
+        _readyPlayedForIngredient2 = false;
+        _burntPlayedForIngredient2 = false;
+    }
+
+    private void PlayCookingSfxForAnchor(ref bool playedFlag)
+    {
+        if (playedFlag)
+            return;
+
+        PlayCookingSizzleSfx();
+        playedFlag = true;
+    }
+
+    private void PlayReadySfxForAnchor(ref bool playedFlag)
+    {
+        if (playedFlag)
+            return;
+
+        PlayCookingReadySfx();
+        playedFlag = true;
+    }
+
+    private void PlayBurntSfxForAnchor(ref bool playedFlag)
+    {
+        if (playedFlag)
+            return;
+
+        PlayCookingBurntSfx();
+        playedFlag = true;
     }
 }

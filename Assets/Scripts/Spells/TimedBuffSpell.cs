@@ -23,5 +23,9 @@ public class TimedBuffSpell : SpellDefinition
     {
         if (context.player == null) return;
         context.player.ApplyTimedBuff(moveSpeedMultiplier, shootCooldownMultiplier, durationSeconds);
+        
+        // Play speed spell sound via SoundManager
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellSpeedSound();
     }
 }

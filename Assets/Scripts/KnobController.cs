@@ -83,6 +83,11 @@ public class KnobController : MonoBehaviour
     [Header("State")]
     [SerializeField] public BurnerSide side;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip turnOnSfx;
+    [SerializeField] private AudioClip turnOffSfx;
+    [SerializeField, Range(0f, 1f)] private float knobSfxVolume = 1f;
+
     private float currentAngle = 0f;
     private bool isOnState = false;
     private Mouse mouse;
@@ -91,11 +96,13 @@ public class KnobController : MonoBehaviour
 
     private Quaternion initialLocalRotation;
     private Quaternion initialWorldRotation;
+    private AudioSource _audioSource;
 
     void Start()
     {
         mouse = Mouse.current;
         stove = GetComponentInParent<StoveScript>();
+        EnsureAudioSource();
 
         initialLocalRotation = transform.localRotation;
         initialWorldRotation = transform.rotation;
@@ -315,6 +322,7 @@ public class KnobController : MonoBehaviour
     protected virtual void OnStateChanged(bool newState)
     {
         Debug.Log($"Knob {gameObject.name} is now: {(newState ? "ON" : "OFF")}");
+        PlayToggleSfx(newState);
         if (cookwareType == CookwareType.Fryer)
         {
             animator.SetBool("isOn", newState);
@@ -331,5 +339,29 @@ public class KnobController : MonoBehaviour
     public float GetHeatLevel()
     {
         return Mathf.InverseLerp(minAngle, maxAngle, currentAngle);
+    }
+
+    private void EnsureAudioSource()
+    {
+        if (_audioSource != null)
+            return;
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+            _audioSource = gameObject.AddComponent<AudioSource>();
+
+        _audioSource.playOnAwake = false;
+        _audioSource.spatialBlend = 1f;
+    }
+
+    private void PlayToggleSfx(bool isOn)
+    {
+        AudioClip clip = isOn ? turnOnSfx : turnOffSfx;
+        if (clip == null)
+            return;
+
+        EnsureAudioSource();
+        if (_audioSource != null)
+            _audioSource.PlayOneShot(clip, knobSfxVolume);
     }
 }
