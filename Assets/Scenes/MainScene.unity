@@ -21573,6 +21573,7 @@ MonoBehaviour:
   pickupSound: {fileID: 8300000, guid: 86b2295f9548a2b4b9b73fef31bb3ec2, type: 3}
   reloadSound: {fileID: 8300000, guid: 4c40f8b17f3c1cd4f846c8cf0dcf0b10, type: 3}
   shootSound: {fileID: 8300000, guid: 180c49781f34df140807abd9be334ba5, type: 3}
+  sfxVolume: 1
 --- !u!1 &1785517865
 GameObject:
   m_ObjectHideFlags: 0
@@ -23805,6 +23806,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe4f61e4ebf06149b7db8288c8e9cab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseScript
+  mainMenuSceneName: Main Menu
+  tutorialSlides:
+  - {fileID: 2800000, guid: e3d69e16bab259047b9ef773bef45ae5, type: 3}
+  - {fileID: 2800000, guid: fca92da192ad70045a18b59be16e9f03, type: 3}
+  - {fileID: 2800000, guid: 400e964c25df7c446a3c669adeca7643, type: 3}
+  tutorialButtonLabel: Tutorial
 --- !u!1001 &2006495666
 PrefabInstance:
   m_ObjectHideFlags: 0

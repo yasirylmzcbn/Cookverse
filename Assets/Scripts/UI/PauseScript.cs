@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseScript : MonoBehaviour
@@ -9,6 +10,14 @@ public class PauseScript : MonoBehaviour
     [Header("Pause Buttons")]
     [SerializeField] private string mainMenuSceneName = "Main Menu";
 
+    [Header("Tutorial")]
+    [Tooltip("Add tutorial PNG textures here. You can add/remove list elements as needed.")]
+    [SerializeField] private List<Texture2D> tutorialSlides = new List<Texture2D>();
+    [SerializeField] private string tutorialButtonLabel = "Tutorial";
+
+    private bool isTutorialOpen = false;
+    private int tutorialSlideIndex = 0;
+
     void Update()
     {
         bool isAnyUIOpen = IsAnyOtherUIOpen();
@@ -17,6 +26,12 @@ public class PauseScript : MonoBehaviour
         {
             if (isPaused)
             {
+                if (isTutorialOpen)
+                {
+                    CloseTutorial();
+                    return;
+                }
+
                 ResumeGame();
             }
             else
@@ -29,6 +44,16 @@ public class PauseScript : MonoBehaviour
         }
 
         wasAnyUIOpenLastFrame = isAnyUIOpen;
+
+        if (isPaused && isTutorialOpen)
+        {
+            if (Input.GetMouseButtonDown(0)
+                || Input.GetKeyDown(KeyCode.Space)
+                || Input.GetKeyDown(KeyCode.Return))
+            {
+                AdvanceTutorial();
+            }
+        }
     }
 
     private bool IsAnyOtherUIOpen()
@@ -97,6 +122,9 @@ public class PauseScript : MonoBehaviour
 
     public void ResumeGame()
     {
+        isTutorialOpen = false;
+        tutorialSlideIndex = 0;
+
         isPaused = false;
         Time.timeScale = 1f;
 
@@ -140,13 +168,84 @@ public class PauseScript : MonoBehaviour
 
     private void OpenTutorialFromPause()
     {
-        // Placeholder hook for future tutorial slideshow/deck flow.
-        Debug.Log("[PauseScript] Tutorial button clicked. Add slideshow logic here.");
+        if (tutorialSlides == null || tutorialSlides.Count <= 0)
+        {
+            Debug.LogWarning("[PauseScript] No tutorial slides assigned.");
+            return;
+        }
+
+        isTutorialOpen = true;
+        tutorialSlideIndex = 0;
+    }
+
+    private void CloseTutorial()
+    {
+        isTutorialOpen = false;
+        tutorialSlideIndex = 0;
+    }
+
+    private void AdvanceTutorial()
+    {
+        if (tutorialSlides == null || tutorialSlides.Count <= 0)
+        {
+            CloseTutorial();
+            return;
+        }
+
+        tutorialSlideIndex++;
+        if (tutorialSlideIndex >= tutorialSlides.Count)
+            CloseTutorial();
+    }
+
+    private void DrawTutorialOverlay()
+    {
+        Texture2D currentSlide = null;
+        if (tutorialSlides != null && tutorialSlideIndex >= 0 && tutorialSlideIndex < tutorialSlides.Count)
+            currentSlide = tutorialSlides[tutorialSlideIndex];
+
+        if (currentSlide == null)
+        {
+            CloseTutorial();
+            return;
+        }
+
+        GUI.color = new Color(0f, 0f, 0f, 0.9f);
+        GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
+        GUI.color = Color.white;
+
+        float slideWidth = currentSlide.width;
+        float slideHeight = currentSlide.height;
+        float maxWidth = Screen.width - 120f;
+        float maxHeight = Screen.height - 180f;
+        float scale = Mathf.Min(maxWidth / slideWidth, maxHeight / slideHeight);
+        scale = Mathf.Max(0.01f, scale);
+
+        float drawWidth = slideWidth * scale;
+        float drawHeight = slideHeight * scale;
+        Rect drawRect = new Rect((Screen.width - drawWidth) * 0.5f, (Screen.height - drawHeight) * 0.5f - 20f, drawWidth, drawHeight);
+
+        GUI.DrawTexture(drawRect, currentSlide, ScaleMode.ScaleToFit, true);
+
+        GUIStyle captionStyle = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = 20,
+            normal = { textColor = Color.white }
+        };
+
+        string caption = $"Slide {tutorialSlideIndex + 1} / {tutorialSlides.Count} - Click, Space, or Enter to continue (Esc to close)";
+        GUI.Label(new Rect(0f, Screen.height - 70f, Screen.width, 40f), caption, captionStyle);
     }
 
     private void OnGUI()
     {
         if (!isPaused) return;
+
+        if (isTutorialOpen)
+        {
+            DrawTutorialOverlay();
+            return;
+        }
 
         Color originalColor = GUI.color;
 
@@ -248,7 +347,7 @@ public class PauseScript : MonoBehaviour
         Rect tutorialRect = new Rect(Screen.width - 170f, 20f, 150f, 36f);
         if (tutorialRect.Contains(Event.current.mousePosition))
             currentHoveredId = 2002;
-        if (GUI.Button(tutorialRect, "Tutorial"))
+        if (GUI.Button(tutorialRect, tutorialButtonLabel))
         {
             PlayPauseSound(hover: false);
             OpenTutorialFromPause();
