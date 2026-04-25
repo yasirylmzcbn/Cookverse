@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class PauseScript : MonoBehaviour
 {
     private bool isPaused = false;
-    private bool wasAnyUIOpenLastFrame = false;
 
     [Header("Pause Buttons")]
     [SerializeField] private string mainMenuSceneName = "Main Menu";
@@ -20,8 +19,6 @@ public class PauseScript : MonoBehaviour
 
     void Update()
     {
-        bool isAnyUIOpen = IsAnyOtherUIOpen();
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (isPaused)
@@ -36,14 +33,9 @@ public class PauseScript : MonoBehaviour
             }
             else
             {
-                if (isAnyUIOpen || wasAnyUIOpenLastFrame)
-                    return;
-
                 PauseGame();
             }
         }
-
-        wasAnyUIOpenLastFrame = isAnyUIOpen;
 
         if (isPaused && isTutorialOpen)
         {
@@ -54,19 +46,6 @@ public class PauseScript : MonoBehaviour
                 AdvanceTutorial();
             }
         }
-    }
-
-    private bool IsAnyOtherUIOpen()
-    {
-        SpellMenuUI spellMenu = FindFirstObjectByType<SpellMenuUI>();
-        if (spellMenu != null && spellMenu.menuOpen)
-            return true;
-
-        DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>();
-        if (difficultyUI != null && difficultyUI.IsVisible())
-            return true;
-
-        return false;
     }
 
     private CursorLockMode previousLockState;
@@ -104,6 +83,10 @@ public class PauseScript : MonoBehaviour
         isPaused = true;
         Time.timeScale = 0f;
 
+        DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>(FindObjectsInactive.Include);
+        if (difficultyUI != null)
+            difficultyUI.SetPausedState(true);
+
         if (PlayerController.Instance != null)
         {
             PlayerController.Instance.enabled = false;
@@ -125,16 +108,28 @@ public class PauseScript : MonoBehaviour
         isTutorialOpen = false;
         tutorialSlideIndex = 0;
 
+        DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>(FindObjectsInactive.Include);
+        if (difficultyUI != null)
+            difficultyUI.SetPausedState(false);
+
         isPaused = false;
         Time.timeScale = 1f;
 
-        if (PlayerController.Instance != null)
-        {
-            PlayerController.Instance.enabled = true;
-        }
+        bool difficultyVisible = difficultyUI != null && difficultyUI.IsVisible();
 
-        Cursor.lockState = previousLockState;
-        Cursor.visible = previousCursorVisible;
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.enabled = !difficultyVisible;
+
+        if (difficultyVisible)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = previousLockState;
+            Cursor.visible = previousCursorVisible;
+        }
 
         // Play close menu sound
         if (SoundManager.Instance != null)

@@ -585,7 +585,7 @@ public class PlayerController : MonoBehaviour
         }
         if (currentlyInteracting)
         {
-            if (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {
                 currentlyInteracting = false;
                 Debug.Log("Stopped interacting via input.");

@@ -84,12 +84,6 @@ public class CameraController : MonoBehaviour
 
         bool menuOpen = spellMenu != null && spellMenu.menuOpen;
 
-        if (menuOpen && escapeAction != null && escapeAction.WasPressedThisFrame())
-        {
-            spellMenu.SetMenuVisible(false);
-            return;
-        }
-
         if (menuOpen) return;
 
         if (Time.timeScale == 0f) return;

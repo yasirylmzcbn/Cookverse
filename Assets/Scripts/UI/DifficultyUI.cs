@@ -17,6 +17,8 @@ public class DifficultyUI : MonoBehaviour
     [SerializeField] private Button bossButton;
 
     private bool storedVisible;
+    private bool isPausedByGame;
+    private CanvasGroup difficultyCanvasGroup;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -33,7 +35,10 @@ public class DifficultyUI : MonoBehaviour
 
     private void Update()
     {
-        if (storedVisible && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)))
+        if (Time.timeScale == 0f)
+            return;
+
+        if (storedVisible && Input.GetKeyDown(KeyCode.E))
         {
             SetMenuVisible(false);
             if (playerController != null)
@@ -60,6 +65,8 @@ public class DifficultyUI : MonoBehaviour
 
         if (difficultyPanel != null)
             difficultyPanel.SetActive(visible);
+
+        RefreshCanvasGroup();
 
         if (visible)
         {
@@ -100,6 +107,7 @@ public class DifficultyUI : MonoBehaviour
                 SoundManager.Instance.PlayUICloseSound();
         }
         storedVisible = visible;
+        ApplyPauseState();
     }
 
     void OnEasyButtonClicked()
@@ -139,6 +147,47 @@ public class DifficultyUI : MonoBehaviour
     public bool IsVisible()
     {
         return storedVisible;
+    }
+
+    public void SetPausedState(bool paused)
+    {
+        isPausedByGame = paused;
+        ApplyPauseState();
+    }
+
+    public void ForceCloseForPause()
+    {
+        if (!storedVisible)
+            return;
+
+        storedVisible = false;
+
+        if (difficultyPanel != null)
+            difficultyPanel.SetActive(false);
+    }
+
+    private void RefreshCanvasGroup()
+    {
+        if (difficultyPanel == null)
+            return;
+
+        if (difficultyCanvasGroup == null)
+            difficultyCanvasGroup = difficultyPanel.GetComponent<CanvasGroup>();
+
+        if (difficultyCanvasGroup == null)
+            difficultyCanvasGroup = difficultyPanel.AddComponent<CanvasGroup>();
+    }
+
+    private void ApplyPauseState()
+    {
+        RefreshCanvasGroup();
+
+        if (difficultyCanvasGroup == null)
+            return;
+
+        bool allowInteraction = storedVisible && !isPausedByGame;
+        difficultyCanvasGroup.interactable = allowInteraction;
+        difficultyCanvasGroup.blocksRaycasts = allowInteraction;
     }
 
     public void UnlockDifficulty(GameManager.Difficulty difficulty)
