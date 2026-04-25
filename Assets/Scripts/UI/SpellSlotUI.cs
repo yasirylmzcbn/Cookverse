@@ -18,6 +18,8 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private SpellMenuUI _menu;
     private static GameObject _dragGhost;
     private Canvas _rootCanvas;
+    private bool _isHovered;
+    private bool _isEquipped;
 
     private Canvas RootCanvas
     {
@@ -31,20 +33,22 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void Init(SpellDefinition spell, SpellMenuUI menu)
     {
+        EnsureImageWiring();
         Spell = spell;
         _menu = menu;
         if (iconImage != null && spell.icon != null)
             iconImage.sprite = spell.icon;
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
+        _isHovered = false;
+        _isEquipped = false;
+        ApplyBackgroundColor();
         if (spellNameText != null)
             spellNameText.text = spell.displayName;
     }
 
     public void SetEquippedVisual(bool equipped)
     {
-        if (backgroundImage != null)
-            backgroundImage.color = equipped ? equippedColor : normalColor;
+        _isEquipped = equipped;
+        ApplyBackgroundColor();
     }
 
     public void OnPointerEnter(PointerEventData e)
@@ -55,12 +59,14 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             UISoundManager.Instance.PlayHoverSound();
 
         _menu.OnSpellHovered(Spell);
-        if (backgroundImage != null) backgroundImage.color = hoveredColor;
+        _isHovered = true;
+        ApplyBackgroundColor();
     }
 
     public void OnPointerExit(PointerEventData e)
     {
         _menu.OnSpellHovered(null);
+        _isHovered = false;
         SetEquippedVisual(_menu.IsEquipped(Spell));
     }
 
@@ -117,5 +123,43 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         Camera cam = RootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : eventData.pressEventCamera;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, eventData.position, cam, out Vector2 localPoint))
             _dragGhost.GetComponent<RectTransform>().localPosition = localPoint;
+    }
+
+    private void EnsureImageWiring()
+    {
+        if (backgroundImage == null)
+            backgroundImage = GetComponent<Image>();
+
+        if (iconImage == null || iconImage == backgroundImage)
+        {
+            Image[] allImages = GetComponentsInChildren<Image>(true);
+            for (int i = 0; i < allImages.Length; i++)
+            {
+                Image candidate = allImages[i];
+                if (candidate != null && candidate != backgroundImage)
+                {
+                    iconImage = candidate;
+                    break;
+                }
+            }
+        }
+
+        // If this slot has a Button with Color Tint transition, it can override script colors.
+        Button button = GetComponent<Button>();
+        if (button != null && button.transition != Selectable.Transition.None)
+            button.transition = Selectable.Transition.None;
+    }
+
+    private void ApplyBackgroundColor()
+    {
+        if (backgroundImage == null)
+            return;
+
+        if (_isHovered)
+            backgroundImage.color = hoveredColor;
+        else if (_isEquipped)
+            backgroundImage.color = equippedColor;
+        else
+            backgroundImage.color = normalColor;
     }
 }

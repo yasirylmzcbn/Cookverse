@@ -38,12 +38,17 @@ public class EquippedDiamondUI : MonoBehaviour, IPointerClickHandler, IPointerEn
     public void Refresh(SpellDefinition spell, bool isSelected)
     {
         bool filled = spell != null;
+        bool showIcon = filled && spell.icon != null;
         if (diamondBackground != null)
             diamondBackground.color = isSelected ? selectedColor : (filled ? filledColor : emptyColor);
         if (iconImage != null)
         {
-            iconImage.enabled = filled && spell.icon != null;
-            if (filled && spell.icon != null)
+            if (iconImage.gameObject.activeSelf != showIcon)
+                iconImage.gameObject.SetActive(showIcon);
+
+            iconImage.enabled = showIcon;
+
+            if (showIcon)
                 iconImage.sprite = spell.icon;
         }
         if (slotLabel != null)
