@@ -79,7 +79,7 @@ public class SwitchCamera : MonoBehaviour
             { KitchenCameras.Stove, kitchenCamera },
             // TODO Add other kitchen cameras here when implemented
         };
-        
+
         StartCoroutine(DelayedEnsureAudioListener());
     }
 
@@ -153,7 +153,7 @@ public class SwitchCamera : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         EnsureActiveAudioListener();
-        
+
         return true;
     }
 
@@ -179,13 +179,7 @@ public class SwitchCamera : MonoBehaviour
         if (firstPerson)
         {
             SetActiveSafe(firstPersonCamera, true);
-
-            CameraController fpController = firstPersonCamera != null
-                ? firstPersonCamera.GetComponentInChildren<CameraController>(true)
-                : null;
-
-            if (fpController != null)
-                fpController.enabled = true;
+            EnableFirstPersonLook();
         }
         else
         {
@@ -202,6 +196,23 @@ public class SwitchCamera : MonoBehaviour
         EnsureActiveAudioListener();
     }
 
+    private void EnableFirstPersonLook()
+    {
+        CameraController fpController = null;
+
+        if (firstPersonCamera != null)
+            fpController = firstPersonCamera.GetComponentInChildren<CameraController>(true);
+
+        if (fpController == null && PlayerController.Instance != null)
+            fpController = PlayerController.Instance.GetComponentInChildren<CameraController>(true);
+
+        if (fpController == null)
+            fpController = FindFirstObjectByType<CameraController>(FindObjectsInactive.Include);
+
+        if (fpController != null)
+            fpController.enabled = true;
+    }
+
     private void EnsureActiveAudioListener()
     {
         Camera activeCamera = GetActiveGameplayCamera();
@@ -209,7 +220,7 @@ public class SwitchCamera : MonoBehaviour
             return;
 
         AudioListener[] allListeners = FindObjectsByType<AudioListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        
+
         AudioListener targetListener = activeCamera.GetComponent<AudioListener>();
         if (targetListener == null)
             targetListener = activeCamera.gameObject.AddComponent<AudioListener>();
@@ -221,14 +232,14 @@ public class SwitchCamera : MonoBehaviour
             if (listener != null)
                 listener.enabled = (listener == targetListener);
         }
-        
+
         // Also force Time scale to normal if previously stuck (safeguard)
         if (Time.timeScale == 0f && !IsPausedMenuOpen())
         {
             Time.timeScale = 1f;
             AudioListener.pause = false;
         }
-        
+
         // Ensure AudioListener itself is unpaused, as jumping scenes can sometimes inherit a paused audio state
         AudioListener.pause = false;
     }

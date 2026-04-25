@@ -104,7 +104,7 @@ public class SpellMenuUI : MonoBehaviour
             RefreshDiamonds();
             ClearDescription();
             inventoryPanel.GetComponent<InventoryUI>().RefreshUI();
-            
+
             // Play open sound only on a real closed -> open transition.
             if (!wasOpen && SoundManager.Instance != null)
                 SoundManager.Instance.PlayUIOpenSound();
@@ -116,12 +116,12 @@ public class SpellMenuUI : MonoBehaviour
             bool keepKitchenCursor = switchCamera != null && switchCamera.IsInKitchenCamera;
 
             if (firstPersonCameraController != null)
-                firstPersonCameraController.enabled = !keepKitchenCursor;
+                firstPersonCameraController.enabled = true;
 
             Cursor.lockState = keepKitchenCursor ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = keepKitchenCursor;
             _selectedDiamondSlot = -1;
-            
+
             // Play close sound only on a real open -> closed transition.
             if (wasOpen && SoundManager.Instance != null)
                 SoundManager.Instance.PlayUICloseSound();
