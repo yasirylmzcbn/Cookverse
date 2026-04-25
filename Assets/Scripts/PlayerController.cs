@@ -382,6 +382,12 @@ public class PlayerController : MonoBehaviour
         _sceneReturnRotations[sceneName] = rotation;
     }
 
+    public static void ClearRememberedScenePositions()
+    {
+        _sceneReturnPositions.Clear();
+        _sceneReturnRotations.Clear();
+    }
+
     private void RestorePositionForScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))

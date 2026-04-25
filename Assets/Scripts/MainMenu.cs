@@ -7,6 +7,11 @@ public class MainMenu : MonoBehaviour
 {
     public void PlayGame()
     {
+        PlayerController.ClearRememberedScenePositions();
+
+        if (PlayerController.Instance != null)
+            Destroy(PlayerController.Instance.gameObject);
+
         SceneManager.LoadSceneAsync("MainScene");
     }
 

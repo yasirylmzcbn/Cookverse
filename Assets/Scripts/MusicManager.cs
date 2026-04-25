@@ -93,10 +93,10 @@ public class MusicManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        ApplyTargetTrack();
+        ApplyTargetTrack(forceRestart: true);
     }
 
-    private void ApplyTargetTrack()
+    private void ApplyTargetTrack(bool forceRestart = false)
     {
         if (musicSource == null)
             return;
@@ -110,8 +110,11 @@ public class MusicManager : MonoBehaviour
             return;
         }
 
-        if (musicSource.clip == targetClip && musicSource.isPlaying)
+        if (!forceRestart && musicSource.clip == targetClip && musicSource.isPlaying)
             return;
+
+        if (musicSource.isPlaying)
+            musicSource.Stop();
 
         musicSource.clip = targetClip;
         musicSource.Play();

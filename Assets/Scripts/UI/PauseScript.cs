@@ -124,6 +124,11 @@ public class PauseScript : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        PlayerController.ClearRememberedScenePositions();
+
+        if (PlayerController.Instance != null)
+            Destroy(PlayerController.Instance.gameObject);
+
         if (!string.IsNullOrWhiteSpace(mainMenuSceneName))
         {
             SceneManager.LoadScene(mainMenuSceneName);
