@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseScript : MonoBehaviour
 {
     private bool isPaused = false;
     private bool wasAnyUIOpenLastFrame = false;
+
+    [Header("Pause Buttons")]
+    [SerializeField] private string mainMenuSceneName = "Main Menu";
 
     void Update()
     {
@@ -109,6 +113,32 @@ public class PauseScript : MonoBehaviour
             SoundManager.Instance.PlayUICloseSound();
     }
 
+    private void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        isPaused = false;
+
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.enabled = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (!string.IsNullOrWhiteSpace(mainMenuSceneName))
+        {
+            SceneManager.LoadScene(mainMenuSceneName);
+            return;
+        }
+
+        Debug.LogWarning("[PauseScript] Main menu scene name is empty.");
+    }
+
+    private void OpenTutorialFromPause()
+    {
+        // Placeholder hook for future tutorial slideshow/deck flow.
+        Debug.Log("[PauseScript] Tutorial button clicked. Add slideshow logic here.");
+    }
+
     private void OnGUI()
     {
         if (!isPaused) return;
@@ -198,6 +228,26 @@ public class PauseScript : MonoBehaviour
         bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
         bool saveLoadDisabled = combatActive || cookingActive;
         int currentHoveredId = -1;
+
+        Rect mainMenuRect = new Rect(20f, 20f, 150f, 36f);
+        if (mainMenuRect.Contains(Event.current.mousePosition))
+            currentHoveredId = 2001;
+        if (GUI.Button(mainMenuRect, "Main Menu"))
+        {
+            PlayPauseSound(hover: false);
+            ReturnToMainMenu();
+            GUI.color = originalColor;
+            return;
+        }
+
+        Rect tutorialRect = new Rect(Screen.width - 170f, 20f, 150f, 36f);
+        if (tutorialRect.Contains(Event.current.mousePosition))
+            currentHoveredId = 2002;
+        if (GUI.Button(tutorialRect, "Tutorial"))
+        {
+            PlayPauseSound(hover: false);
+            OpenTutorialFromPause();
+        }
 
         for (int i = 1; i <= 3; i++)
         {
