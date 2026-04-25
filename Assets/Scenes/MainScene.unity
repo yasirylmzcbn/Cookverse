@@ -6968,11 +6968,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
   musicSource: {fileID: 159306353}
   musicVolume: 0.2
-  sceneTracks:
-  - sceneName: EnemyScene
-    clip: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
-  - sceneName: 
-    clip: {fileID: 0}
+  mainMenuSceneName: MainMenu
+  mainMenuMusic: {fileID: 0}
+  kitchenMusic: {fileID: 0}
+  combatEasyMusic: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
+  combatMediumMusic: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
+  combatHardMusic: {fileID: 8300000, guid: 2b037574eed09e2419d7a2fa108e8d8a, type: 3}
+  combatBossMusic: {fileID: 8300000, guid: c48b8643b48400b45828316b9d27cba1, type: 3}
 --- !u!4 &535633528
 Transform:
   m_ObjectHideFlags: 0
@@ -25979,8 +25981,8 @@ SceneRoots:
   - {fileID: 237661785}
   - {fileID: 2102608537}
   - {fileID: 2005958091}
-  - {fileID: 535633528}
   - {fileID: 1113400004}
   - {fileID: 1761259163}
   - {fileID: 1509088539}
   - {fileID: 1785286493}
+  - {fileID: 535633528}

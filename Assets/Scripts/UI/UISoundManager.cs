@@ -8,6 +8,12 @@ public class UISoundManager : MonoBehaviour
 {
     public static UISoundManager Instance;
 
+    public float SfxVolume
+    {
+        get => audioSource != null ? audioSource.volume : PlayerPrefs.GetFloat(SoundManager.SFX_VOLUME_PREF_KEY, 1f);
+        set => ApplySfxVolume(value, persist: true);
+    }
+
     [Header("UI Sounds")]
     [SerializeField] private AudioClip hoverSound;
     [SerializeField] private AudioClip clickSound;
@@ -79,6 +85,8 @@ public class UISoundManager : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
             
         audioSource.ignoreListenerVolume = true;
+        ApplySfxVolume(PlayerPrefs.GetFloat(SoundManager.SFX_VOLUME_PREF_KEY, 1f), persist: false);
+        SoundManager.OnSfxVolumeChanged += OnSharedSfxVolumeChanged;
         
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -90,7 +98,23 @@ public class UISoundManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        SoundManager.OnSfxVolumeChanged -= OnSharedSfxVolumeChanged;
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSharedSfxVolumeChanged(float volume)
+    {
+        ApplySfxVolume(volume, persist: false);
+    }
+
+    private void ApplySfxVolume(float volume, bool persist)
+    {
+        float clamped = Mathf.Clamp01(volume);
+        if (audioSource != null)
+            audioSource.volume = clamped;
+
+        if (persist)
+            PlayerPrefs.SetFloat(SoundManager.SFX_VOLUME_PREF_KEY, clamped);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

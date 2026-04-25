@@ -204,7 +204,6 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             {
                 completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
                 StartCoroutine(HideTextCoroutine(5f));
-
             }
         }
         return complete;

@@ -155,9 +155,26 @@ public class PauseScript : MonoBehaviour
 
         GUI.Label(new Rect(centerX, sliderBlockY + 40f, sliderWidth, 30f), "SFX Volume", labelStyle);
 
-        AudioListener.volume =
-            GUI.HorizontalSlider(new Rect(centerX, sliderBlockY + 70f, sliderWidth, sliderHeight),
-            AudioListener.volume, 0f, 1f);
+        float currentSfxVolume = 1f;
+        if (SoundManager.Instance != null)
+            currentSfxVolume = SoundManager.Instance.SfxVolume;
+        else if (UISoundManager.Instance != null)
+            currentSfxVolume = UISoundManager.Instance.SfxVolume;
+        else
+            currentSfxVolume = AudioListener.volume;
+
+        float newSfxVolume = GUI.HorizontalSlider(
+            new Rect(centerX, sliderBlockY + 70f, sliderWidth, sliderHeight),
+            currentSfxVolume, 0f, 1f);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.SfxVolume = newSfxVolume;
+
+        if (UISoundManager.Instance != null)
+            UISoundManager.Instance.SfxVolume = newSfxVolume;
+
+        // Keep global listener volume in sync for any one-off SFX paths not using the managers.
+        AudioListener.volume = newSfxVolume;
 
         float halfScreenWidth = Screen.width / 2f;
 

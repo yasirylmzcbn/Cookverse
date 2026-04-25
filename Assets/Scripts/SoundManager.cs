@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using System;
 
 /// <summary>
 /// Centralized sound manager for all game audio.
@@ -10,6 +11,8 @@ using UnityEngine.Serialization;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
+    public const string SFX_VOLUME_PREF_KEY = "Cookverse_SfxVolume";
+    public static event Action<float> OnSfxVolumeChanged;
 
     [Header("Player Sounds")]
     [Tooltip("Sound played when the player takes damage")]
@@ -89,6 +92,25 @@ public class SoundManager : MonoBehaviour
     [Tooltip("Sound played when shooting")]
     [SerializeField] private AudioClip shootSound;
 
+    [Header("Volume")]
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+
+    public float SfxVolume
+    {
+        get => sfxVolume;
+        set
+        {
+            float clamped = Mathf.Clamp01(value);
+            if (Mathf.Approximately(sfxVolume, clamped))
+                return;
+
+            sfxVolume = clamped;
+            ApplySfxVolume();
+            PlayerPrefs.SetFloat(SFX_VOLUME_PREF_KEY, sfxVolume);
+            OnSfxVolumeChanged?.Invoke(sfxVolume);
+        }
+    }
+
     private AudioSource audioSource;
 
     private void Awake()
@@ -109,6 +131,10 @@ public class SoundManager : MonoBehaviour
         audioSource.playOnAwake = false;
         audioSource.ignoreListenerVolume = true;
         audioSource.spatialBlend = 0f; // Global 2D sound
+
+        sfxVolume = PlayerPrefs.GetFloat(SFX_VOLUME_PREF_KEY, 1f);
+        ApplySfxVolume();
+        OnSfxVolumeChanged?.Invoke(sfxVolume);
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -190,5 +216,11 @@ public class SoundManager : MonoBehaviour
         {
             audioSource.PlayOneShot(clip, volume);
         }
+    }
+
+    private void ApplySfxVolume()
+    {
+        if (audioSource != null)
+            audioSource.volume = sfxVolume;
     }
 }
