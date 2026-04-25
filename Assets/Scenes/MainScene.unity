@@ -6970,7 +6970,7 @@ MonoBehaviour:
   musicVolume: 0.2
   mainMenuSceneName: MainMenu
   mainMenuMusic: {fileID: 0}
-  kitchenMusic: {fileID: 0}
+  kitchenMusic: {fileID: 8300000, guid: 2628a006e27ad5d4db94e9578b405d22, type: 3}
   combatEasyMusic: {fileID: 8300000, guid: a32c7492a73146c45b89e918ad214b50, type: 3}
   combatMediumMusic: {fileID: 8300000, guid: a32c7492a73146c45b89e918ad214b50, type: 3}
   combatHardMusic: {fileID: 8300000, guid: de6e520d7fdc44c4a8128df09204560f, type: 3}
