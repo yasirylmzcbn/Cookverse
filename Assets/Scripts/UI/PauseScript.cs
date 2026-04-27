@@ -20,13 +20,17 @@ public class PauseScript : MonoBehaviour
 
     [Header("Pause UI Calibration")]
     [Tooltip("Inspector-only scale for pause menu buttons and other interactive controls. This is not an in-game setting.")]
-    [SerializeField, Range(0.5f, 2f)] private float pauseUiButtonScale = 1f;
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiButtonScale = 1f;
     [Tooltip("Inspector-only scale for the distance between pause menu elements. This is not an in-game setting.")]
-    [SerializeField, Range(0.5f, 2f)] private float pauseUiSpacingScale = 1f;
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiSpacingScale = 1f;
     [Tooltip("Inspector-only scale for horizontal spacing between pause menu buttons. This is not an in-game setting.")]
-    [SerializeField, Range(0.5f, 3f)] private float pauseUiHorizontalSpacingScale = 1f;
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiHorizontalSpacingScale = 1f;
+    [Tooltip("Inspector-only scale for the vertical distance between pause menu volume sliders. This is not an in-game setting.")]
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiVolumeVerticalSpacingScale = 1f;
     [Tooltip("Inspector-only scale for pause menu text sizes. This is not an in-game setting.")]
-    [SerializeField, Range(0.5f, 2f)] private float pauseUiTextScale = 1f;
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiTextScale = 1f;
+    [Tooltip("Inspector-only scale for the tutorial overlay presentation. This is not an in-game setting.")]
+    [SerializeField, Range(0.1f, 10f)] private float pauseUiTutorialScale = 1f;
 
     private bool isTutorialOpen = false;
     private int tutorialSlideIndex = 0;
@@ -231,7 +235,17 @@ public class PauseScript : MonoBehaviour
         GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
 
-        GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), currentSlide, ScaleMode.ScaleAndCrop, true);
+        float tutorialWidth = Screen.width * pauseUiTutorialScale;
+        float tutorialHeight = Screen.height * pauseUiTutorialScale;
+        float tutorialX = (Screen.width - tutorialWidth) * 0.5f;
+        float tutorialY = (Screen.height - tutorialHeight) * 0.5f;
+
+        GUI.DrawTexture(
+            new Rect(tutorialX, tutorialY, tutorialWidth, tutorialHeight),
+            currentSlide,
+            ScaleMode.ScaleAndCrop,
+            true
+        );
     }
 
     private void OnGUI()
@@ -268,7 +282,7 @@ public class PauseScript : MonoBehaviour
         float sliderHeight = baseSliderHeight * pauseUiButtonScale;
         float centerX = (Screen.width - sliderWidth) / 2f;
         float sliderBlockY = Screen.height * 0.38f;
-        float sliderSpacing = 50f * pauseUiSpacingScale;
+        float sliderSpacing = 50f * pauseUiSpacingScale * pauseUiVolumeVerticalSpacingScale;
 
         GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
         {
@@ -300,8 +314,6 @@ public class PauseScript : MonoBehaviour
 
         ApplyVolumeSettings();
 
-        float halfScreenWidth = Screen.width / 2f;
-
         GUIStyle textStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleCenter,
@@ -316,9 +328,10 @@ public class PauseScript : MonoBehaviour
             normal = { textColor = Color.lightGray }
         };
 
+        float halfScreenWidth = Screen.width / 2f;
         float slotsStartY = Screen.height * 0.65f;
         float slotSpacing = 55f * pauseUiSpacingScale;
-        float horizontalSpacing = 10f * pauseUiHorizontalSpacingScale;
+        float horizontalSpacing = 12f * pauseUiHorizontalSpacingScale;
         bool combatActive = PlayerController.Instance != null && PlayerController.Instance.IsCombatEnabled;
         SwitchCamera switchCamera = FindFirstObjectByType<SwitchCamera>();
         bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
@@ -350,34 +363,9 @@ public class PauseScript : MonoBehaviour
 
         float saveButtonWidth = 100f * pauseUiButtonScale;
         float saveButtonHeight = 35f * pauseUiButtonScale;
-        float saveButtonGap = horizontalSpacing * pauseUiSpacingScale;
-        float slotLabelWidth = 80f * pauseUiTextScale;
-
         for (int i = 1; i <= 3; i++)
         {
             float slotY = slotsStartY + (i - 1) * slotSpacing;
-
-            GUI.Label(new Rect(halfScreenWidth - 250f, slotY, slotLabelWidth, 40f), "Slot " + i, textStyle);
-
-            GUI.enabled = !saveLoadDisabled;
-            Rect saveRect = new Rect(halfScreenWidth - 160f, slotY, saveButtonWidth, saveButtonHeight);
-            if (!saveLoadDisabled && saveRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10;
-            if (GUI.Button(saveRect, "Save"))
-            {
-                PlayPauseSound(hover: false);
-                if (GameManager.Instance != null)
-                    GameManager.Instance.SaveGame(i);
-            }
-
-            Rect loadRect = new Rect(saveRect.xMax + saveButtonGap, slotY, saveButtonWidth, saveButtonHeight);
-            if (!saveLoadDisabled && loadRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10 + 1;
-            if (GUI.Button(loadRect, "Load"))
-            {
-                PlayPauseSound(hover: false);
-                if (GameManager.Instance != null)
-                    GameManager.Instance.LoadGame(i);
-            }
-            GUI.enabled = true;
 
             string infoText = "Empty";
 
@@ -414,7 +402,42 @@ public class PauseScript : MonoBehaviour
                 infoText = $"Diff: {diff} | Items: {totalItems}";
             }
 
-            GUI.Label(new Rect(halfScreenWidth + 60f, slotY, 200f, 40f), infoText, infoStyle);
+            GUIContent slotContent = new GUIContent("Slot " + i);
+            GUIContent infoContent = new GUIContent(infoText);
+
+            float labelWidth = Mathf.Max(80f * pauseUiTextScale, textStyle.CalcSize(slotContent).x + horizontalSpacing);
+            float infoWidth = Mathf.Max(200f * pauseUiTextScale, infoStyle.CalcSize(infoContent).x + horizontalSpacing);
+            float rowGap = horizontalSpacing;
+
+            float totalRowWidth = labelWidth + rowGap + saveButtonWidth + rowGap + saveButtonWidth + rowGap + infoWidth;
+            float rowStartX = Mathf.Max(horizontalSpacing, (Screen.width - totalRowWidth) * 0.5f);
+
+            Rect labelRect = new Rect(rowStartX, slotY, labelWidth, 40f);
+            Rect saveRect = new Rect(labelRect.xMax + rowGap, slotY, saveButtonWidth, saveButtonHeight);
+            Rect loadRect = new Rect(saveRect.xMax + rowGap, slotY, saveButtonWidth, saveButtonHeight);
+            Rect infoRect = new Rect(loadRect.xMax + rowGap, slotY, infoWidth, 40f);
+
+            GUI.Label(labelRect, slotContent, textStyle);
+
+            GUI.enabled = !saveLoadDisabled;
+            if (!saveLoadDisabled && saveRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10;
+            if (GUI.Button(saveRect, "Save"))
+            {
+                PlayPauseSound(hover: false);
+                if (GameManager.Instance != null)
+                    GameManager.Instance.SaveGame(i);
+            }
+
+            if (!saveLoadDisabled && loadRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10 + 1;
+            if (GUI.Button(loadRect, "Load"))
+            {
+                PlayPauseSound(hover: false);
+                if (GameManager.Instance != null)
+                    GameManager.Instance.LoadGame(i);
+            }
+            GUI.enabled = true;
+
+            GUI.Label(infoRect, infoContent, infoStyle);
         }
 
         if (saveLoadDisabled)
