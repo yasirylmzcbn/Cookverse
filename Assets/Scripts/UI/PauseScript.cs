@@ -14,8 +14,21 @@ public class PauseScript : MonoBehaviour
     [SerializeField] private List<Texture2D> tutorialSlides = new List<Texture2D>();
     [SerializeField] private string tutorialButtonLabel = "Tutorial";
 
+    [Header("Initial Volume Sliders")]
+    [SerializeField, Range(0f, 1f)] private float initialMusicVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float initialSfxVolume = 1f;
+
     private bool isTutorialOpen = false;
     private int tutorialSlideIndex = 0;
+    private float currentMusicVolume;
+    private float currentSfxVolume;
+
+    private void Start()
+    {
+        currentMusicVolume = Mathf.Clamp01(initialMusicVolume);
+        currentSfxVolume = Mathf.Clamp01(initialSfxVolume);
+        ApplyVolumeSettings();
+    }
 
     void Update()
     {
@@ -257,35 +270,23 @@ public class PauseScript : MonoBehaviour
 
         GUI.Label(new Rect(centerX, sliderBlockY - 40f, sliderWidth, 30f), "Music Volume", labelStyle);
 
-        if (MusicManager.Instance != null)
-        {
-            MusicManager.Instance.MusicVolume =
-                GUI.HorizontalSlider(new Rect(centerX, sliderBlockY - 10f, sliderWidth, sliderHeight),
-                MusicManager.Instance.MusicVolume, 0f, 1f);
-        }
+        currentMusicVolume = GUI.HorizontalSlider(
+            new Rect(centerX, sliderBlockY - 10f, sliderWidth, sliderHeight),
+            currentMusicVolume,
+            0f,
+            1f
+        );
 
         GUI.Label(new Rect(centerX, sliderBlockY + 40f, sliderWidth, 30f), "SFX Volume", labelStyle);
 
-        float currentSfxVolume = 1f;
-        if (SoundManager.Instance != null)
-            currentSfxVolume = SoundManager.Instance.SfxVolume;
-        else if (UISoundManager.Instance != null)
-            currentSfxVolume = UISoundManager.Instance.SfxVolume;
-        else
-            currentSfxVolume = AudioListener.volume;
-
-        float newSfxVolume = GUI.HorizontalSlider(
+        currentSfxVolume = GUI.HorizontalSlider(
             new Rect(centerX, sliderBlockY + 70f, sliderWidth, sliderHeight),
-            currentSfxVolume, 0f, 1f);
+            currentSfxVolume,
+            0f,
+            1f
+        );
 
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.SfxVolume = newSfxVolume;
-
-        if (UISoundManager.Instance != null)
-            UISoundManager.Instance.SfxVolume = newSfxVolume;
-
-        // Keep global listener volume in sync for any one-off SFX paths not using the managers.
-        AudioListener.volume = newSfxVolume;
+        ApplyVolumeSettings();
 
         float halfScreenWidth = Screen.width / 2f;
 
@@ -417,7 +418,6 @@ public class PauseScript : MonoBehaviour
         }
 
         GUI.color = originalColor;
-
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         DrawUnlockAllTestingButton(ref currentHoveredId);
 #endif
@@ -428,6 +428,21 @@ public class PauseScript : MonoBehaviour
                 PlayPauseSound(hover: true);
             lastHoveredButtonId = currentHoveredId;
         }
+    }
+
+    private void ApplyVolumeSettings()
+    {
+        if (MusicManager.Instance != null)
+            MusicManager.Instance.MusicVolume = currentMusicVolume;
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.SfxVolume = currentSfxVolume;
+
+        if (UISoundManager.Instance != null)
+            UISoundManager.Instance.SfxVolume = currentSfxVolume;
+
+        // Keep global listener volume in sync for any one-off SFX paths not using the managers.
+        AudioListener.volume = currentSfxVolume;
     }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
