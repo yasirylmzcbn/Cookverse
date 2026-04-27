@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class PauseScript : MonoBehaviour
 {
+    public static PauseScript Instance { get; private set; }
+
     private bool isPaused = false;
 
     [Header("Pause Buttons")]
@@ -32,6 +34,12 @@ public class PauseScript : MonoBehaviour
     [Tooltip("Inspector-only scale for the tutorial overlay presentation. This is not an in-game setting.")]
     [SerializeField, Range(0.1f, 10f)] private float pauseUiTutorialScale = 1f;
 
+    [Header("Interaction Prompt Scaling")]
+    [Tooltip("Inspector-only scale for the 'Press E to cook' and difficulty prompt font sizes. This is not an in-game setting.")]
+    [SerializeField, Range(0.1f, 10f)] private float promptFontSizeScale = 1f;
+    [Tooltip("Inspector-only scale that moves the interaction prompts up and down on the screen. This is not an in-game setting.")]
+    [SerializeField, Range(0.1f, 10f)] private float promptVerticalPositionScale = 1f;
+
     private bool isTutorialOpen = false;
     private int tutorialSlideIndex = 0;
     private float currentMusicVolume;
@@ -42,6 +50,24 @@ public class PauseScript : MonoBehaviour
         currentMusicVolume = Mathf.Clamp01(initialMusicVolume);
         currentSfxVolume = Mathf.Clamp01(initialSfxVolume);
         ApplyVolumeSettings();
+    }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // No scene-specific rebinds needed right now.
     }
 
     void Update()
@@ -489,6 +515,9 @@ public class PauseScript : MonoBehaviour
         // Keep global listener volume in sync for any one-off SFX paths not using the managers.
         AudioListener.volume = currentSfxVolume;
     }
+
+    public float PromptFontSizeScale => promptFontSizeScale;
+    public float PromptVerticalPositionScale => promptVerticalPositionScale;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
     private void DrawUnlockAllTestingButton(ref int currentHoveredId, float buttonScale)
