@@ -30,6 +30,11 @@ public class Portal : MonoBehaviour
     [Header("Return Cooldown")]
     [SerializeField, Min(0f)] private float combatPortalDisableSeconds = 5f;
 
+    [Header("Cooldown Prompt")]
+    [SerializeField, Min(0f)] private float cooldownPromptDistance = 4f;
+    [SerializeField] private Vector3 cooldownPromptWorldOffset = new Vector3(0f, 2f, 0f);
+    [SerializeField] private int cooldownPromptFontSize = 28;
+
     private static float _combatPortalDisabledUntilUnscaled = -1f;
     private Collider _portalCollider;
     private Coroutine _reenableCombatPortalRoutine;
@@ -45,6 +50,35 @@ public class Portal : MonoBehaviour
 
         _portalCollider = GetComponent<Collider>();
         ApplyCombatPortalCooldownState();
+    }
+
+    private void OnGUI()
+    {
+        if (Time.timeScale == 0f)
+            return;
+
+        if (!ShouldShowCombatPortalCooldownPrompt())
+            return;
+
+        float secondsLeft = Mathf.Max(0f, _combatPortalDisabledUntilUnscaled - Time.unscaledTime);
+        int displaySeconds = Mathf.CeilToInt(secondsLeft);
+
+        Color previousColor = GUI.color;
+        GUI.color = Color.white;
+
+        GUIStyle style = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.Max(12, cooldownPromptFontSize),
+            richText = true
+        };
+
+        GUI.Label(
+            new Rect(0f, Screen.height * 0.7f, Screen.width, 100f),
+            $"You can go back in {displaySeconds} seconds",
+            style
+        );
+        GUI.color = previousColor;
     }
 
     private Vector3 GetSafeReturnOffset()
@@ -130,6 +164,32 @@ public class Portal : MonoBehaviour
     private static bool IsCombatPortalLocked()
     {
         return Time.unscaledTime < _combatPortalDisabledUntilUnscaled;
+    }
+
+    private bool ShouldShowCombatPortalCooldownPrompt()
+    {
+        if (sceneToLoad != combatSceneName)
+            return false;
+
+        if (!IsCombatPortalLocked())
+            return false;
+
+        if (PlayerController.Instance == null)
+            return false;
+
+        Transform source = PlayerController.Instance.InteractorSource != null
+            ? PlayerController.Instance.InteractorSource
+            : PlayerController.Instance.transform;
+
+        float maxDistance = Mathf.Max(0f, cooldownPromptDistance);
+        Vector3 referencePoint = transform.position;
+        if (_portalCollider != null)
+        {
+            referencePoint = _portalCollider.ClosestPoint(source.position);
+        }
+
+        float sqrDistance = (source.position - referencePoint).sqrMagnitude;
+        return sqrDistance <= maxDistance * maxDistance;
     }
 
     private void LockCombatPortalsAfterKitchenReturn()
