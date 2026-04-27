@@ -47,15 +47,19 @@ public class DifficultySetter : MonoBehaviour, IInteractable
 
         if (canInteract)
         {
+            PauseScript pauseScript = PauseScript.Instance != null ? PauseScript.Instance : FindFirstObjectByType<PauseScript>();
+            float promptFontSizeScale = pauseScript != null ? pauseScript.PromptFontSizeScale : 1f;
+            float promptVerticalPositionScale = pauseScript != null ? pauseScript.PromptVerticalPositionScale : 1f;
+
             Color originalColor = GUI.color;
             GUI.color = Color.white;
             GUIStyle style = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 36
+                fontSize = Mathf.RoundToInt(36f * promptFontSizeScale)
             };
 
-            GUI.Label(new Rect(0, Screen.height * 0.7f, Screen.width, 100f), "Press E to adjust the difficulty", style);
+            GUI.Label(new Rect(0, Screen.height * 0.7f * promptVerticalPositionScale, Screen.width, 100f), "Press E to adjust the difficulty", style);
             GUI.color = originalColor;
         }
     }
