@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Yeti Drumstick
   stackable: 0
   icon: {fileID: 21300000, guid: f8ce72679cbdd425b86a9fbe504fe31c, type: 3}
-  dropPrefab: {fileID: 2444061934136964041, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+  dropPrefab: {fileID: 2444061934136964041, guid: aad718de69b4d484e9961438bb8e4182, type: 3}

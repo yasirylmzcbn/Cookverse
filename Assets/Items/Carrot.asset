@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Carrot
   stackable: 0
   icon: {fileID: 21300000, guid: 3a19372d1b22542b480745008371d765, type: 3}
-  dropPrefab: {fileID: 7837687064494324331, guid: 8dc37b52e93f848739e7a8883af194db, type: 3}
+  dropPrefab: {fileID: 7837687064494324331, guid: f343ab43fc70fff47a47b39b630d6ac0, type: 3}

@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Werewolf Tail
   stackable: 0
   icon: {fileID: 21300000, guid: 7731a044277884ccca93b4f163361a18, type: 3}
-  dropPrefab: {fileID: 2444061934136964041, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+  dropPrefab: {fileID: 2444061934136964041, guid: 0c6abe07fb1e96c4db8f9c084419f566, type: 3}

@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Yeti Ribs
   stackable: 0
   icon: {fileID: 21300000, guid: b858bb27fd6f59e4dba8bf8311bcff0e, type: 3}
-  dropPrefab: {fileID: 2444061934136964041, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+  dropPrefab: {fileID: 2444061934136964041, guid: b1601ec11c7746a49a0bf71d349af5b0, type: 3}
