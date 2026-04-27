@@ -28,7 +28,7 @@ public class Portal : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float enterPortalSfxVolume = 1f;
 
     [Header("Return Cooldown")]
-    [SerializeField, Min(0f)] private float combatPortalDisableSeconds = 5f;
+    [SerializeField, Min(0f)] private float combatPortalDisableSeconds = 15f;
 
     [Header("Cooldown Prompt")]
     [SerializeField, Min(0f)] private float cooldownPromptDistance = 4f;
