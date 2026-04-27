@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da09a4fe5bebb534d965ee89ea3c4b74, type: 3}
-  m_Name: Potato
+  m_Name: Golden Egg
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Potato
+  itemName: Meat
   stackable: 0
-  icon: {fileID: 21300000, guid: 2caa9664d94594e5faaca401cb250b96, type: 3}
-  dropPrefab: {fileID: 1239875331138270109, guid: 7046f3a1af0b048d6a080a622594c5c1, type: 3}
+  icon: {fileID: 21300000, guid: c480c33663287a34aa5da9f068ed8ef3, type: 3}
+  dropPrefab: {fileID: 5898702171912911067, guid: 078bfa084a4d613458c17924a4a1a4ad, type: 3}

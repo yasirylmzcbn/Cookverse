@@ -113,6 +113,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   itemData: {fileID: 11400000, guid: 0f30e51203a8442debf66656aa344e66, type: 2}
+  pickupSound: {fileID: 8300000, guid: 86b2295f9548a2b4b9b73fef31bb3ec2, type: 3}
+  pickupSoundVolume: 1
 --- !u!65 &5093124404398003418
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da09a4fe5bebb534d965ee89ea3c4b74, type: 3}
-  m_Name: Steak
+  m_Name: Carrot
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Steak
+  itemName: Carrots
   stackable: 0
-  icon: {fileID: 21300000, guid: d9e12b723b78a4888897a00e753ae3f7, type: 3}
-  dropPrefab: {fileID: 2444061934136964041, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+  icon: {fileID: 21300000, guid: 3a19372d1b22542b480745008371d765, type: 3}
+  dropPrefab: {fileID: 7837687064494324331, guid: 8dc37b52e93f848739e7a8883af194db, type: 3}

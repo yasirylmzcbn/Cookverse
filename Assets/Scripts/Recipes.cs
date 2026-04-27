@@ -2,30 +2,36 @@ using System.Collections.Generic;
 
 public enum Ingredient
 {
-    Potato,
-    Tomato,
     Pepper,
-    Mushroom,
-    DraculaWing,
-    MerewolfSteak,
-    ManticoreTail
+    Tomato,
+    Carrot,
+    GoldenEgg,
+    WerewolfSteak,
+    WerewolfTail,
+    YetiRibs,
+    YetiDrumstick
 }
 
 public enum Recipe
 {
     PepperSteak,
-    DragulaCacciotare,
-    ManticoreRisotto,
-    Test
+    WerewolfTailSoup,
+    YetiBBQPlate,
+    Quackshuka,
+    NashvilleHotYeti,
+    Quacklet
 }
 
 public static class Recipes
 {
     public static readonly Dictionary<Recipe, List<Ingredient>> RecipeIngredients = new()
     {
-        { Recipe.PepperSteak, new List<Ingredient> { Ingredient.Pepper, Ingredient.MerewolfSteak } },
-        { Recipe.DragulaCacciotare, new List<Ingredient> { Ingredient.Pepper, Ingredient.DraculaWing } },
-        { Recipe.ManticoreRisotto, new List<Ingredient> { Ingredient.Pepper, Ingredient.ManticoreTail } }
+        { Recipe.PepperSteak, new List<Ingredient> { Ingredient.WerewolfSteak, Ingredient.Pepper } },
+        { Recipe.WerewolfTailSoup, new List<Ingredient> { Ingredient.Tomato, Ingredient.WerewolfTail } },
+        { Recipe.YetiBBQPlate, new List<Ingredient> { Ingredient.YetiRibs, Ingredient.Carrot } },
+        { Recipe.Quackshuka, new List<Ingredient> { Ingredient.GoldenEgg, Ingredient.Tomato } },
+        { Recipe.NashvilleHotYeti, new List<Ingredient> { Ingredient.YetiDrumstick, Ingredient.Carrot } },
+        { Recipe.Quacklet, new List<Ingredient> { Ingredient.WerewolfSteak, Ingredient.GoldenEgg } }
     };
 
     public static List<Ingredient> GetIngredientsForRecipe(Recipe recipe)
@@ -66,16 +72,14 @@ public static class Recipes
 
     public static bool IsProtein(Ingredient ingredient)
     {
-        return ingredient == Ingredient.MerewolfSteak ||
-               ingredient == Ingredient.DraculaWing ||
-               ingredient == Ingredient.ManticoreTail;
+        return ingredient == Ingredient.WerewolfSteak || 
+            ingredient == Ingredient.WerewolfTail || 
+            ingredient == Ingredient.YetiRibs || 
+            ingredient == Ingredient.YetiDrumstick;
     }
 
     public static bool IsVegetable(Ingredient ingredient)
     {
-        return ingredient == Ingredient.Potato ||
-               ingredient == Ingredient.Tomato ||
-               ingredient == Ingredient.Pepper ||
-               ingredient == Ingredient.Mushroom;
+        return !IsProtein(ingredient);
     }
 }
