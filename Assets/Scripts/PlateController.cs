@@ -12,8 +12,9 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     private AudioSource _audioSource;
 
     [Header("Recipe")]
-    [SerializeField] public Recipe recipe;
+    [SerializeField] public Recipe recipe; // Optional: leave empty for universal plate that works with all recipes
     private List<Ingredient> requiredIngredients;
+    private Recipe _detectedRecipe; // The recipe currently being made (auto-detected if recipe field is not set)
 
     [Header("Placement")]
     [Tooltip("Where the protein ingredient snaps to (create an empty child and assign it).")]
@@ -83,8 +84,42 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     public void Start()
     {
-        requiredIngredients = Recipes.GetIngredientsForRecipe(recipe);
+        // If recipe is explicitly set, pre-load its ingredients
+        if (!recipe.Equals(default(Recipe)))
+        {
+            requiredIngredients = Recipes.GetIngredientsForRecipe(recipe);
+        }
         ValidateRecipeCompletion();
+    }
+
+    /// <summary>
+    /// Finds which recipe matches the currently placed ingredients.
+    /// Returns the matching recipe, or the explicitly set recipe if one exists.
+    /// </summary>
+    private Recipe FindMatchingRecipe()
+    {
+        // If recipe is explicitly set, use that
+        if (!recipe.Equals(default(Recipe)))
+            return recipe;
+
+        // If no ingredients placed yet, return default
+        if (proteinIngredient == null || vegetableIngredient == null)
+            return default;
+
+        // Try to find a recipe that matches the placed ingredients
+        foreach (var recipeEntry in Recipes.RecipeIngredients)
+        {
+            Recipe potentialRecipe = recipeEntry.Key;
+            List<Ingredient> ingredientsNeeded = recipeEntry.Value;
+
+            if (ingredientsNeeded.Contains(proteinIngredient.IngredientType) &&
+                ingredientsNeeded.Contains(vegetableIngredient.IngredientType))
+            {
+                return potentialRecipe;
+            }
+        }
+
+        return default;
     }
     public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
@@ -181,10 +216,14 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     {
         RebindReferences();
 
-        if (requiredIngredients == null || requiredIngredients.Count == 0)
-            requiredIngredients = Recipes.GetIngredientsForRecipe(recipe);
-
         if (proteinIngredient == null || vegetableIngredient == null) return false;
+
+        // Determine which recipe is being made
+        _detectedRecipe = FindMatchingRecipe();
+        if (_detectedRecipe.Equals(default(Recipe)))
+            return false;
+
+        requiredIngredients = Recipes.GetIngredientsForRecipe(_detectedRecipe);
 
         bool hasRequiredProtein = requiredIngredients.Contains(proteinIngredient.IngredientType);
         bool hasRequiredVegetable = requiredIngredients.Contains(vegetableIngredient.IngredientType);
@@ -193,23 +232,23 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         if (complete && !_unlockedFired)
         {
             _unlockedFired = true;
-            Debug.Log("Recipe complete: " + recipe);
+            Debug.Log("Recipe complete: " + _detectedRecipe);
 
             bool unlockedNow = false;
 
             if (playerRecipeUnlocks != null)
-                unlockedNow = playerRecipeUnlocks.Unlock(recipe);
+                unlockedNow = playerRecipeUnlocks.Unlock(_detectedRecipe);
             else
-                Debug.LogWarning($"No PlayerRecipeUnlocks found. Recipe '{recipe}' won't be saved as unlocked.");
+                Debug.LogWarning($"No PlayerRecipeUnlocks found. Recipe '{_detectedRecipe}' won't be saved as unlocked.");
 
             if (autoEquipUnlockedSpell && recipeSpellDatabase != null && playerController != null)
             {
-                var spell = recipeSpellDatabase.GetSpellOrNull(recipe);
+                var spell = recipeSpellDatabase.GetSpellOrNull(_detectedRecipe);
             }
 
             if (completionText != null && unlockedNow)
             {
-                completionText.text = "You unlocked the " + recipe.ToString() + " recipe!";
+                completionText.text = "You unlocked the " + _detectedRecipe.ToString() + " recipe!";
                 StartCoroutine(HideTextCoroutine(5f));
             }
         }

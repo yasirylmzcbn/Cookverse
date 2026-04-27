@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AoEKnockbackSpell
   m_EditorClassIdentifier: Assembly-CSharp::AoEKnockbackSpell
   icon: {fileID: 21300000, guid: 13bf366283601c943aca410724468af3, type: 3}
-  requiresRecipeUnlock: 0
+  requiresRecipeUnlock: 1
   requiredRecipe: 5
   cooldownSeconds: 10
   radius: 7

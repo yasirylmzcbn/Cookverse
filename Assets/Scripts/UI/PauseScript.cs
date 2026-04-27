@@ -464,7 +464,17 @@ public class PauseScript : MonoBehaviour
                 PlayerRecipeUnlocks.Instance.UnlockAllRecipesForTesting();
 
             if (GameManager.Instance != null)
+            {
                 GameManager.Instance.UnlockAllDifficultiesForTesting();
+
+                // Give 90 of each ingredient
+                ItemData[] allItems = Resources.FindObjectsOfTypeAll<ItemData>();
+                foreach (ItemData item in allItems)
+                {
+                    if (item != null)
+                        GameManager.Instance.AddInventoryItem(item, 90);
+                }
+            }
 
             DifficultyUI difficultyUI = FindFirstObjectByType<DifficultyUI>(FindObjectsInactive.Include);
             if (difficultyUI != null)
