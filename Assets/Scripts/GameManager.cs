@@ -418,7 +418,7 @@ public class GameManager : MonoBehaviour
             {
                 slotIndex = i,
                 spellName = spell != null ? spell.name : string.Empty,
-                recipe = (spell != null && spell.requiresRecipeUnlock) ? (int)spell.requiredRecipe : -1
+                recipe = spell != null ? (int)spell.requiredRecipe : -1
             };
             result.Add(entry);
         }
@@ -469,7 +469,6 @@ public class GameManager : MonoBehaviour
                 foreach (SpellDefinition candidate in spellLookup.Values)
                 {
                     if (candidate != null
-                        && candidate.requiresRecipeUnlock
                         && candidate.requiredRecipe == recipe)
                     {
                         spell = candidate;

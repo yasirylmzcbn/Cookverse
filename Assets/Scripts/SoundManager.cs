@@ -71,6 +71,12 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip spellProjectileSound;
     [Tooltip("Sound played when a projectile hits something and disappears")]
     [SerializeField] private AudioClip spellProjectileImpactSound;
+    [Tooltip("Sound played when the lightning/stun spell is cast")]
+    [SerializeField] private AudioClip spellStunSound;
+    [Tooltip("Sound played when the ground slam spell is cast")]
+    [SerializeField] private AudioClip spellAoEDamageSound;
+    [Tooltip("Sound played when the forcefield/knockback spell is cast")]
+    [SerializeField] private AudioClip spellKnockbackSound;
 
     [Header("Cooking Sounds")]
     [Tooltip("Sound played when an ingredient is placed into cookware")]
@@ -185,6 +191,9 @@ public class SoundManager : MonoBehaviour
     public void PlaySpellHealSound() => PlayOneShot(spellHealSound);
     public void PlaySpellProjectileSound() => PlayOneShot(spellProjectileSound);
     public void PlaySpellProjectileImpactSound() => PlayOneShot(spellProjectileImpactSound);
+    public void PlaySpellStunSound() => PlayOneShot(spellStunSound);
+    public void PlaySpellAoEDamageSound() => PlayOneShot(spellAoEDamageSound);
+    public void PlaySpellKnockbackSound() => PlayOneShot(spellKnockbackSound);
     #endregion
 
     #region Cooking Sounds

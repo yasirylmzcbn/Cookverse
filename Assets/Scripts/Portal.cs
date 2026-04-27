@@ -27,6 +27,18 @@ public class Portal : MonoBehaviour
     [SerializeField] private AudioClip enterPortalSfx;
     [SerializeField, Range(0f, 1f)] private float enterPortalSfxVolume = 1f;
 
+    [Header("Return Cooldown")]
+    [SerializeField, Min(0f)] private float combatPortalDisableSeconds = 5f;
+
+    [Header("Cooldown Prompt")]
+    [SerializeField, Min(0f)] private float cooldownPromptDistance = 4f;
+    [SerializeField] private Vector3 cooldownPromptWorldOffset = new Vector3(0f, 2f, 0f);
+    [SerializeField] private int cooldownPromptFontSize = 28;
+
+    private static float _combatPortalDisabledUntilUnscaled = -1f;
+    private Collider _portalCollider;
+    private Coroutine _reenableCombatPortalRoutine;
+
     private void Start()
     {
         // If the portal has a looping ambient audio source attached to it, make sure it is global (2D) as requested.
@@ -35,6 +47,38 @@ public class Portal : MonoBehaviour
         {
             ambientSource.spatialBlend = 0f; // 0 is fully 2D (Global)
         }
+
+        _portalCollider = GetComponent<Collider>();
+        ApplyCombatPortalCooldownState();
+    }
+
+    private void OnGUI()
+    {
+        if (Time.timeScale == 0f)
+            return;
+
+        if (!ShouldShowCombatPortalCooldownPrompt())
+            return;
+
+        float secondsLeft = Mathf.Max(0f, _combatPortalDisabledUntilUnscaled - Time.unscaledTime);
+        int displaySeconds = Mathf.CeilToInt(secondsLeft);
+
+        Color previousColor = GUI.color;
+        GUI.color = Color.white;
+
+        GUIStyle style = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = Mathf.Max(12, cooldownPromptFontSize),
+            richText = true
+        };
+
+        GUI.Label(
+            new Rect(0f, Screen.height * 0.7f, Screen.width, 100f),
+            $"You can go back in {displaySeconds} seconds",
+            style
+        );
+        GUI.color = previousColor;
     }
 
     private Vector3 GetSafeReturnOffset()
@@ -51,6 +95,9 @@ public class Portal : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log("Portal triggered by: " + other.name);
+        if (sceneToLoad == combatSceneName && IsCombatPortalLocked())
+            return;
+
         if (other.CompareTag("Player"))
         {
             PlayPortalEnterSfxGlobal();
@@ -69,6 +116,10 @@ public class Portal : MonoBehaviour
 
                 playerController.ResetCombatState();
             }
+
+            if (sceneToLoad == cookingSceneName)
+                LockCombatPortalsAfterKitchenReturn();
+
             Potato_Shooter shooter = other.GetComponentInParent<Potato_Shooter>();
             if (shooter == null)
             {
@@ -108,6 +159,71 @@ public class Portal : MonoBehaviour
 
             SceneManager.LoadScene(sceneToLoad);
         }
+    }
+
+    private static bool IsCombatPortalLocked()
+    {
+        return Time.unscaledTime < _combatPortalDisabledUntilUnscaled;
+    }
+
+    private bool ShouldShowCombatPortalCooldownPrompt()
+    {
+        if (sceneToLoad != combatSceneName)
+            return false;
+
+        if (!IsCombatPortalLocked())
+            return false;
+
+        if (PlayerController.Instance == null)
+            return false;
+
+        float maxDistance = Mathf.Max(0f, cooldownPromptDistance);
+        Transform playerTransform = PlayerController.Instance.transform;
+        Vector3 playerPos = playerTransform.position;
+        Vector3 portalPos = transform.position;
+        playerPos.y = 0f;
+        portalPos.y = 0f;
+
+        float sqrDistance = (playerPos - portalPos).sqrMagnitude;
+        return sqrDistance <= maxDistance * maxDistance;
+    }
+
+    private void LockCombatPortalsAfterKitchenReturn()
+    {
+        if (combatPortalDisableSeconds <= 0f)
+            return;
+
+        _combatPortalDisabledUntilUnscaled = Time.unscaledTime + combatPortalDisableSeconds;
+        ApplyCombatPortalCooldownState();
+    }
+
+    private void ApplyCombatPortalCooldownState()
+    {
+        if (_portalCollider == null)
+            _portalCollider = GetComponent<Collider>();
+
+        if (_portalCollider == null)
+            return;
+
+        bool shouldDisable = sceneToLoad == combatSceneName && IsCombatPortalLocked();
+        _portalCollider.enabled = !shouldDisable;
+
+        if (shouldDisable && _reenableCombatPortalRoutine == null)
+            _reenableCombatPortalRoutine = StartCoroutine(ReenableCombatPortalWhenReady());
+    }
+
+    private System.Collections.IEnumerator ReenableCombatPortalWhenReady()
+    {
+        while (IsCombatPortalLocked())
+            yield return null;
+
+        if (_portalCollider == null)
+            _portalCollider = GetComponent<Collider>();
+
+        if (_portalCollider != null)
+            _portalCollider.enabled = true;
+
+        _reenableCombatPortalRoutine = null;
     }
 
     private void PlayPortalEnterSfxGlobal()

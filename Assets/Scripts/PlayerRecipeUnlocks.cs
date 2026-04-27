@@ -16,7 +16,7 @@ public class PlayerRecipeUnlocks : MonoBehaviour
     [SerializeField] private List<Recipe> unlockedOnStart = new List<Recipe>();
 
     [Header("Persistence")]
-    [SerializeField] private bool persistToPlayerPrefs = true;
+    [SerializeField] private bool persistToPlayerPrefs = false;
     [SerializeField] private string playerPrefsKey = "cookverse.unlockedRecipes";
 
     [Header("Audio")]
@@ -143,7 +143,7 @@ public class PlayerRecipeUnlocks : MonoBehaviour
     }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-    public void UnlockAllRecipesForTesting(bool saveToPrefs = true)
+    public void UnlockAllRecipesForTesting(bool saveToPrefs = false)
     {
         List<Recipe> allRecipes = new List<Recipe>();
 

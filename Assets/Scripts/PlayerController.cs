@@ -155,13 +155,14 @@ public class PlayerController : MonoBehaviour
     {
         SpellDefinition spell = GetSpell(slotIndex);
         if (spell == null) return false;
-        if (!spell.requiresRecipeUnlock) return true;
         return IsRecipeUnlocked(spell.requiredRecipe);
     }
 
     public bool TryEquipSpell(SpellDefinition spell, int slotIndex = -1)
     {
         if (spell == null) return false;
+        if (!IsRecipeUnlocked(spell.requiredRecipe))
+            return false;
         if (spellLoadout == null || spellLoadout.Length != 4)
             spellLoadout = new SpellDefinition[4];
 
@@ -725,7 +726,7 @@ public class PlayerController : MonoBehaviour
         bool unlocked = IsSpellUnlocked(slotIndex);
         if (!unlocked)
         {
-            Debug.LogWarning($"Spell '{spell.displayName}' in slot {slotIndex} is locked. RequiresRecipe={spell.requiresRecipeUnlock}, RequiredRecipe={spell.requiredRecipe}, HasUnlock={IsRecipeUnlocked(spell.requiredRecipe)}");
+            Debug.LogWarning($"Spell '{spell.displayName}' in slot {slotIndex} is locked. RequiredRecipe={spell.requiredRecipe}, HasUnlock={IsRecipeUnlocked(spell.requiredRecipe)}");
             return;
         }
         Debug.LogWarning($"{spell.displayName} is unlocked on slot " + slotIndex);

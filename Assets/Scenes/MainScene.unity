@@ -16147,8 +16147,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1401387913}
   m_HandleRect: {fileID: 1401387912}
   m_Direction: 2
-  m_Value: 1.0000002
-  m_Size: 0.7025833
+  m_Value: 1
+  m_Size: 0.66127753
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20741,6 +20741,9 @@ MonoBehaviour:
   spellHealSound: {fileID: 8300000, guid: 348ef75489ac2a84cb195d7f87e7bbb4, type: 3}
   spellProjectileSound: {fileID: 8300000, guid: 65a28ef022a08154785ed12880ec7c8a, type: 3}
   spellProjectileImpactSound: {fileID: 8300000, guid: 5e42afc6fae79594784e54ea5fadc83a, type: 3}
+  spellStunSound: {fileID: 8300000, guid: 6507f7c249e274b42b78a8ac5c57cc05, type: 3}
+  spellAoEDamageSound: {fileID: 8300000, guid: 5e42afc6fae79594784e54ea5fadc83a, type: 3}
+  spellKnockbackSound: {fileID: 8300000, guid: e6e687b62c1d34845860ad64a7a577e2, type: 3}
   kitchenPlaceSound: {fileID: 8300000, guid: 684a6e6e1159f5c41a24a5db50e23e65, type: 3}
   cookingSizzleSound: {fileID: 8300000, guid: 7f2313179c415554ab66d44bcedb806a, type: 3}
   cookingReadySound: {fileID: 8300000, guid: 198c8c344b6799a48878d2a5961893e0, type: 3}
@@ -21316,7 +21319,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1825057926}
   m_HandleRect: {fileID: 1825057925}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -22938,12 +22941,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRecipeUnlocks
   unlockedOnStart: 
-  persistToPlayerPrefs: 1
+  persistToPlayerPrefs: 0
   playerPrefsKey: cookverse.unlockedRecipes
   recipeUnlockedSfx: {fileID: 8300000, guid: 9078ecaea556a794f8ce2428130a56bc, type: 3}
   recipeUnlockedSfxVolume: 1
   detachFromPlayerOnAwake: 0
-  resetUnlocksOnSessionStart: 0
+  resetUnlocksOnSessionStart: 1
 --- !u!136 &2005958088
 CapsuleCollider:
   m_ObjectHideFlags: 0

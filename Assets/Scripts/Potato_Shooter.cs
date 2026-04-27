@@ -107,14 +107,24 @@ public class Potato_Shooter : MonoBehaviour
             return;
         }
 
+        // Already reloading, don't start another reload
         if (state == WeaponState.Reloading)
         {
             return;
         }
 
+        // Stop any active cooldown coroutine to allow reload
+        if (shootCooldownCoroutine != null)
+        {
+            StopCoroutine(shootCooldownCoroutine);
+            shootCooldownCoroutine = null;
+        }
+
+        // Stop any stale reload coroutine
         if (reloadCoroutine != null)
         {
-            return;
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
         }
 
         if (reloadSfx != null && _audioSource != null)
@@ -149,6 +159,18 @@ public class Potato_Shooter : MonoBehaviour
     // for respawning
     public void ResetAmmo()
     {
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+
+        if (shootCooldownCoroutine != null)
+        {
+            StopCoroutine(shootCooldownCoroutine);
+            shootCooldownCoroutine = null;
+        }
+
         currentAmmo = maxAmmo;
         state = WeaponState.Ready;
     }
