@@ -42,7 +42,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     [Tooltip("If true, when a recipe is completed its mapped spell will be equipped (if available).")]
     [SerializeField] private bool autoEquipUnlockedSpell = true;
 
-    private bool _unlockedFired;
+    private Recipe _unlockedRecipe = default; // Tracks which recipe was unlocked to allow multiple unlocks
 
     public Transform ProteinAnchor => proteinAnchor;
     public Transform VegetableAnchor => vegetableAnchor;
@@ -229,9 +229,13 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         bool hasRequiredVegetable = requiredIngredients.Contains(vegetableIngredient.IngredientType);
         bool complete = hasRequiredProtein && hasRequiredVegetable;
         Debug.Log("req:" + hasRequiredProtein + " veg:" + hasRequiredVegetable);
-        if (complete && !_unlockedFired)
+        
+        // Check if this is a new recipe (different from what was previously unlocked)
+        bool isNewRecipe = !_unlockedRecipe.Equals(_detectedRecipe);
+        
+        if (complete && isNewRecipe)
         {
-            _unlockedFired = true;
+            _unlockedRecipe = _detectedRecipe; // Mark this recipe as unlocked
             Debug.Log("Recipe complete: " + _detectedRecipe);
 
             bool unlockedNow = false;
@@ -254,7 +258,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         }
         else if (!complete)
         {
-            _unlockedFired = false;
+            _unlockedRecipe = default; // Reset when recipe is no longer complete
         }
 
         return complete;
