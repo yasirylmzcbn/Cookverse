@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AoEStunSpell
   icon: {fileID: 0}
   requiresRecipeUnlock: 0
-  requiredRecipe: 3
+  requiredRecipe: 4
   cooldownSeconds: 10
   radius: 5
   duration: 5

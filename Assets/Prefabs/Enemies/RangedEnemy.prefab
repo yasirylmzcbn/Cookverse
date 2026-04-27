@@ -192,9 +192,14 @@ MonoBehaviour:
   flashDuration: 0.1
   attackRange: 10
   dropList:
-  - itemData: {fileID: 11400000, guid: 628e7911d042445c29158c34fe5fd4d5, type: 2}
+  - itemData: {fileID: 11400000, guid: 5106e4e274a379445949b9d16b675858, type: 2}
     weight: 1
-  attackSound: {fileID: 8300000, guid: 7551d875ec0bc9a43aeaf78ffb28781f, type: 3}
+  - itemData: {fileID: 11400000, guid: bdb9866054f10fb44a1396f971382e75, type: 2}
+    weight: 1
+  - itemData: {fileID: 11400000, guid: cd1cf575a046f2e43b6126b186089d3c, type: 2}
+    weight: 1
+  - itemData: {fileID: 11400000, guid: e7aec4e41f15be248b3843f5adcfb548, type: 2}
+    weight: 1
   damage: 5
   attackCooldown: 2
   enemyBulletPrefab: {fileID: 6888836019528570085, guid: 91305abee79d9d54d826bd15c5cb42dd, type: 3}

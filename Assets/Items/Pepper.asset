@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da09a4fe5bebb534d965ee89ea3c4b74, type: 3}
-  m_Name: Meat
+  m_Name: Pepper
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Meat
+  itemName: Pepper
   stackable: 0
-  icon: {fileID: 0}
-  dropPrefab: {fileID: 5898702171912911067, guid: 078bfa084a4d613458c17924a4a1a4ad, type: 3}
+  icon: {fileID: 21300000, guid: 818ed417e505e4c8ab61a1dba861af16, type: 3}
+  dropPrefab: {fileID: 7837687064494324331, guid: eb098c205fdf8604583f5e80afebefcd, type: 3}

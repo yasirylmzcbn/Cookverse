@@ -229,9 +229,14 @@ MonoBehaviour:
   flashDuration: 0.1
   attackRange: 3
   dropList:
+  - itemData: {fileID: 11400000, guid: 628e7911d042445c29158c34fe5fd4d5, type: 2}
+    weight: 1
+  - itemData: {fileID: 11400000, guid: 0aa446328656e3f46a52af5c3973019c, type: 2}
+    weight: 1
+  - itemData: {fileID: 11400000, guid: 3d7f23784240c44ca96f61ddaaf7b2d6, type: 2}
+    weight: 1
   - itemData: {fileID: 11400000, guid: 0f30e51203a8442debf66656aa344e66, type: 2}
     weight: 1
-  attackSound: {fileID: 8300000, guid: 7551d875ec0bc9a43aeaf78ffb28781f, type: 3}
   damage: 1
   attackCooldown: 0.25
 --- !u!65 &7706587683828808451

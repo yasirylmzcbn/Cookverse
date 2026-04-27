@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5076401932632648552}
   - component: {fileID: 511600146165470020}
   m_Layer: 6
-  m_Name: Steak
+  m_Name: WerewolfSteak
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65547fb4d6e3a45d08bb428a4eb61dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenIngredientController
-  ingredientType: 5
+  ingredientType: 4
   rawForm: {fileID: 2910483639006140095}
   choppedForm: {fileID: 6504491841459510738}
   cookedVisualMode: 0
@@ -106,12 +106,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2444061934136964041}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f001fc1427f09404689c7a8823acd93b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
   itemData: {fileID: 11400000, guid: 628e7911d042445c29158c34fe5fd4d5, type: 2}
+  pickupSound: {fileID: 8300000, guid: 86b2295f9548a2b4b9b73fef31bb3ec2, type: 3}
+  pickupSoundVolume: 1
 --- !u!65 &511600146165470020
 BoxCollider:
   m_ObjectHideFlags: 0

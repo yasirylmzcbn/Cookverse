@@ -14,9 +14,10 @@ public class KitchenIngredientController : MonoBehaviour
     [SerializeField] private Ingredient ingredientType;
 
     public Ingredient IngredientType => ingredientType;
-    public bool IsProteinIngredient => ingredientType == Ingredient.DraculaWing
-                                     || ingredientType == Ingredient.MerewolfSteak
-                                     || ingredientType == Ingredient.ManticoreTail;
+    public bool IsProteinIngredient => ingredientType == Ingredient.WerewolfSteak ||
+            ingredientType == Ingredient.WerewolfTail ||
+            ingredientType == Ingredient.YetiRibs ||
+            ingredientType == Ingredient.YetiDrumstick;
     public bool IsVegetableIngredient => !IsProteinIngredient;
 
     [Header("Forms")]

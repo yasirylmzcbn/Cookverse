@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1756577890584578352}
   - component: {fileID: 5093124404398003418}
   m_Layer: 6
-  m_Name: Tomato
+  m_Name: Pepper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65547fb4d6e3a45d08bb428a4eb61dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenIngredientController
-  ingredientType: 1
+  ingredientType: 0
   rawForm: {fileID: 1544849334864511687}
   choppedForm: {fileID: 3270002228608154616}
   cookedVisualMode: 0
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f001fc1427f09404689c7a8823acd93b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickup
-  itemData: {fileID: 11400000, guid: 0f30e51203a8442debf66656aa344e66, type: 2}
+  itemData: {fileID: 11400000, guid: 3d7f23784240c44ca96f61ddaaf7b2d6, type: 2}
   pickupSound: {fileID: 8300000, guid: 86b2295f9548a2b4b9b73fef31bb3ec2, type: 3}
   pickupSoundVolume: 1
 --- !u!65 &5093124404398003418

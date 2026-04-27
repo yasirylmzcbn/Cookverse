@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da09a4fe5bebb534d965ee89ea3c4b74, type: 3}
-  m_Name: Steak
+  m_Name: Yeti Ribs
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Steak
+  itemName: Yeti Ribs
   stackable: 0
-  icon: {fileID: 21300000, guid: d9e12b723b78a4888897a00e753ae3f7, type: 3}
-  dropPrefab: {fileID: 2444061934136964041, guid: 64dd0c6bbc9564fadaea9e4dd0bf0608, type: 3}
+  icon: {fileID: 21300000, guid: b858bb27fd6f59e4dba8bf8311bcff0e, type: 3}
+  dropPrefab: {fileID: 2444061934136964041, guid: b1601ec11c7746a49a0bf71d349af5b0, type: 3}
