@@ -28,8 +28,6 @@ public class AoEKnockbackSpell : SpellDefinition
         if (context.player == null) return;
 
         Vector3 center = context.player.transform.position;
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.PlaySpellKnockbackSound();
         int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer, hitMask, QueryTriggerInteraction.Ignore);
 
         HashSet<Enemy> pushed = new HashSet<Enemy>();

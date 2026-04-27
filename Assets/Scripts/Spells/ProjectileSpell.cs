@@ -21,9 +21,6 @@ public class ProjectileSpell : SpellDefinition
     {
         if (projectilePrefab == null) return;
 
-        if (SoundManager.Instance != null)
-            SoundManager.Instance.PlaySpellProjectileSound();
-
         Transform origin = context.origin != null ? context.origin : (context.player != null ? context.player.transform : null);
         if (origin == null) return;
 
