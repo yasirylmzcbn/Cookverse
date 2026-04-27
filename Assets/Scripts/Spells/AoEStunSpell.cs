@@ -24,6 +24,8 @@ public class AoEStunSpell : SpellDefinition
         if (context.player == null) return;
 
         Vector3 center = context.player.transform.position;
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellStunSound();
         int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer, hitMask, QueryTriggerInteraction.Ignore);
 
         HashSet<Enemy> stunned = new HashSet<Enemy>();

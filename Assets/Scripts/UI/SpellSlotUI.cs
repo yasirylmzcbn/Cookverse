@@ -34,6 +34,7 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void Init(SpellDefinition spell, SpellMenuUI menu)
     {
         EnsureImageWiring();
+        EnsureNameWiring();
         Spell = spell;
         _menu = menu;
         if (iconImage != null && spell.icon != null)
@@ -148,6 +149,14 @@ public class SpellSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         Button button = GetComponent<Button>();
         if (button != null && button.transition != Selectable.Transition.None)
             button.transition = Selectable.Transition.None;
+    }
+
+    private void EnsureNameWiring()
+    {
+        if (spellNameText != null)
+            return;
+
+        spellNameText = GetComponentInChildren<TextMeshProUGUI>(true);
     }
 
     private void ApplyBackgroundColor()

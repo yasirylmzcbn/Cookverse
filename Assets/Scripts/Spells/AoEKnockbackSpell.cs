@@ -28,6 +28,8 @@ public class AoEKnockbackSpell : SpellDefinition
         if (context.player == null) return;
 
         Vector3 center = context.player.transform.position;
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySpellKnockbackSound();
         int count = Physics.OverlapSphereNonAlloc(center, radius, _overlapBuffer, hitMask, QueryTriggerInteraction.Ignore);
 
         HashSet<Enemy> pushed = new HashSet<Enemy>();
@@ -52,7 +54,7 @@ public class AoEKnockbackSpell : SpellDefinition
             Vector3 knockbackDir = (flatDir + Vector3.up * knockbackUpwardBias).normalized;
             Vector3 force = knockbackDir * knockbackForce;
 
-            // Hand off to the AI component — it handles disabling the agent
+            // Hand off to the AI component ï¿½ it handles disabling the agent
             EnemyMovementAI ai = enemy.GetComponent<EnemyMovementAI>();
             if (ai != null)
                 ai.ApplyKnockback(force, 1.2f); // 1.2s is usually enough for the arc
