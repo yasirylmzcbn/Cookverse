@@ -177,18 +177,14 @@ public class Portal : MonoBehaviour
         if (PlayerController.Instance == null)
             return false;
 
-        Transform source = PlayerController.Instance.InteractorSource != null
-            ? PlayerController.Instance.InteractorSource
-            : PlayerController.Instance.transform;
-
         float maxDistance = Mathf.Max(0f, cooldownPromptDistance);
-        Vector3 referencePoint = transform.position;
-        if (_portalCollider != null)
-        {
-            referencePoint = _portalCollider.ClosestPoint(source.position);
-        }
+        Transform playerTransform = PlayerController.Instance.transform;
+        Vector3 playerPos = playerTransform.position;
+        Vector3 portalPos = transform.position;
+        playerPos.y = 0f;
+        portalPos.y = 0f;
 
-        float sqrDistance = (source.position - referencePoint).sqrMagnitude;
+        float sqrDistance = (playerPos - portalPos).sqrMagnitude;
         return sqrDistance <= maxDistance * maxDistance;
     }
 
