@@ -107,23 +107,24 @@ public class Potato_Shooter : MonoBehaviour
             return;
         }
 
-        if (shootCooldownCoroutine != null && state == WeaponState.Cooldown)
-        {
-            StopCoroutine(shootCooldownCoroutine);
-            shootCooldownCoroutine = null;
-        }
-
-        if (reloadCoroutine != null && state != WeaponState.Reloading)
-            reloadCoroutine = null;
-
+        // Already reloading, don't start another reload
         if (state == WeaponState.Reloading)
         {
             return;
         }
 
+        // Stop any active cooldown coroutine to allow reload
+        if (shootCooldownCoroutine != null)
+        {
+            StopCoroutine(shootCooldownCoroutine);
+            shootCooldownCoroutine = null;
+        }
+
+        // Stop any stale reload coroutine
         if (reloadCoroutine != null)
         {
-            return;
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
         }
 
         if (reloadSfx != null && _audioSource != null)
