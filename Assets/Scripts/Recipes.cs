@@ -72,10 +72,11 @@ public static class Recipes
 
     public static bool IsProtein(Ingredient ingredient)
     {
-        return ingredient == Ingredient.WerewolfSteak || 
-            ingredient == Ingredient.WerewolfTail || 
-            ingredient == Ingredient.YetiRibs || 
-            ingredient == Ingredient.YetiDrumstick;
+        return ingredient == Ingredient.WerewolfSteak ||
+            ingredient == Ingredient.WerewolfTail ||
+            ingredient == Ingredient.YetiRibs ||
+            ingredient == Ingredient.YetiDrumstick ||
+            ingredient == Ingredient.GoldenEgg;
     }
 
     public static bool IsVegetable(Ingredient ingredient)

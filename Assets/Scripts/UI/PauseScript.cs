@@ -205,6 +205,12 @@ public class PauseScript : MonoBehaviour
         if (PlayerController.Instance != null)
             Destroy(PlayerController.Instance.gameObject);
 
+        // Reset unlocked difficulty so returning to main menu starts a fresh session.
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResetUnlockedDifficultyToEasy();
+        }
+
         if (!string.IsNullOrWhiteSpace(mainMenuSceneName))
         {
             SceneManager.LoadScene(mainMenuSceneName);

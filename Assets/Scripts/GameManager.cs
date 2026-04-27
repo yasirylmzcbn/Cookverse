@@ -316,6 +316,17 @@ public class GameManager : MonoBehaviour
         currentDifficulty = Difficulty.Easy;
     }
 
+    /// <summary>
+    /// Reset the player's max/unlocked difficulty (last completed) to Easy.
+    /// Call this when returning to the main menu to start a fresh session.
+    /// This only changes in-memory state; saved slots are not modified.
+    /// </summary>
+    public void ResetUnlockedDifficultyToEasy()
+    {
+        lastCompletedDifficulty = Difficulty.Easy;
+        Debug.Log("GameManager: Reset lastCompletedDifficulty to Easy");
+    }
+
     public void SetMediumDifficulty()
     {
         firstWave = 10;
