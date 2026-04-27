@@ -27,6 +27,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<ItemData> allItemsDatabase = new List<ItemData>();
     private readonly Dictionary<string, ItemData> _itemLookup = new Dictionary<string, ItemData>(StringComparer.OrdinalIgnoreCase);
 
+    void Start()
+    {
+        //added for debugging
+        if (allItemsDatabase != null && allItemsDatabase.Count >= 2)
+        {
+            items[allItemsDatabase[0]] = 1;
+            items[allItemsDatabase[1]] = 1;
+            OnInventoryChanged?.Invoke();
+        }
+    }
+
     public Difficulty GetLastCompletedDifficulty()
     {
         return lastCompletedDifficulty;
@@ -301,7 +312,7 @@ public class GameManager : MonoBehaviour
     {
         firstWave = 1;
         currentWave = 1;
-        lastWave = 5;
+        lastWave = 3;
         currentDifficulty = Difficulty.Easy;
     }
 
@@ -309,7 +320,7 @@ public class GameManager : MonoBehaviour
     {
         firstWave = 10;
         currentWave = 10;
-        lastWave = 19;
+        lastWave = 15;
         currentDifficulty = Difficulty.Medium;
     }
 
@@ -317,7 +328,7 @@ public class GameManager : MonoBehaviour
     {
         firstWave = 20;
         currentWave = 20;
-        lastWave = 29;
+        lastWave = 27;
         currentDifficulty = Difficulty.Hard;
     }
 
