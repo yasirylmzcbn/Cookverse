@@ -52,10 +52,10 @@ MonoBehaviour:
   ingredientType: 2
   rawForm: {fileID: 3949612899192384529}
   choppedForm: {fileID: 3430125924393539552}
-  cookedVisualMode: 1
-  cookedMaterial: {fileID: 0}
-  burntMaterial: {fileID: 0}
-  cookedForm: {fileID: 3949612899192384529}
+  cookedVisualMode: 0
+  cookedMaterial: {fileID: 2100000, guid: f24a79778d3c345fc8f7e1e52735d8a9, type: 2}
+  burntMaterial: {fileID: 2100000, guid: 11914f65ec8164ff9bf7f1f25034c93f, type: 2}
+  cookedForm: {fileID: 0}
   kitchenCamera: {fileID: 0}
   interactLayers:
     serializedVersion: 2
@@ -153,15 +153,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4091493676812278141, guid: 2b64e55e2ba72cc42804c35f4d30e3b4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.10000038
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4091493676812278141, guid: 2b64e55e2ba72cc42804c35f4d30e3b4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.019270182
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4091493676812278141, guid: 2b64e55e2ba72cc42804c35f4d30e3b4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.032850266
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4091493676812278141, guid: 2b64e55e2ba72cc42804c35f4d30e3b4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -220,15 +220,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5322930932306322313, guid: 1473e8761428dcd44a8962866ef4fc6a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.10000038
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5322930932306322313, guid: 1473e8761428dcd44a8962866ef4fc6a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.05248022
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5322930932306322313, guid: 1473e8761428dcd44a8962866ef4fc6a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.032850266
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5322930932306322313, guid: 1473e8761428dcd44a8962866ef4fc6a, type: 3}
       propertyPath: m_LocalRotation.w
