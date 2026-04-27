@@ -192,6 +192,14 @@ public class SpellMenuUI : MonoBehaviour
         RebindReferences();
         if (playerController == null || spell == null) return;
 
+        if (TryUnequipSpell(spell))
+        {
+            _selectedDiamondSlot = -1;
+            RefreshDiamonds();
+            RebuildSpellList();
+            return;
+        }
+
         if (_selectedDiamondSlot < 0)
         {
             if (!TryAutoEquipSpell(spell) && spellDescText != null)
@@ -201,6 +209,28 @@ public class SpellMenuUI : MonoBehaviour
 
         AssignSpellToSlot(spell, _selectedDiamondSlot);
         _selectedDiamondSlot = -1;  // deselect after assigning
+    }
+
+    private bool TryUnequipSpell(SpellDefinition spell)
+    {
+        RebindReferences();
+        if (playerController == null || spell == null)
+            return false;
+
+        var loadout = playerController.GetLoadout();
+        if (loadout == null)
+            return false;
+
+        for (int i = 0; i < loadout.Length; i++)
+        {
+            if (loadout[i] == spell)
+            {
+                playerController.UnequipSpell(i);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // ── Hover description ─────────────────────────────────────
