@@ -2268,8 +2268,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a55c2502658c4343885e3c7f67f75b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
-  sensX: 45
-  sensY: 37
+  sensX: 28
+  sensY: 26
   smoothing: 0.05
   lookAction:
     m_Name: Look
@@ -15788,7 +15788,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1369411309
 Transform:
   m_ObjectHideFlags: 0
@@ -16120,7 +16120,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1401387913}
   m_HandleRect: {fileID: 1401387912}
   m_Direction: 2
-  m_Value: 0.9999996
+  m_Value: 1.0000002
   m_Size: 0.7025833
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -21292,7 +21292,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1825057926}
   m_HandleRect: {fileID: 1825057925}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

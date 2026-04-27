@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    public float sensX = 45f;
-    public float sensY = 37f;
+    public float sensX = 28f;
+    public float sensY = 26f;
 
     [Header("Smoothing")]
     [SerializeField, Range(0f, 1f)] private float smoothing = 0.1f; // 0 = no smoothing, higher = more lag
