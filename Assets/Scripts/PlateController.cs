@@ -83,7 +83,8 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
     public void Start()
     {
-        requiredIngredients = Recipes.RecipeIngredients[recipe];
+        requiredIngredients = Recipes.GetIngredientsForRecipe(recipe);
+        ValidateRecipeCompletion();
     }
     public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
@@ -137,7 +138,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             proteinIngredient = ingredient;
             ingredient.SnapInto(GetProteinAnchor());
             PlayOneShot(placeOnPlateSfx, placeOnPlateSfxVolume);
-            IsRecipeComplete();
+            ValidateRecipeCompletion();
             return true;
         }
         else if (isVegetable && !HasVegetableIngredient())
@@ -145,7 +146,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             vegetableIngredient = ingredient;
             ingredient.SnapInto(GetVegetableAnchor());
             PlayOneShot(placeOnPlateSfx, placeOnPlateSfxVolume);
-            IsRecipeComplete();
+            ValidateRecipeCompletion();
             return true;
         }
 
@@ -161,6 +162,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         {
             proteinIngredient = null;
             ingredient.OnRemovedFromSlot();
+            ValidateRecipeCompletion();
             return true;
         }
 
@@ -168,6 +170,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         {
             vegetableIngredient = null;
             ingredient.OnRemovedFromSlot();
+            ValidateRecipeCompletion();
             return true;
         }
 
@@ -178,9 +181,13 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     {
         RebindReferences();
 
+        if (requiredIngredients == null || requiredIngredients.Count == 0)
+            requiredIngredients = Recipes.GetIngredientsForRecipe(recipe);
+
         if (proteinIngredient == null || vegetableIngredient == null) return false;
-        bool hasRequiredProtein = requiredIngredients.Exists(ing => proteinIngredient != null && ing == proteinIngredient.IngredientType);
-        bool hasRequiredVegetable = requiredIngredients.Exists(ing => vegetableIngredient != null && ing == vegetableIngredient.IngredientType);
+
+        bool hasRequiredProtein = requiredIngredients.Contains(proteinIngredient.IngredientType);
+        bool hasRequiredVegetable = requiredIngredients.Contains(vegetableIngredient.IngredientType);
         bool complete = hasRequiredProtein && hasRequiredVegetable;
         Debug.Log("req:" + hasRequiredProtein + " veg:" + hasRequiredVegetable);
         if (complete && !_unlockedFired)
@@ -206,7 +213,17 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
                 StartCoroutine(HideTextCoroutine(5f));
             }
         }
+        else if (!complete)
+        {
+            _unlockedFired = false;
+        }
+
         return complete;
+    }
+
+    private void ValidateRecipeCompletion()
+    {
+        IsRecipeComplete();
     }
 
     private System.Collections.IEnumerator HideTextCoroutine(float delay)

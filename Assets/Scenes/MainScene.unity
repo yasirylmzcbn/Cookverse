@@ -22941,12 +22941,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRecipeUnlocks
   unlockedOnStart: 
-  persistToPlayerPrefs: 1
+  persistToPlayerPrefs: 0
   playerPrefsKey: cookverse.unlockedRecipes
   recipeUnlockedSfx: {fileID: 8300000, guid: 9078ecaea556a794f8ce2428130a56bc, type: 3}
   recipeUnlockedSfxVolume: 1
   detachFromPlayerOnAwake: 0
-  resetUnlocksOnSessionStart: 0
+  resetUnlocksOnSessionStart: 1
 --- !u!136 &2005958088
 CapsuleCollider:
   m_ObjectHideFlags: 0

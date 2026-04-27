@@ -107,6 +107,15 @@ public class Potato_Shooter : MonoBehaviour
             return;
         }
 
+        if (shootCooldownCoroutine != null && state == WeaponState.Cooldown)
+        {
+            StopCoroutine(shootCooldownCoroutine);
+            shootCooldownCoroutine = null;
+        }
+
+        if (reloadCoroutine != null && state != WeaponState.Reloading)
+            reloadCoroutine = null;
+
         if (state == WeaponState.Reloading)
         {
             return;
@@ -149,6 +158,18 @@ public class Potato_Shooter : MonoBehaviour
     // for respawning
     public void ResetAmmo()
     {
+        if (reloadCoroutine != null)
+        {
+            StopCoroutine(reloadCoroutine);
+            reloadCoroutine = null;
+        }
+
+        if (shootCooldownCoroutine != null)
+        {
+            StopCoroutine(shootCooldownCoroutine);
+            shootCooldownCoroutine = null;
+        }
+
         currentAmmo = maxAmmo;
         state = WeaponState.Ready;
     }

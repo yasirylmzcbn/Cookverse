@@ -27,6 +27,13 @@ public class Portal : MonoBehaviour
     [SerializeField] private AudioClip enterPortalSfx;
     [SerializeField, Range(0f, 1f)] private float enterPortalSfxVolume = 1f;
 
+    [Header("Return Cooldown")]
+    [SerializeField, Min(0f)] private float combatPortalDisableSeconds = 5f;
+
+    private static float _combatPortalDisabledUntilUnscaled = -1f;
+    private Collider _portalCollider;
+    private Coroutine _reenableCombatPortalRoutine;
+
     private void Start()
     {
         // If the portal has a looping ambient audio source attached to it, make sure it is global (2D) as requested.
@@ -35,6 +42,9 @@ public class Portal : MonoBehaviour
         {
             ambientSource.spatialBlend = 0f; // 0 is fully 2D (Global)
         }
+
+        _portalCollider = GetComponent<Collider>();
+        ApplyCombatPortalCooldownState();
     }
 
     private Vector3 GetSafeReturnOffset()
@@ -51,6 +61,9 @@ public class Portal : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log("Portal triggered by: " + other.name);
+        if (sceneToLoad == combatSceneName && IsCombatPortalLocked())
+            return;
+
         if (other.CompareTag("Player"))
         {
             PlayPortalEnterSfxGlobal();
@@ -69,6 +82,10 @@ public class Portal : MonoBehaviour
 
                 playerController.ResetCombatState();
             }
+
+            if (sceneToLoad == cookingSceneName)
+                LockCombatPortalsAfterKitchenReturn();
+
             Potato_Shooter shooter = other.GetComponentInParent<Potato_Shooter>();
             if (shooter == null)
             {
@@ -108,6 +125,49 @@ public class Portal : MonoBehaviour
 
             SceneManager.LoadScene(sceneToLoad);
         }
+    }
+
+    private static bool IsCombatPortalLocked()
+    {
+        return Time.unscaledTime < _combatPortalDisabledUntilUnscaled;
+    }
+
+    private void LockCombatPortalsAfterKitchenReturn()
+    {
+        if (combatPortalDisableSeconds <= 0f)
+            return;
+
+        _combatPortalDisabledUntilUnscaled = Time.unscaledTime + combatPortalDisableSeconds;
+        ApplyCombatPortalCooldownState();
+    }
+
+    private void ApplyCombatPortalCooldownState()
+    {
+        if (_portalCollider == null)
+            _portalCollider = GetComponent<Collider>();
+
+        if (_portalCollider == null)
+            return;
+
+        bool shouldDisable = sceneToLoad == combatSceneName && IsCombatPortalLocked();
+        _portalCollider.enabled = !shouldDisable;
+
+        if (shouldDisable && _reenableCombatPortalRoutine == null)
+            _reenableCombatPortalRoutine = StartCoroutine(ReenableCombatPortalWhenReady());
+    }
+
+    private System.Collections.IEnumerator ReenableCombatPortalWhenReady()
+    {
+        while (IsCombatPortalLocked())
+            yield return null;
+
+        if (_portalCollider == null)
+            _portalCollider = GetComponent<Collider>();
+
+        if (_portalCollider != null)
+            _portalCollider.enabled = true;
+
+        _reenableCombatPortalRoutine = null;
     }
 
     private void PlayPortalEnterSfxGlobal()
