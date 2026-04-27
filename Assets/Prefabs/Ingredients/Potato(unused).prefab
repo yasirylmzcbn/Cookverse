@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -435113693819528513}
   - component: {fileID: 1016338548708688470}
   m_Layer: 6
-  m_Name: Potato
+  m_Name: Potato(unused)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
