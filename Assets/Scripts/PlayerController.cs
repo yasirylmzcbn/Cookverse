@@ -745,9 +745,38 @@ public class PlayerController : MonoBehaviour
         var context = new SpellCastContext(this, origin, forward);
         if (!spell.CanCast(in context)) return;
 
+        PlaySpellCastSound(spell);
         spell.Cast(in context);
         float cd = Mathf.Max(0f, spell.cooldownSeconds);
         _nextSpellTimes[slotIndex] = Time.time + cd;
+    }
+
+    private void PlaySpellCastSound(SpellDefinition spell)
+    {
+        if (SoundManager.Instance == null || spell == null)
+            return;
+
+        switch (spell)
+        {
+            case ProjectileSpell:
+                SoundManager.Instance.PlaySpellProjectileSound();
+                break;
+            case HealSpell:
+                SoundManager.Instance.PlaySpellHealSound();
+                break;
+            case TimedBuffSpell:
+                SoundManager.Instance.PlaySpellSpeedSound();
+                break;
+            case AoEStunSpell:
+                SoundManager.Instance.PlaySpellStunSound();
+                break;
+            case AoEDamageSpell:
+                SoundManager.Instance.PlaySpellAoEDamageSound();
+                break;
+            case AoEKnockbackSpell:
+                SoundManager.Instance.PlaySpellKnockbackSound();
+                break;
+        }
     }
 
     public void EnablePickupTrigger(bool enable)
