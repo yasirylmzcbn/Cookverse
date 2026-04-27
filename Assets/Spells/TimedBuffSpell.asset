@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimedBuffSpell
   icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   requiresRecipeUnlock: 1
-  requiredRecipe: 0
+  requiredRecipe: 2
   cooldownSeconds: 10
   durationSeconds: 5
   moveSpeedMultiplier: 5
