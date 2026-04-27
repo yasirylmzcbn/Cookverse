@@ -14,7 +14,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     [Header("Recipe")]
     [SerializeField] public Recipe recipe; // Optional: leave empty for universal plate that works with all recipes
     private List<Ingredient> requiredIngredients;
-    private Recipe _detectedRecipe; // The recipe currently being made (auto-detected if recipe field is not set)
+    private Recipe? _detectedRecipe; // The recipe currently being made (auto-detected if recipe field is not set)
 
     [Header("Placement")]
     [Tooltip("Where the protein ingredient snaps to (create an empty child and assign it).")]
@@ -42,7 +42,8 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     [Tooltip("If true, when a recipe is completed its mapped spell will be equipped (if available).")]
     [SerializeField] private bool autoEquipUnlockedSpell = true;
 
-    private Recipe _unlockedRecipe = default; // Tracks which recipe was unlocked to allow multiple unlocks
+    private Recipe? _unlockedRecipe = null; // Tracks which recipe was unlocked to allow multiple unlocks
+    private bool _hasUnlockedRecipe;
 
     public Transform ProteinAnchor => proteinAnchor;
     public Transform VegetableAnchor => vegetableAnchor;
@@ -96,15 +97,15 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
     /// Finds which recipe matches the currently placed ingredients.
     /// Returns the matching recipe, or the explicitly set recipe if one exists.
     /// </summary>
-    private Recipe FindMatchingRecipe()
+    private Recipe? FindMatchingRecipe()
     {
         // If recipe is explicitly set, use that
         if (!recipe.Equals(default(Recipe)))
             return recipe;
 
-        // If no ingredients placed yet, return default
+        // If no ingredients placed yet, return null
         if (proteinIngredient == null || vegetableIngredient == null)
-            return default;
+            return null;
 
         // Try to find a recipe that matches the placed ingredients
         foreach (var recipeEntry in Recipes.RecipeIngredients)
@@ -119,7 +120,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             }
         }
 
-        return default;
+        return null;
     }
     public override bool CanAcceptIngredient(KitchenIngredientController ingredient)
     {
@@ -220,13 +221,13 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
 
         // Determine which recipe is being made
         _detectedRecipe = FindMatchingRecipe();
-        if (_detectedRecipe.Equals(default(Recipe)))
+        if (!_detectedRecipe.HasValue)
         {
             Debug.Log($"No matching recipe found for ingredients: protein={proteinIngredient.IngredientType}, vegetable={vegetableIngredient.IngredientType}");
             return false;
         }
 
-        requiredIngredients = Recipes.GetIngredientsForRecipe(_detectedRecipe);
+        requiredIngredients = Recipes.GetIngredientsForRecipe(_detectedRecipe.Value);
 
         bool hasRequiredProtein = requiredIngredients.Contains(proteinIngredient.IngredientType);
         bool hasRequiredVegetable = requiredIngredients.Contains(vegetableIngredient.IngredientType);
@@ -234,19 +235,20 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         Debug.Log($"Recipe check for {_detectedRecipe}: protein={proteinIngredient.IngredientType} (required={hasRequiredProtein}), vegetable={vegetableIngredient.IngredientType} (required={hasRequiredVegetable}), complete={complete}");
         
         // Check if this is a new recipe (different from what was previously unlocked)
-        bool isNewRecipe = !_unlockedRecipe.Equals(_detectedRecipe);
+        bool isNewRecipe = !_hasUnlockedRecipe || !_unlockedRecipe.HasValue || !_unlockedRecipe.Value.Equals(_detectedRecipe.Value);
         
         if (complete && isNewRecipe)
         {
             _unlockedRecipe = _detectedRecipe; // Mark this recipe as unlocked
+            _hasUnlockedRecipe = true;
             Debug.Log($"*** RECIPE COMPLETE: {_detectedRecipe} - Triggering unlock sequence ***");
 
             bool unlockedNow = false;
 
             if (playerRecipeUnlocks != null)
             {
-                unlockedNow = playerRecipeUnlocks.Unlock(_detectedRecipe);
-                Debug.Log($"Unlock result for {_detectedRecipe}: {unlockedNow}");
+                unlockedNow = playerRecipeUnlocks.Unlock(_detectedRecipe.Value);
+                Debug.Log($"Unlock result for {_detectedRecipe.Value}: {unlockedNow}");
             }
             else
                 Debug.LogWarning($"No PlayerRecipeUnlocks found. Recipe '{_detectedRecipe}' won't be saved as unlocked.");
@@ -254,10 +256,10 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
             // Try to auto-equip the spell if enabled
             if (autoEquipUnlockedSpell && recipeSpellDatabase != null && playerController != null)
             {
-                SpellDefinition spell = recipeSpellDatabase.GetSpellOrNull(_detectedRecipe);
+                SpellDefinition spell = recipeSpellDatabase.GetSpellOrNull(_detectedRecipe.Value);
                 if (spell != null)
                 {
-                    Debug.Log($"Found spell {spell.name} for recipe {_detectedRecipe}. Attempting auto-equip...");
+                    Debug.Log($"Found spell {spell.name} for recipe {_detectedRecipe.Value}. Attempting auto-equip...");
                     // Find first empty spell slot and equip there
                     bool spellEquipped = false;
                     for (int i = 0; i < 4; i++)
@@ -273,15 +275,15 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
                         Debug.LogWarning($"Could not auto-equip spell {spell.name} - all slots full or TryEquipSpell failed");
                 }
                 else
-                    Debug.LogWarning($"No spell found for recipe {_detectedRecipe}");
+                    Debug.LogWarning($"No spell found for recipe {_detectedRecipe.Value}");
             }
             else
                 Debug.Log($"Auto-equip disabled or missing components. autoEquipUnlockedSpell={autoEquipUnlockedSpell}, db={recipeSpellDatabase != null}, controller={playerController != null}");
 
             if (completionText != null)
             {
-                completionText.text = "You unlocked the " + _detectedRecipe.ToString() + " recipe!";
-                Debug.Log($"Displaying completion text for {_detectedRecipe}");
+                completionText.text = "You unlocked the " + _detectedRecipe.Value.ToString() + " recipe!";
+                Debug.Log($"Displaying completion text for {_detectedRecipe.Value}");
                 StartCoroutine(HideTextCoroutine(5f));
             }
             else
@@ -289,6 +291,7 @@ public class PlateController : IngredientSlotBehaviour, IDualAnchorIngredientSlo
         }
         else if (!complete)
         {
+            _hasUnlockedRecipe = false;
             _unlockedRecipe = default; // Reset when recipe is no longer complete
         }
 
