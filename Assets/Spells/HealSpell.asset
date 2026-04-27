@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7145b298108d047f6ae248b6fcb9f490, type: 3}
   m_Name: HealSpell
   m_EditorClassIdentifier: Assembly-CSharp::HealSpell
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8b5d4f8380a1aff46878db9a14934a13, type: 3}
   requiresRecipeUnlock: 1
   requiredRecipe: 1
   cooldownSeconds: 10

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82fe0d782ff974be2a98f35ab1b3f511, type: 3}
   m_Name: ProjectileSpell
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileSpell
-  icon: {fileID: 21300000, guid: 5a135fab96998c64caf5a538a15186b9, type: 3}
+  icon: {fileID: 21300000, guid: 89a1c820eda4fda48b73acdc76540997, type: 3}
   requiresRecipeUnlock: 1
   requiredRecipe: 0
   cooldownSeconds: 10

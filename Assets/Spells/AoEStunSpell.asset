@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f64b46554173154fbdf90c0c2ba619c, type: 3}
   m_Name: AoEStunSpell
   m_EditorClassIdentifier: Assembly-CSharp::AoEStunSpell
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 410ae9159bc2bb44aa6cb8195aac8204, type: 3}
   requiresRecipeUnlock: 0
   requiredRecipe: 4
   cooldownSeconds: 10
