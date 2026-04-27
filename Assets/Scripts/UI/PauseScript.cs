@@ -18,6 +18,16 @@ public class PauseScript : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float initialMusicVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float initialSfxVolume = 1f;
 
+    [Header("Pause UI Calibration")]
+    [Tooltip("Inspector-only scale for pause menu buttons and other interactive controls. This is not an in-game setting.")]
+    [SerializeField, Range(0.5f, 2f)] private float pauseUiButtonScale = 1f;
+    [Tooltip("Inspector-only scale for the distance between pause menu elements. This is not an in-game setting.")]
+    [SerializeField, Range(0.5f, 2f)] private float pauseUiSpacingScale = 1f;
+    [Tooltip("Inspector-only scale for horizontal spacing between pause menu buttons. This is not an in-game setting.")]
+    [SerializeField, Range(0.5f, 3f)] private float pauseUiHorizontalSpacingScale = 1f;
+    [Tooltip("Inspector-only scale for pause menu text sizes. This is not an in-game setting.")]
+    [SerializeField, Range(0.5f, 2f)] private float pauseUiTextScale = 1f;
+
     private bool isTutorialOpen = false;
     private int tutorialSlideIndex = 0;
     private float currentMusicVolume;
@@ -227,7 +237,6 @@ public class PauseScript : MonoBehaviour
     private void OnGUI()
     {
         if (!isPaused) return;
-
         if (isTutorialOpen)
         {
             DrawTutorialOverlay();
@@ -244,7 +253,7 @@ public class PauseScript : MonoBehaviour
         GUIStyle titleStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleCenter,
-            fontSize = 36
+            fontSize = Mathf.RoundToInt(36f * pauseUiTextScale)
         };
 
         GUI.Label(
@@ -253,22 +262,25 @@ public class PauseScript : MonoBehaviour
             titleStyle
         );
 
-        float sliderWidth = 300f;
-        float sliderHeight = 30f;
+        float baseSliderWidth = 300f;
+        float baseSliderHeight = 30f;
+        float sliderWidth = baseSliderWidth * pauseUiButtonScale;
+        float sliderHeight = baseSliderHeight * pauseUiButtonScale;
         float centerX = (Screen.width - sliderWidth) / 2f;
         float sliderBlockY = Screen.height * 0.38f;
+        float sliderSpacing = 50f * pauseUiSpacingScale;
 
         GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleLeft,
-            fontSize = 24,
+            fontSize = Mathf.RoundToInt(24f * pauseUiTextScale),
             normal = { textColor = Color.white }
         };
         labelStyle.hover.textColor = labelStyle.normal.textColor;
         labelStyle.active.textColor = labelStyle.normal.textColor;
         labelStyle.focused.textColor = labelStyle.normal.textColor;
 
-        GUI.Label(new Rect(centerX, sliderBlockY - 40f, sliderWidth, 30f), "Music Volume", labelStyle);
+        GUI.Label(new Rect(centerX, sliderBlockY - sliderSpacing, sliderWidth, 30f), "Music Volume", labelStyle);
 
         currentMusicVolume = GUI.HorizontalSlider(
             new Rect(centerX, sliderBlockY - 10f, sliderWidth, sliderHeight),
@@ -277,10 +289,10 @@ public class PauseScript : MonoBehaviour
             1f
         );
 
-        GUI.Label(new Rect(centerX, sliderBlockY + 40f, sliderWidth, 30f), "SFX Volume", labelStyle);
+        GUI.Label(new Rect(centerX, sliderBlockY + sliderSpacing - 10f, sliderWidth, 30f), "SFX Volume", labelStyle);
 
         currentSfxVolume = GUI.HorizontalSlider(
-            new Rect(centerX, sliderBlockY + 70f, sliderWidth, sliderHeight),
+            new Rect(centerX, sliderBlockY + sliderSpacing + 20f, sliderWidth, sliderHeight),
             currentSfxVolume,
             0f,
             1f
@@ -293,25 +305,30 @@ public class PauseScript : MonoBehaviour
         GUIStyle textStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleCenter,
-            fontSize = 20,
+            fontSize = Mathf.RoundToInt(20f * pauseUiTextScale),
             normal = { textColor = Color.white }
         };
 
         GUIStyle infoStyle = new GUIStyle(GUI.skin.label)
         {
             alignment = TextAnchor.MiddleLeft,
-            fontSize = 16,
+            fontSize = Mathf.RoundToInt(16f * pauseUiTextScale),
             normal = { textColor = Color.lightGray }
         };
 
         float slotsStartY = Screen.height * 0.65f;
+        float slotSpacing = 55f * pauseUiSpacingScale;
+        float horizontalSpacing = 10f * pauseUiHorizontalSpacingScale;
         bool combatActive = PlayerController.Instance != null && PlayerController.Instance.IsCombatEnabled;
         SwitchCamera switchCamera = FindFirstObjectByType<SwitchCamera>();
         bool cookingActive = switchCamera != null && switchCamera.IsInKitchenCamera;
         bool saveLoadDisabled = combatActive || cookingActive;
         int currentHoveredId = -1;
 
-        Rect mainMenuRect = new Rect(20f, 20f, 150f, 36f);
+        float menuButtonWidth = 150f * pauseUiButtonScale;
+        float menuButtonHeight = 36f * pauseUiButtonScale;
+
+        Rect mainMenuRect = new Rect(20f, 20f, menuButtonWidth, menuButtonHeight);
         if (mainMenuRect.Contains(Event.current.mousePosition))
             currentHoveredId = 2001;
         if (GUI.Button(mainMenuRect, "Main Menu"))
@@ -322,7 +339,7 @@ public class PauseScript : MonoBehaviour
             return;
         }
 
-        Rect tutorialRect = new Rect(Screen.width - 170f, 20f, 150f, 36f);
+        Rect tutorialRect = new Rect(Screen.width - horizontalSpacing - menuButtonWidth, 20f, menuButtonWidth, menuButtonHeight);
         if (tutorialRect.Contains(Event.current.mousePosition))
             currentHoveredId = 2002;
         if (GUI.Button(tutorialRect, tutorialButtonLabel))
@@ -331,14 +348,19 @@ public class PauseScript : MonoBehaviour
             OpenTutorialFromPause();
         }
 
+        float saveButtonWidth = 100f * pauseUiButtonScale;
+        float saveButtonHeight = 35f * pauseUiButtonScale;
+        float saveButtonGap = horizontalSpacing * pauseUiSpacingScale;
+        float slotLabelWidth = 80f * pauseUiTextScale;
+
         for (int i = 1; i <= 3; i++)
         {
-            float slotY = slotsStartY + (i - 1) * 55f;
+            float slotY = slotsStartY + (i - 1) * slotSpacing;
 
-            GUI.Label(new Rect(halfScreenWidth - 250f, slotY, 80f, 40f), "Slot " + i, textStyle);
+            GUI.Label(new Rect(halfScreenWidth - 250f, slotY, slotLabelWidth, 40f), "Slot " + i, textStyle);
 
             GUI.enabled = !saveLoadDisabled;
-            Rect saveRect = new Rect(halfScreenWidth - 160f, slotY, 100f, 35f);
+            Rect saveRect = new Rect(halfScreenWidth - 160f, slotY, saveButtonWidth, saveButtonHeight);
             if (!saveLoadDisabled && saveRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10;
             if (GUI.Button(saveRect, "Save"))
             {
@@ -347,7 +369,7 @@ public class PauseScript : MonoBehaviour
                     GameManager.Instance.SaveGame(i);
             }
 
-            Rect loadRect = new Rect(halfScreenWidth - 50f, slotY, 100f, 35f);
+            Rect loadRect = new Rect(saveRect.xMax + saveButtonGap, slotY, saveButtonWidth, saveButtonHeight);
             if (!saveLoadDisabled && loadRect.Contains(Event.current.mousePosition)) currentHoveredId = i * 10 + 1;
             if (GUI.Button(loadRect, "Load"))
             {
@@ -400,7 +422,7 @@ public class PauseScript : MonoBehaviour
             GUIStyle combatInfoStyle = new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleCenter,
-                fontSize = 16,
+                fontSize = Mathf.RoundToInt(16f * pauseUiTextScale),
                 normal = { textColor = new Color(1f, 0.8f, 0.4f) }
             };
 
@@ -411,7 +433,7 @@ public class PauseScript : MonoBehaviour
                     : "Save/Load disabled while cooking";
 
             GUI.Label(
-                new Rect(halfScreenWidth - 250f, slotsStartY - 35f, 500f, 25f),
+                new Rect(halfScreenWidth - 250f, slotsStartY - 35f * pauseUiSpacingScale, 500f, 25f),
                 reasonText,
                 combatInfoStyle
             );
@@ -419,7 +441,7 @@ public class PauseScript : MonoBehaviour
 
         GUI.color = originalColor;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        DrawUnlockAllTestingButton(ref currentHoveredId);
+        DrawUnlockAllTestingButton(ref currentHoveredId, pauseUiButtonScale);
 #endif
 
         if (currentHoveredId != lastHoveredButtonId)
@@ -446,11 +468,11 @@ public class PauseScript : MonoBehaviour
     }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-    private void DrawUnlockAllTestingButton(ref int currentHoveredId)
+    private void DrawUnlockAllTestingButton(ref int currentHoveredId, float buttonScale)
     {
-        const float buttonWidth = 150f;
-        const float buttonHeight = 40f;
-        const float margin = 20f;
+        float buttonWidth = 150f * buttonScale;
+        float buttonHeight = 40f * buttonScale;
+        float margin = 20f * buttonScale;
 
         Rect unlockAllRect = new Rect(margin, Screen.height - buttonHeight - margin, buttonWidth, buttonHeight);
         if (unlockAllRect.Contains(Event.current.mousePosition))
