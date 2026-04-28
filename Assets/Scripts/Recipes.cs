@@ -75,7 +75,7 @@ public static class Recipes
         return ingredient == Ingredient.WerewolfSteak ||
             ingredient == Ingredient.WerewolfTail ||
             ingredient == Ingredient.YetiRibs ||
-            ingredient == Ingredient.YetiDrumstick ||
+            ingredient == Ingredient.YetiDrumstick;
     }
 
     public static bool IsVegetable(Ingredient ingredient)
