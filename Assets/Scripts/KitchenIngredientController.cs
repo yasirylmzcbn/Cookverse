@@ -18,7 +18,6 @@ public class KitchenIngredientController : MonoBehaviour
             ingredientType == Ingredient.WerewolfTail ||
             ingredientType == Ingredient.YetiRibs ||
             ingredientType == Ingredient.YetiDrumstick ||
-            ingredientType == Ingredient.GoldenEgg;
     public bool IsVegetableIngredient => !IsProteinIngredient;
 
     [Header("Forms")]
